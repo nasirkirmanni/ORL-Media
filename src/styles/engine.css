@@ -702,3 +702,21 @@ body.eng-body::after {
   .mod__ctabtn, .eng__finalbtn, .mod__next svg, .eng__rowarrow, .eng__q summary { transition: none; }
   .mod__delivergrid li:hover, .eng__row:hover, .mod__ctabtn:hover, .eng__finalbtn:hover { transform: none; }
 }
+
+/* ── mobile touch targets ──
+   Audited at 375px. These are the module-page controls that fell under the
+   44px floor: the hero breadcrumb, every link in the system ladder, and the
+   "next system" footer link. Scoped to small screens and coarse pointers so
+   desktop spacing is untouched. */
+@media (max-width: 900px), (pointer: coarse) {
+  .mod__crumb a,
+  .mod__next {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .mod__stripline a {
+    min-height: 44px;
+    align-items: center;
+  }
+}

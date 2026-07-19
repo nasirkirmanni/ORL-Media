@@ -673,7 +673,7 @@ html, body {
     #8a8580 70%,
     #6e6964 80%,
     #564f4b 90%,
-    #17171a 100%
+    #4a423e 100%
   );
 }
 .orl3__particles {
@@ -772,37 +772,136 @@ html, body {
   isolation: isolate;
 }
 
-/* ── THE GROUND ──
-   Host for the "Mesh drift" shader (components/MeshDriftBackdrop.astro).
-   Keeps a flat dark fill of its own so the section is never bright before
-   the canvas paints, and stays correct with no WebGL and no JS. */
+/* ── THE SKY ──
+   A viewport-tall backdrop, absolutely covering the whole flow, carrying a
+   single flat colour that JS rewrites on scroll. Because the colour is
+   uniform across the entire layer, every pixel on screen changes tone
+   together as you scroll — the same thing a pinned backdrop achieves, with
+   none of the sticky containing-block risk. */
 .orl3__fade {
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  overflow: hidden;
-  background-color: #131315;
+  /* no-JS / pre-hydration fallback: the mid-tone of the run, so the
+     chapters are always legible even if the driver never starts */
+  background-color: #3d3835;
 }
-.mdrift { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease; }
-.mdrift.is-live { opacity: 1; }
-.mdrift__canvas { display: block; width: 100%; height: 100%; }
 
-/* ── THE SCRIM — load-bearing, not decoration ──
-   The chapter copy in this section is CREAM and sits directly on this ground.
-   The shader palette's brightest entry is #f5f5f5, and its own contrast of
-   1.158 clips that to pure white, where the muted copy measures 1.39:1 and
-   is simply invisible.
+/* ── weather container ──
+   Holds the blooms and the cloud layer, and exists purely to CONTAIN them.
+   Both are deliberately larger than the viewport, and without clipping they
+   spilled several hundred pixels above the run — washing grey over the cream
+   intro. overflow:hidden stops the bleed; the mask then fades the decoration
+   out at the top and bottom edges, so clipping never shows as a hard cut. */
+.orl3__weather {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 5%, #000 95%, transparent 100%);
+}
 
-   Measured against that clipped peak: 0.62 alpha still fails (muted 3.91),
-   0.68 is the first pass (4.86). 0.72 is used for margin — muted 5.65, ink
-   6.85. Lowering this below 0.68 breaks the body copy at the shader's bright
-   spots, which move, so it will not fail consistently or obviously. */
-.mdrift::after {
+.orl3__blob {
+  position: absolute;
+  left: 50%;
+  width: min(125vw, 1500px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  /* alpha is a variable so a shorter section can dial it down — see
+     .orl3__weather--tight on the Metrics layer */
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 243, 226, var(--blob-a, 0.13)),
+    rgba(255, 243, 226, calc(var(--blob-a, 0.13) * 0.42)) 42%,
+    rgba(255, 243, 226, 0) 70%
+  );
+  /* transform-only animation — stays on the compositor, no layout or paint */
+  will-change: transform;
+}
+.orl3__blob--1 { top:  2%; animation: o3drift-a 21s ease-in-out infinite; }
+.orl3__blob--2 { top: 18%; animation: o3drift-b 27s ease-in-out infinite; }
+.orl3__blob--3 { top: 35%; animation: o3drift-a 24s ease-in-out infinite -8s; }
+.orl3__blob--4 { top: 52%; animation: o3drift-b 29s ease-in-out infinite -13s; }
+.orl3__blob--5 { top: 68%; animation: o3drift-a 25s ease-in-out infinite -4s; }
+.orl3__blob--6 { top: 85%; animation: o3drift-b 23s ease-in-out infinite -17s; }
+
+/* the two cycles pull in opposite directions so neighbouring blooms never
+   drift in lockstep — that is what stops it reading as one sliding sheet */
+@keyframes o3drift-a {
+  0%, 100% { transform: translate(-68%, -50%) scale(1); }
+  50%      { transform: translate(-32%, -46%) scale(1.18); }
+}
+@keyframes o3drift-b {
+  0%, 100% { transform: translate(-32%, -50%) scale(1.12); }
+  50%      { transform: translate(-70%, -54%) scale(0.94); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orl3__blob { animation: none; transform: translate(-50%, -50%); }
+}
+
+
+/* ── Metrics layer: the chapters' ground, at this section's scale ──
+   Reuses .orl3__weather / .orl3__blob verbatim so the two read as one
+   material. Two deviations, both forced by the section being 745px tall
+   against the chapters' 4260px:
+
+   1. Three blooms, not six — six would sit permanently stacked.
+   2. --blob-a drops 0.13 -> 0.055. Blooms overlap far more in a short
+      container, and at the full 0.13 two overlapping lift the ground to
+      #56514a, where --ml-muted measures 3.48:1 and --ml-gold 3.73:1. At
+      0.055 the peak ground is #34302c and the worst token holds 5.78:1.
+      Raising this without re-checking those two tokens breaks them. */
+.orl3__weather--tight { --blob-a: 0.055; }
+.orl3__weather--tight .orl3__blob { width: min(90vw, 1000px); }
+.orl3__blob--m1 { top: 12%; animation: o3drift-a 23s ease-in-out infinite; }
+.orl3__blob--m2 { top: 48%; animation: o3drift-b 29s ease-in-out infinite -9s; }
+.orl3__blob--m3 { top: 84%; animation: o3drift-a 26s ease-in-out infinite -15s; }
+
+/* ── drifting shadow clouds ──
+   The counterpart to the light blooms, and the stronger half of the effect:
+   these only ever DARKEN, so they cost nothing in contrast and can run at
+   an alpha the light blooms could never reach. */
+.orl3__weather::before {
+  content: '';
+  position: absolute;
+  inset: -8% -22%;
+  background-image:
+    radial-gradient(circle at 18% 6%,  rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0) 34%),
+    radial-gradient(circle at 76% 19%, rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0) 30%),
+    radial-gradient(circle at 33% 38%, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0) 32%),
+    radial-gradient(circle at 84% 55%, rgba(0, 0, 0, 0.26), rgba(0, 0, 0, 0) 30%),
+    radial-gradient(circle at 22% 71%, rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0) 33%),
+    radial-gradient(circle at 68% 88%, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0) 31%);
+  animation: o3clouds 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes o3clouds {
+  from { transform: translate3d(-2.5%, 0, 0) scale(1); }
+  to   { transform: translate3d(3.5%, -1.8%, 0) scale(1.07); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orl3__weather::before { animation: none; }
+}
+
+/* edge falloff, sized to the VIEWPORT via fixed attachment rather than
+   stretched over the whole 4300px layer. Sits after the blooms in paint
+   order, so the flanks stay dark no matter where a bloom drifts. */
+.orl3__fade::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(14, 14, 16, 0.72);
+  background-image: radial-gradient(
+    ellipse 78% 46% at 50% 50%,
+    rgba(0, 0, 0, 0) 42%,
+    rgba(0, 0, 0, 0.26) 100%
+  );
+  background-attachment: fixed;
+  /* the vignette only exists over the flow, so without this it switches on at
+     the flow's top edge — a second seam right under the first */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 6%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 6%);
 }
 
 /* The per-chapter colours below are no longer painted as gradients — they
@@ -834,8 +933,8 @@ html, body {
   /* picks up exactly where the intro's descent band ends. #4a423e is the
      lightest tone in the whole run — every other value is darker, so the
      flat sky can never wash out the cream type at any scroll position. */
-  --o3-from: #17171a;
-  --o3-hold: #17171a;
+  --o3-from: #4a423e;
+  --o3-hold: #4a423e;
   --o3-to:   #201d1a;
 }
 .orl3__chapter--sx {                 /* 02 Signals — the rise */
@@ -875,7 +974,14 @@ html, body {
      ink/muted separation is narrower as a result, so the copy hierarchy
      leans on weight and scale rather than colour alone. */
   --o3-muted: #e0dace;
-  --o3-soft: #cfc7b9;
+  /* Lifted from #cfc7b9. That value was validated against the FLAT sky colour
+     (5.85) before the drifting blooms existed. A bloom centre lifts the
+     lightest ground from #4a423e to #625953, where #cfc7b9 falls to 4.07:1 —
+     so it has been failing wherever a bloom passes under the copy since the
+     blooms were added. #d8d1c5 holds 4.51 at a bloom centre, 6.47 flat.
+     Ink, pos and muted were all already clear at that ground; this was the
+     only token below the line. */
+  --o3-soft: #d8d1c5;
   --o3-border: rgba(243, 239, 230, 0.14);
   color: var(--o3-ink);
 }
@@ -1401,7 +1507,9 @@ html, body {
   color: var(--o3-ink);
 }
 .orl3__caps--vx div p { margin: 0.3rem 0 0; font-size: 0.9rem; line-height: 1.5; color: var(--o3-muted); }
-.orl3__cta--vx { padding-bottom: 0.45rem; border-bottom: 1px solid #c9a86a; }
+/* the #c9a86a gold rule under each "Explore …" link is gone; the padding
+   stays so the CTA keeps its footing in the stack */
+.orl3__cta--vx { padding-bottom: 0.45rem; }
 
 /* — the application window — */
 .orl3__demo--vx { position: relative; }
@@ -2576,11 +2684,22 @@ html, body {
    ═══════════════════════════════════════════════════════════ */
 .mlayer {
   /* text-on-dark tokens — all AA-checked against the composited tiles */
+  /* --ml-bg-a is unchanged: chapter 04 exits on exactly this value, so the
+     seam already matches. --ml-bg-b was #121009 — r18 g16 b9, chroma 9,
+     a distinctly olive-brown near-black next to the chapters' darkest
+     (#201d1a, chroma 6). Neutralised so the Metrics ground reads as the
+     same material continuing rather than a different one starting. */
   --ml-bg-a: #1b1815;
-  --ml-bg-b: #121009;
+  --ml-bg-b: #141210;
   --ml-ink: #f3efe6;
   --ml-muted: #b5ac9c;
-  --ml-soft: #9d9484;
+  /* Lifted from #9d9484. It was fine on the flat ground (5.89) but this layer
+     now carries drifting blooms. Two effects stack where a bloom crosses a
+     metric tile: the bloom lifts the ground to #34302c, then the tile's own
+     rgba(255,255,255,0.043) fill lifts it again to #3d3935. #9d9484 measures
+     4.36 there and #a9a091 only 4.43 — both short. This is the dimmest token
+     in the layer and the tile labels use it, so it sets the floor. */
+  --ml-soft: #b3aa9b;
   --ml-gold: #c9a86a;
   --ml-vx: #8fa4ff;   /* module accents, lightened for dark ground */
   --ml-sx: #d9a45c;
@@ -2607,7 +2726,9 @@ html, body {
 .mlayer::before { top: 0; }
 .mlayer::after { bottom: 0; }
 
-.mlayer__inner { max-width: 72rem; margin: 0 auto; }
+.mlayer__inner {
+  position: relative;
+  z-index: 1; max-width: 72rem; margin: 0 auto; }
 
 /* — head — */
 .mlayer__head { text-align: center; max-width: 44rem; margin: 0 auto; }
@@ -2949,7 +3070,6 @@ html, body {
   display: inline-flex; align-items: center; gap: 0.5rem;
   font-size: 0.88rem; font-weight: 500; color: #1f1d19;
   text-decoration: none; padding-bottom: 0.3rem;
-  border-bottom: 1px solid #c9a86a;
   transition: color 0.25s, border-color 0.25s;
 }
 .why__cta-ghost::after { content: ''; position: absolute; inset: -10px -6px; }
@@ -3155,7 +3275,7 @@ html, body {
   display: inline-flex; align-items: center; gap: 0.45rem;
   margin-top: 1.4rem; padding-bottom: 0.3rem;
   font-size: 0.82rem; font-weight: 500; color: #1f1d19;
-  text-decoration: none; border-bottom: 1px solid #c9a86a;
+  text-decoration: none;
   transition: color 0.25s;
 }
 /* invisible hit-area extension — underline link stays 25px visually,
@@ -3289,7 +3409,6 @@ html, body {
   font-weight: 500;
   letter-spacing: 0.26em;
   color: var(--x3-gold);
-  border-bottom: 1px solid #c9a86a;
 }
 .s3d__title {
   font-family: var(--font-display);
@@ -5029,4 +5148,161 @@ body.blg-body .mono {
   /* the desktop scale-down does not apply here — narrow columns already
      shorten the measure, and 14px paragraphs on a phone read as cramped */
   .chk__body, .chk__psigns li, .chk__pbody, .chk__pnote { font-size: 0.95rem; }
+}
+
+/* ── Metrics → "Why" seam ──
+   The dark Metrics layer met the cream section below it on a hard edge. This
+   is the same eased ramp used for the intro descent: smoothstep positions,
+   mixed in LINEAR-LIGHT space, so the slope approaches zero at both ends and
+   the ramp eases out of the dark and into the cream with no derivative break.
+   A 2-stop linear gradient changes 3.6x faster at its ends and reads as a
+   visible corner even though the colours are identical.
+
+   160px total: it starts 64px up — the clear space below the Metrics content,
+   so it never lightens the ground under the tiles — and ends exactly at
+   .why's 96px padding, where its copy begins. Nothing sits on a mid-tone. */
+.why { position: relative; }
+.why::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* -50/146, not -64/160: the Metrics container box ends 64px above the seam
+     but its last line of text extends 14px further, so a 64px lift started
+     the ramp over that copy. This starts exactly at the text's bottom and
+     still finishes at .why's 96px padding. */
+  top: -50px;
+  height: 146px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    #141210 0%,
+    #33312f 10%,
+    #5a5855 20%,
+    #7d7b76 30%,
+    #9b9993 40%,
+    #b5b2ac 50%,
+    #cbc8c1 60%,
+    #ddd9d2 70%,
+    #eae7df 80%,
+    #f3efe7 90%,
+    #f6f2ea 100%
+  );
+}
+/* .why's own content rides above the ramp */
+.why > * { position: relative; z-index: 1; }
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE PASS
+   Audited at 375x812. The page had no horizontal scroll, so
+   these are the real defects: one panel overflowing its column,
+   touch targets under 44px, and body copy under 15px.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 1. demo panels overflowing their column ──
+   .orl3__demo is a grid/flex child, so it inherits min-width:auto — which
+   refuses to shrink below the intrinsic width of its content. On a 375px
+   screen the Visibility panel rendered 391px wide inside a 327px column and
+   was silently clipped by .orl3's overflow. min-width:0 lets it shrink.
+   This is the fix for the whole class of "panel is cut off" bugs here. */
+.orl3__demo,
+.orl3__copy,
+.orl3__rowmain { min-width: 0; }
+
+@media (max-width: 1023px) {
+  /* .orl3__demo carries align-self:center for the desktop two-column layout.
+     Once the chapter flips to flex-direction:column that centres it on the
+     CROSS axis, which sizes the panel to its content instead of stretching —
+     so min-width:0 never got a chance to apply and the panel rendered 391px
+     inside a 327px column. Stretch restores column-width sizing. */
+  .orl3__demo { align-self: stretch; }
+  /* the result card hangs 0.75rem past its panel by design on desktop; on a
+     narrow column that margin is what tips it over the edge */
+  .vx__result { width: 100%; margin-right: 0; }
+}
+
+/* ── 2. touch targets ──
+   Scoped to coarse pointers and small screens, so desktop hit areas and
+   visual weights are untouched. 44px is the Apple HIG / WCAG floor. */
+@media (max-width: 900px), (pointer: coarse) {
+  .sitenav__pill,
+  .orl3__cta,
+  .ins__all,
+  .eng__finalbtn,
+  .mod__ctabtn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .sitenav__brand { min-height: 44px; display: inline-flex; align-items: center; }
+
+  /* icon buttons: bump the box itself, they have no text to reflow */
+  .deck__arrow { width: 44px; height: 44px; }
+  .p2modal__close { width: 44px; height: 44px; }
+
+  /* hero scene picker — 39x16 labels in a row. Padding here rather than a
+     min-height so the row keeps its baseline alignment. */
+  .index__item { padding: 0.85rem 0.35rem; }
+
+  /* The toggle is 46x26 and should STAY 26px tall — a 44px-tall switch looks
+     broken. Extend the hit area instead of the control (the hitSlop pattern),
+     so the tap target is compliant without changing the design. */
+  .why__switch { position: relative; }
+  .why__switch::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    top: 50%;
+    height: 44px;
+    transform: translateY(-50%);
+  }
+}
+
+/* ── 3. body copy under 15px ──
+   Only real prose. The text inside the simulated product panels (.vx__, .sx__,
+   .s3d__ …) is deliberately small — those are mock screenshots and scaling
+   them up would stop them reading as product UI. */
+@media (max-width: 767px) {
+  .orl3__caps p,
+  .dcard__desc,
+  .orl3__desc,
+  .prob2__sub,
+  .why__lead { font-size: 0.95rem; line-height: 1.6; }
+}
+
+/* ── 4. form fields: stop iOS zooming on focus ──
+   Safari on iOS zooms the viewport whenever a focused field's font-size is
+   below 16px, then leaves the page scaled. All four text inputs on /book were
+   14.7px, so every tap on a field shifted the layout. 16px is the threshold —
+   this is a functional fix, not a typographic preference. */
+@media (max-width: 900px), (pointer: coarse) {
+  .bk-field input,
+  .bk-field textarea,
+  .bk-field select,
+  input[type='text'],
+  input[type='email'],
+  input[type='url'],
+  input[type='tel'],
+  textarea,
+  select { font-size: 16px; }
+
+  /* the budget slider's own box is 6px tall — the track. Give the control a
+     real touch height without changing the track's appearance. */
+  .bk__range {
+    min-height: 44px;
+    background: transparent;
+  }
+
+  /* filter chips on the journal index sit at 35px */
+  .blg__chip { min-height: 44px; display: inline-flex; align-items: center; }
+}
+
+/* ── 5. remaining small prose ──
+   Real sentences only. Mono micro-labels (eyebrows, meta, footer) stay small:
+   they are tracked uppercase captions, and scaling them up would break the
+   editorial voice rather than help anyone read. */
+@media (max-width: 767px) {
+  .inscard__desc,
+  .eng__phase p,
+  .mod__stepdesc { font-size: 0.95rem; line-height: 1.6; }
 }

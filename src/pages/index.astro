@@ -144,7 +144,6 @@ const GAPS = [
 const ld = graph([organization(), website()]);
 import GlassNav from '../components/GlassNav.astro';
 import ShaderBackdrop from '../components/ShaderBackdrop.astro';
-import MeshDriftBackdrop from '../components/MeshDriftBackdrop.astro';
 ---
 
 <html lang="en">
@@ -946,11 +945,15 @@ import MeshDriftBackdrop from '../components/MeshDriftBackdrop.astro';
        scrolling past a still image. Stops are in % of this wrapper, so each
        chapter owns exactly one quarter and the cycle closes back on ivory. -->
   <div class="orl3__flow">
-    <!-- The four-system ground. Was a scroll-driven flat colour with drifting
-         blooms; now the "Mesh drift" WebGL shader. The flat --o3 fallback is
-         still painted beneath, so no-WebGL / no-JS is unchanged. -->
     <div class="orl3__fade" aria-hidden="true">
-      <MeshDriftBackdrop />
+      <div class="orl3__weather">
+        <i class="orl3__blob orl3__blob--1"></i>
+        <i class="orl3__blob orl3__blob--2"></i>
+        <i class="orl3__blob orl3__blob--3"></i>
+        <i class="orl3__blob orl3__blob--4"></i>
+        <i class="orl3__blob orl3__blob--5"></i>
+        <i class="orl3__blob orl3__blob--6"></i>
+      </div>
     </div>
 
     <!-- ── 01 · VISIBILITY (interactive Visibility Engine demo) ── -->
@@ -1592,6 +1595,15 @@ import MeshDriftBackdrop from '../components/MeshDriftBackdrop.astro';
        no browser chrome, no cursor demo. Four conduits drain into one
        strip of board metrics and a typed intelligence readout. -->
   <section class="mlayer" data-chapter="metrics" aria-label="The Metrics layer">
+    <!-- Same ground treatment as the four chapters above: identical .orl3__weather
+         / .orl3__blob classes, not a copy. Three blooms rather than six —
+         this section is 745px against the run's 4260px, so six would be
+         permanently stacked on top of each other. -->
+    <div class="orl3__weather orl3__weather--tight" aria-hidden="true">
+      <i class="orl3__blob orl3__blob--m1"></i>
+      <i class="orl3__blob orl3__blob--m2"></i>
+      <i class="orl3__blob orl3__blob--m3"></i>
+    </div>
     <div class="mlayer__inner">
 
       <header class="mlayer__head">
@@ -4796,6 +4808,12 @@ import MeshDriftBackdrop from '../components/MeshDriftBackdrop.astro';
     cursor: pointer;
     transition: color 0.3s ease;
   }
+  /* Touch target: these are real <button>s but render 39x16. Padding rather
+     than min-height so the row keeps its baseline alignment. Declared here,
+     not in global.css — this stylesheet loads after it and would win. */
+  @media (max-width: 900px), (pointer: coarse) {
+    .index__item { padding: 0.85rem 0.4rem; }
+  }
   .index__item:hover { color: rgba(255, 255, 255, 0.8); }
   .index__item.is-active { color: #fff; }
   .index__dot {
@@ -4916,6 +4934,93 @@ import MeshDriftBackdrop from '../components/MeshDriftBackdrop.astro';
       items.forEach((el) => io2.observe(el));
       setTimeout(() => items.forEach((el) => el.classList.add('is-in')), 4000);
     }
+  }
+</script>
+
+<!-- ══════════ SECTION 3 — the sky (scroll-driven ground colour) ══════════
+     Deliberately its OWN script block, importing nothing. It previously
+     lived in the GSAP block above and was never reaching the browser: an
+     unrelated null in that block's entrance loop threw, aborting every
+     statement after it. The section's legibility depends on this ground
+     being dark, so it must not share a failure domain with animation code. -->
+<script>
+  const sky = document.querySelector('.orl3__fade');
+  const flowEl = document.querySelector('.orl3__flow');
+  if (sky instanceof HTMLElement && flowEl instanceof HTMLElement) {
+    const chapters = [...flowEl.querySelectorAll('[data-chapter]')];
+    const rail = document.querySelector('[data-orl3-rail]');
+    const intro = document.querySelector('.orl3__intro');
+    /* the point where the intro's descent band is halfway down — past here
+       the ground under the rail is dark enough to need the light palette */
+    let darkStart = 0;
+    const readVar = (el, n) => {
+      const v = getComputedStyle(el).getPropertyValue(n).trim().replace('#', '');
+      return [0, 2, 4].map((i) => parseInt(v.substr(i, 2), 16));
+    };
+    let bands = [];
+    const measure = () => {
+      if (intro) {
+        const ir = intro.getBoundingClientRect();
+        /* band is the intro's bottom 30% (see .orl3__intro::after) */
+        darkStart = ir.bottom + window.scrollY - ir.height * 0.15;
+      }
+      bands = chapters.map((c) => {
+        const r = c.getBoundingClientRect();
+        return {
+          top: r.top + window.scrollY,
+          h: r.height,
+          from: readVar(c, '--o3-from'),
+          hold: readVar(c, '--o3-hold'),
+          to: readVar(c, '--o3-to'),
+          enter: parseFloat(getComputedStyle(c).getPropertyValue('--o3-enter')) || 50,
+        };
+      });
+    };
+    const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+    const paint = () => {
+      if (!bands.length) return;
+      /* sample at the viewport centre — the tone the screen reads as "now" */
+      const y = window.scrollY + window.innerHeight / 2;
+      const first = bands[0], last = bands[bands.length - 1];
+      let c;
+      if (y <= first.top) c = first.from;
+      else if (y >= last.top + last.h) c = last.to;
+      else {
+        const b = bands.find((b) => y >= b.top && y < b.top + b.h) || last;
+        const f = ((y - b.top) / b.h) * 100;
+        c = f < b.enter
+          ? mix(b.from, b.hold, f / b.enter)
+          : mix(b.hold, b.to, (f - b.enter) / (100 - b.enter));
+      }
+      sky.style.backgroundColor = `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+
+      /* The rail is position:fixed and floats over both the cream intro and
+         the dark run, so it has to swap palettes. Driving that from the
+         ground colour we just computed is exact — an IntersectionObserver
+         on the flow flipped it at the wrong moment, because the intro's
+         own descent band goes dark before the flow starts. */
+      if (rail) {
+        const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+        const lum = 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+        /* above the run the ground is the intro: light until its band falls */
+        const darkGround = y >= darkStart && lum < 0.22;
+        rail.classList.toggle('is-dark', darkGround);
+      }
+    };
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { paint(); ticking = false; });
+    };
+    const remeasure = () => { measure(); paint(); };
+    measure();
+    paint();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', remeasure);
+    window.addEventListener('load', remeasure);
+    /* chapter heights shift as fonts land and the demos lay out */
+    if ('ResizeObserver' in window) new ResizeObserver(remeasure).observe(flowEl);
   }
 </script>
 
