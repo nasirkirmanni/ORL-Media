@@ -1,0 +1,120 @@
+---
+import '../../styles/global.css';
+import Seo from '../../components/Seo.astro';
+import { graph, organization, website, breadcrumbs } from '../../lib/schema';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const featured = posts.find((p) => p.data.featured) ?? posts[0];
+const rest = posts.filter((p) => p.id !== featured.id);
+const categories = ['All', ...new Set(posts.map((p) => p.data.category))];
+
+const CAT_COLOR: Record<string, string> = {
+  'AI Search': '#2e5cff',
+  'Retention': '#b0532f',
+  'Pipeline': '#279a58',
+  'Market': '#a5824c',
+  'Operations': '#6e6759',
+};
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+const ld = graph([
+  organization(),
+  website(),
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'The ORL Journal', path: '/blog/' },
+  ]),
+]);
+import GlassNav from '../../components/GlassNav.astro';
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <Seo
+    title="The ORL Journal — Growth, engineered | ORL Media"
+    description="Field notes on AI search visibility, buying signals, and pipeline — written for B2B founders who own their growth infrastructure."
+    ogTitle="The ORL Journal"
+    image="/og/default.jpg"
+  >
+    <script type="application/ld+json" is:inline set:html={ld} />
+  </Seo>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
+</head>
+<body class="blg-body">
+
+<nav class="sitenav sitenav--page is-visible" aria-label="Site">
+  <a class="sitenav__brand" href="/">
+    <span class="sitenav__mark" aria-hidden="true"></span>
+    ORL Media
+  </a>
+  <div class="sitenav__links">
+    <a href="/engine" class="sitenav__link">Services</a>
+    <a href="/blog" class="sitenav__link" aria-current="page">Blog</a>
+  </div>
+  <a class="sitenav__pill" href="/book">Book a call</a>
+</nav>
+<GlassNav />
+
+<main class="blg">
+  <header class="blg__hero">
+    <p class="blg__eyebrow mono">The ORL Journal</p>
+    <h1 class="blg__title">Growth, engineered.</h1>
+    <p class="blg__sub">Field notes on AI search visibility, retention, and pipeline &mdash; written for founders who own their growth infrastructure instead of renting it.</p>
+    <div class="blg__filters" role="group" aria-label="Filter articles by category">
+      {categories.map((cat, i) => (
+        <button class={`blg__chip ${i === 0 ? 'is-on' : ''}`} type="button" data-blg-chip={cat}>{cat}</button>
+      ))}
+    </div>
+  </header>
+
+  <div class="blg__grid" data-blg-grid>
+    <a class="inscard inscard--feat" href={`/blog/${featured.id}/`} data-blg-card data-cat={featured.data.category} style={`--cat:${CAT_COLOR[featured.data.category]}`}>
+      <p class="inscard__cat mono"><i aria-hidden="true"></i>{featured.data.category} &middot; Featured</p>
+      <h2 class="inscard__title">{featured.data.title}</h2>
+      <p class="inscard__desc">{featured.data.description}</p>
+      <p class="inscard__meta mono">{fmt(featured.data.date)} &middot; {featured.data.readTime}</p>
+    </a>
+    {rest.map((p) => (
+      <a class="inscard" href={`/blog/${p.id}/`} data-blg-card data-cat={p.data.category} style={`--cat:${CAT_COLOR[p.data.category]}`}>
+        <p class="inscard__cat mono"><i aria-hidden="true"></i>{p.data.category}</p>
+        <h2 class="inscard__title">{p.data.title}</h2>
+        <p class="inscard__desc">{p.data.description}</p>
+        <p class="inscard__meta mono">{fmt(p.data.date)} &middot; {p.data.readTime}</p>
+      </a>
+    ))}
+  </div>
+
+  <section class="blg__cta" aria-label="Work with ORL">
+    <h2>Stop renting growth.<br />Own the infrastructure.</h2>
+    <p>ORL installs the systems behind these essays &mdash; AI visibility, buying signals, retention, and revenue analytics in one engine.</p>
+    <a href="/#section3">See the ORL Growth Engine</a>
+  </section>
+
+  <footer class="blg__foot mono">&copy; 2026 ORL Media &mdash; Growth infrastructure for B2B</footer>
+</main>
+
+<script>
+  // category filter: show/hide cards, no layout library needed
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('[data-blg-chip]')];
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-blg-card]')];
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.classList.toggle('is-on', c === chip));
+      const cat = chip.dataset.blgChip;
+      cards.forEach((card) => {
+        card.style.display = cat === 'All' || card.dataset.cat === cat ? '' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>

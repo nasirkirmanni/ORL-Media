@@ -1,0 +1,280 @@
+---
+import '../../styles/global.css';
+import '../../styles/longform.css';
+import { getCollection, render } from 'astro:content';
+import Seo from '../../components/Seo.astro';
+import { graph, organization, website, article, breadcrumbs } from '../../lib/schema';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+/* wordCount measured from the actual body, never hand-entered — but the raw
+   markdown carries inline SVG and HTML, and counting path data as prose
+   inflates the number (8,991 vs ~7,530 on the flagship). Strip markup first
+   so the schema doesn't overstate the article to crawlers. */
+const wordCount = (post.body ?? '')
+  .replace(/<svg[\s\S]*?<\/svg>/gi, ' ')   // figures
+  .replace(/<[^>]+>/g, ' ')                // remaining tags
+  .replace(/[#*`_>|-]+/g, ' ')             // markdown syntax
+  .split(/\s+/)
+  .filter(Boolean).length;
+const postPath = `/blog/${post.id}/`;
+/* per-post card where one has been made, otherwise the site default */
+const OG_POSTS = new Set(['buying-windows']);
+const ogImage = OG_POSTS.has(post.id) ? `/og/${post.id}.jpg` : '/og/default.jpg';
+const ld = graph([
+  organization(),
+  website(),
+  article({
+    title: post.data.title,
+    description: post.data.description,
+    path: postPath,
+    published: post.data.date,
+    section: post.data.category,
+    wordCount,
+  }),
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'The ORL Journal', path: '/blog/' },
+    { name: post.data.title, path: postPath },
+  ]),
+]);
+
+const all = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const related = [
+  ...all.filter((p) => p.id !== post.id && p.data.category === post.data.category),
+  ...all.filter((p) => p.id !== post.id && p.data.category !== post.data.category),
+].slice(0, 2);
+
+const CAT_COLOR: Record<string, string> = {
+  'AI Search': '#2e5cff',
+  'Retention': '#b0532f',
+  'Pipeline': '#279a58',
+  'Market': '#a5824c',
+  'Operations': '#6e6759',
+};
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+// service posts point readers at the matching module; others get the generic close.
+// 'Retention' stays a valid content category — ORL retired the Retain module in
+// July 2026, so those posts close on expansion revenue, not a service we don't sell.
+const CTA: Record<string, { t: string; s: string }> = {
+  'AI Search': {
+    t: 'See your Share of Answer.',
+    s: 'ORL Visibility tracks how AI answers your category’s buying questions — and what to fix first.',
+  },
+  'Pipeline': {
+    t: 'See how many buying windows are open right now.',
+    s: 'ORL Signals detects the accounts entering a buying window before they fill in a form.',
+  },
+  'Retention': {
+    t: 'Expansion costs half what acquisition does.',
+    s: 'ORL Pricing turns packaging, usage, and expansion into revenue you can forecast.',
+  },
+};
+const cta = CTA[post.data.category] ?? {
+  t: 'Growth that compounds.',
+  s: 'ORL installs discovery, demand, deal conversion, and monetization as one engine — on one set of numbers.',
+};
+import GlassNav from '../../components/GlassNav.astro';
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <Seo
+    title={`${post.data.title} | The ORL Journal`}
+    description={post.data.description}
+    ogTitle={post.data.title}
+    type="article"
+    publishedTime={post.data.date.toISOString()}
+    image={ogImage}
+  >
+    <script type="application/ld+json" is:inline set:html={ld} />
+  </Seo>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
+  <script is:inline>
+    /* Flip the reveal gate before first paint. Without this class the
+       article renders fully visible, so a script failure degrades to a
+       static page rather than a blank one. */
+    document.documentElement.classList.add('js');
+  </script>
+</head>
+<body class="blg-body">
+
+<div class="rprog" aria-hidden="true"><div class="rprog__bar" data-rprog></div></div>
+<nav class="srail" data-srail aria-label="Article sections"></nav>
+<GlassNav />
+
+<nav class="sitenav sitenav--page is-visible" aria-label="Site">
+  <a class="sitenav__brand" href="/">
+    <span class="sitenav__mark" aria-hidden="true"></span>
+    ORL Media
+  </a>
+  <div class="sitenav__links">
+    <a href="/engine" class="sitenav__link">Services</a>
+    <a href="/blog" class="sitenav__link">Blog</a>
+  </div>
+  <a class="sitenav__pill" href="/book">Book a call</a>
+</nav>
+
+<main class="post">
+  <article>
+    <header class="post__head">
+      <a class="post__back mono" href="/blog">&larr; All articles</a>
+      <p class="post__cat mono" style={`--cat:${CAT_COLOR[post.data.category]}`}><i aria-hidden="true"></i>{post.data.category} &middot; {post.data.readTime}</p>
+      <h1 class="post__title">{post.data.title}</h1>
+      <p class="post__desc">{post.data.description}</p>
+      <p class="post__meta mono">{fmt(post.data.date)} &middot; ORL Media</p>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  {!post.data.hideCta && (
+    <aside class="post__cta" aria-label="Work with ORL">
+      <div>
+        <p class="post__cta-t">{cta.t}</p>
+        <p class="post__cta-s">{cta.s}</p>
+      </div>
+      <a class="post__cta-btn" href="/book">Book a call</a>
+    </aside>
+  )}
+
+  {related.length > 0 && (
+    <section class="post__related" aria-label="Related articles">
+      <p class="post__related-h mono">Keep reading</p>
+      <div class="post__related-grid">
+        {related.map((p) => (
+          <a class="inscard" href={`/blog/${p.id}/`} style={`--cat:${CAT_COLOR[p.data.category]}`}>
+            <p class="inscard__cat mono"><i aria-hidden="true"></i>{p.data.category}</p>
+            <h2 class="inscard__title">{p.data.title}</h2>
+            <p class="inscard__desc">{p.data.description}</p>
+            <p class="inscard__meta mono">{fmt(p.data.date)} &middot; {p.data.readTime}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <footer class="blg__foot mono">&copy; 2026 ORL Media &mdash; Growth infrastructure for B2B</footer>
+</main>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const article = document.querySelector('.post');
+  const prose = document.querySelector('.prose');
+
+  /* reading progress — measured against the article, not the page,
+     so the footer and related cards don't count as "unread". */
+  const bar = document.querySelector('[data-rprog]') as HTMLElement | null;
+  if (bar && article) {
+    let ticking = false;
+    const draw = () => {
+      const top = article.getBoundingClientRect().top + window.scrollY;
+      const span = article.scrollHeight - window.innerHeight;
+      const pct = span > 0 ? ((window.scrollY - top) / span) * 100 : 0;
+      bar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+      ticking = false;
+    };
+    addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(draw); }
+    }, { passive: true });
+    draw();
+  }
+
+  /* chapter rail — only worth showing on longform pieces */
+  const rail = document.querySelector('[data-srail]');
+  /* numbered h3s are the chapters in longform pieces; h2s are act breaks.
+     Skip headings inside accordions and the closing panel. */
+  const heads = prose
+    ? Array.from(prose.querySelectorAll('h2, h3')).filter(
+        (h) => !h.closest('.acc') && !h.closest('.finale'),
+      )
+    : [];
+  if (rail && heads.length >= 8) {
+    heads.forEach((h, i) => {
+      if (!h.id) h.id = 'sec-' + i;
+      const a = document.createElement('a');
+      a.href = '#' + h.id;
+      const label = (h.textContent || '').replace(/^\d+\.\s*/, '');
+      a.innerHTML = '<i></i><span></span>';
+      (a.querySelector('span') as HTMLElement).textContent =
+        label.length > 26 ? label.slice(0, 26).trimEnd() + '…' : label;
+      rail.appendChild(a);
+    });
+    const links = Array.from(rail.querySelectorAll('a'));
+    const spy = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const i = heads.indexOf(e.target as HTMLHeadingElement);
+        links.forEach((l, li) => l.classList.toggle('is-on', li === i));
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    heads.forEach((h) => spy.observe(h));
+  }
+
+  /* scroll reveals + figure entrance */
+  const revealables = document.querySelectorAll('[data-reveal], .fig');
+  const revealAll = () => revealables.forEach((el) => el.classList.add('is-in'));
+  if (reduced || !('IntersectionObserver' in window)) {
+    revealAll();
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.15 });
+    revealables.forEach((el) => io.observe(el));
+
+    /* failsafe: if the observer never fires (stalled renderer, exotic
+       embedding), show everything rather than stranding the reader on
+       an invisible article. */
+    setTimeout(() => {
+      if (!document.querySelector('[data-reveal].is-in, .fig.is-in')) revealAll();
+    }, 2500);
+  }
+
+  /* number counters — text content is the real value, so the figure
+     is correct with JS disabled and the animation only replays it. */
+  const nums = document.querySelectorAll<HTMLElement>('[data-count]');
+  if (nums.length && !reduced) {
+    const co = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const el = e.target as HTMLElement;
+        co.unobserve(el);
+        const target = parseFloat(el.dataset.count || '0');
+        const suffix = el.dataset.suffix || '';
+        const decimals = (el.dataset.count || '').includes('.') ? 1 : 0;
+        const start = performance.now();
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - start) / 1100);
+          const eased = 1 - Math.pow(1 - t, 3);
+          el.textContent = (target * eased).toFixed(decimals) + suffix;
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.6 });
+    nums.forEach((n) => co.observe(n));
+  }
+</script>
+</body>
+</html>

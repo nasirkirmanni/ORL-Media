@@ -1,0 +1,127 @@
+---
+/* ─────────────────────────────────────────────────────────────
+   ShaderBackdrop — animated mesh-gradient ground for section 2B.
+
+   WHY THIS SHAPE, not the supplied React component:
+   this is an Astro site with no React. The reference used
+   @paper-design/shaders-react, whose only job is to wrap the
+   vanilla core in a component. That core — @paper-design/shaders
+   — is ALREADY a dependency here, so mounting it directly gives
+   the identical shader with no React, no @react-three/fiber and
+   no three.js added to the bundle.
+
+   PALETTE: the reference ran black. This section is ivory and
+   carries AA body copy, so the colours below are clamped to a
+   light band — see the contrast note in global.css.
+   ───────────────────────────────────────────────────────────── */
+---
+
+<div class="shbg" data-shader-backdrop aria-hidden="true"></div>
+
+<script>
+  import {
+    ShaderMount,
+    meshGradientFragmentShader,
+    getShaderColorFromString,
+    ShaderFitOptions,
+  } from '@paper-design/shaders';
+
+  const host = document.querySelector<HTMLElement>('[data-shader-backdrop]');
+
+  if (host) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    /* Clamped to a light band on purpose. The darkest is #ded7c4; measured
+       against every text colour in the section, the worst clears 5.13:1 even
+       with no veil. Darkening any of these silently breaks the body copy. */
+    const COLORS = ['#f7f4ec', '#efe9dc', '#e6dfce', '#ded7c4'];
+
+    /* The sizing uniforms must be spelled with the u_ prefix.
+       defaultObjectSizing is a *params* object ({ fit, scale, rotation … }),
+       NOT uniforms ({ u_fit, u_scale, u_rotation … }). Spreading it here
+       looked right, compiled fine, threw nothing — and left u_scale
+       undefined, so the shader drew nothing at all. Map explicitly. */
+    const SIZING = {
+      u_fit: ShaderFitOptions.cover,
+      u_scale: 1,
+      u_rotation: 0,
+      u_originX: 0.5,
+      u_originY: 0.5,
+      u_offsetX: 0,
+      u_offsetY: 0,
+      u_worldWidth: 0,
+      u_worldHeight: 0,
+    };
+
+    let mount: any = null;
+
+    const start = () => {
+      if (mount) return;
+      try {
+        mount = new ShaderMount(
+          host,
+          meshGradientFragmentShader,
+          {
+            ...SIZING,
+            u_colors: COLORS.map(getShaderColorFromString),
+            u_colorsCount: COLORS.length,
+            u_distortion: 0.9,
+            u_swirl: 0.6,
+            u_grainMixer: 0.2,
+            /* keeps large flat washes from banding without putting visible
+               noise over the type */
+            u_grainOverlay: 0.05,
+          },
+          { antialias: true, premultipliedAlpha: false },
+          // speed 0 under reduced-motion renders one static frame and stops
+          // the rAF loop entirely, so it costs nothing
+          reduce.matches ? 0 : 0.16,
+          0,
+          1,
+          // ~1.5MP ceiling: decorative ground, not a hero. The default 4K
+          // budget is wasted GPU here.
+          1_600_000,
+        );
+        host.classList.add('is-live');
+        /* dev-only handle, matching the existing window.__o3 convention —
+           lets the mount be driven (setFrame / setMaxPixelCount) for
+           verification without shipping anything to production */
+        if (import.meta.env.DEV) (window as any).__shbg = mount;
+      } catch (err) {
+        /* Log it. The previous version swallowed this silently, which is
+           exactly why a bad uniform name looked like "nothing happened"
+           instead of an error. The flat --c-bg beneath still shows, so the
+           section is never broken by a failure here — but it must be
+           diagnosable. */
+        console.error('[ShaderBackdrop] shader failed to mount:', err);
+        host.classList.remove('is-live');
+      }
+    };
+
+    /* Build the GL context only as the section approaches the viewport —
+       compiling a shader program on load costs main-thread time for
+       something far down a long page. */
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          io.disconnect();
+          start();
+        });
+      },
+      { rootMargin: '300px 0px' },
+    );
+    io.observe(host);
+
+    /* Safety net: if the observer never fires (some embedded/headless
+       viewers never report intersection), mount anyway rather than leaving
+       the section permanently flat. */
+    setTimeout(() => { io.disconnect(); start(); }, 2500);
+
+    reduce.addEventListener?.('change', () => {
+      if (mount && typeof mount.setSpeed === 'function') {
+        mount.setSpeed(reduce.matches ? 0 : 0.16);
+      }
+    });
+  }
+</script>

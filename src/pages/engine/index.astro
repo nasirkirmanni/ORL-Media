@@ -1,0 +1,346 @@
+---
+import '../../styles/global.css';
+import '../../styles/engine.css';
+import Seo from '../../components/Seo.astro';
+import { graph, organization, website, faqPage, breadcrumbs } from '../../lib/schema';
+
+/* ─────────────────────────────────────────────────────────────
+   THE GROWTH ENGINE — flagship offer page.
+   Per the blueprint: expanded module descriptions → month one →
+   what's included → cadence → guarantee → FAQ → Book a Call.
+   No pricing section; the guarantee sits where pricing would.
+   Metrics lives here as a section (#metrics), never a page.
+   ───────────────────────────────────────────────────────────── */
+
+const MODULES = [
+  {
+    slug: 'visibility', num: '01', name: 'Visibility', verb: 'Get discovered.',
+    accent: '#2e5cff', dark: '#8fa4ff', accT: '#2244bd', metric: 'Share of Answer', status: 'Live',
+    line: 'Buyers ask AI before they search your name. This system puts you inside the answer — 100+ buying questions mapped, engineered, and re-scored monthly against your competitors.',
+  },
+  {
+    slug: 'signals', num: '02', name: 'Signals', verb: 'Find demand.',
+    accent: '#c98b32', dark: '#d9a45c', accT: '#724911', metric: 'Qualified meetings', status: 'Limited seats',
+    line: 'Roughly 5% of your market is in a buying window right now. This system reads signal convergence — hiring, stack changes, competitor churn — and tells you which 5%, with the evidence attached.',
+  },
+  {
+    slug: 'proof', num: '03', name: 'Proof', verb: 'Win the deal.',
+    accent: '#3e8e5a', dark: '#6fbb90', accT: '#235c38', metric: 'No-decision rate', status: '3 seats',
+    line: 'Deals die in security review, in committee, in silence. This system maps where yours stall, builds the third-party evidence that unsticks them, and fires it into live deals at the stall moment.',
+  },
+  {
+    slug: 'pricing', num: '04', name: 'Pricing', verb: 'Monetize & expand.',
+    accent: '#2b7f86', dark: '#64b4bb', accT: '#1a5a60', metric: 'Net revenue / account', status: 'In build',
+    line: 'Expansion costs half of what acquisition does. This system instruments usage, tests packaging against real conversion, and fires expansion plays the week an account is ready.',
+  },
+];
+
+/* The service mark: nine overlapping arcs swept around a ring, reading as a
+   braided rope. One shape recoloured per module — the same device the
+   reference uses. Nine at 40° with a 50° sweep gives a 10° overlap, which is
+   what makes it read as braided rather than as a dashed circle. */
+const RING = Array.from({ length: 9 }, (_, i) => i * 40);
+
+const FAQ = [
+  {
+    q: 'Can we just buy one module?',
+    a: 'Yes. Visibility and Signals run standalone; Proof is design-partner only right now; Pricing is in build. The Engine is for companies that want the whole machine — every module, one senior team, one weekly cadence, with the Metrics layer bundled.',
+  },
+  {
+    q: 'What does it cost?',
+    a: 'Scoped on the call — every engagement is a flat retainer matched to the modules and volume you need. Flat fee, never a percentage of ad spend. Ask on the call and you will get numbers immediately; we don’t do the coy-pricing dance.',
+  },
+  {
+    q: 'What if it doesn’t work?',
+    a: 'Engine engagements carry the 90-day guarantee: installed and generating qualified pipeline within 90 days, or we work free until it is. We can offer that because we don’t start engagements we don’t believe in — the Audit exists to find that out first, cheaply, for both of us.',
+  },
+  {
+    q: 'Do you do social media or paid ads?',
+    a: 'Paid runs inside the Engine when it is the right channel — retargeting real intent, launching into a named segment. We don’t sell channel management as a product. We sell the system that makes channels worth paying for.',
+  },
+  {
+    q: 'You dropped churn/retention — why?',
+    a: 'Because we’d rather be excellent at four things than adequate at five. Expansion revenue moved into Pricing, where it belongs. Churn defense is a real problem and we’re not the right people for it yet — ask us and we’ll tell you who is.',
+  },
+];
+
+/* FAQ schema is generated from the array rendered below — one source
+   of truth, so the structured data can never drift from the copy. */
+const ld = graph([
+  organization(),
+  website(),
+  faqPage(FAQ),
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'The Growth Engine', path: '/engine/' },
+  ]),
+]);
+import GlassNav from '../../components/GlassNav.astro';
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <Seo
+    title="The ORL Growth Engine — Four systems. One layer of truth."
+    description="ORL installs the Growth Engine: Visibility, Signals, Proof, and Pricing — four revenue systems on one metrics layer, operated by one senior team. Installed and generating pipeline in 90 days, or we work free until it is."
+    ogTitle="The ORL Growth Engine"
+    ogDescription="Four revenue systems — discovery, demand, deals, monetization — installed on your data and run by one senior team. When we leave, it keeps working."
+    image="/og/engine.jpg"
+  >
+    <script type="application/ld+json" is:inline set:html={ld} />
+  </Seo>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
+</head>
+<body class="blg-body eng-body">
+
+<nav class="sitenav sitenav--page is-visible" aria-label="Site">
+  <a class="sitenav__brand" href="/">
+    <span class="sitenav__mark" aria-hidden="true"></span>
+    ORL Media
+  </a>
+  <div class="sitenav__links">
+    <a href="/engine" class="sitenav__link" aria-current="page">Engine</a>
+    <a href="/blog" class="sitenav__link">Blog</a>
+  </div>
+  <a class="sitenav__pill" href="/book">Book a call</a>
+</nav>
+<GlassNav />
+
+<main class="eng" id="main">
+
+  <!-- ── hero ── -->
+  <header class="eng__hero">
+    <div class="eng__heroinner">
+      <p class="eng__eyebrow mono" data-e-in>The ORL Growth Engine</p>
+      <h1 class="eng__title" data-e-in>We don&rsquo;t run<br />your marketing.<br /><em>We install the machine.</em></h1>
+      <p class="eng__sub" data-e-in>Four revenue systems — discovery, demand, deals, monetization — built on your data, run by one senior team, reporting into one layer of truth. When we leave, it keeps working. That is the entire difference.</p>
+
+      <!-- The schematic: four systems drain into the layer. Decorative here —
+           every module below is a real link with the same content, so this
+           preview stays out of the accessibility tree rather than repeating it.
+           The hairlines are the point: four verticals meeting one rule is the
+           architecture of the offer, drawn rather than described. -->
+      <div class="eng__schematic" data-e-in aria-hidden="true">
+        {MODULES.map((mo) => (
+          <span class="eng__schip" style={`--acc:${mo.accent}; --acc-t:${mo.accT}`}>
+            <svg class="eng__mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+              {RING.map((a) => (
+                <path d="M24 10A14 14 0 0 1 34.7 15" transform={`rotate(${a} 24 24)`} />
+              ))}
+            </svg>
+            <b class="eng__schnum mono">{mo.num}</b>
+            <span class="eng__schname">{mo.name}</span>
+            <span class="eng__schverb">{mo.verb}</span>
+            <i class="eng__sline"><em data-e-schpulse></em></i>
+            <span class="eng__schmetric mono">{mo.metric}</span>
+          </span>
+        ))}
+        <span class="eng__sbar"><span class="mono">Metrics layer</span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── the four systems ── -->
+  <section class="eng__systems" aria-label="The four systems">
+    <div class="eng__inner">
+      <p class="eng__seyebrow mono" data-e-in>The systems</p>
+      <h2 class="eng__h2" data-e-in>Four installations.<br />Each accountable to one number.</h2>
+      <div class="eng__rows">
+        {MODULES.map((mo) => (
+          <a class="eng__row" href={`/engine/${mo.slug}`} style={`--acc:${mo.accent}; --acc-t:${mo.accT}`} data-e-in>
+            <span class="eng__rownum mono">{mo.num}</span>
+            <span class="eng__rowmain">
+              <span class="eng__rowhead">
+                <strong class="eng__rowname">{mo.name}</strong>
+                <em class="eng__rowverb">{mo.verb}</em>
+                <i class="eng__rowstatus mono">{mo.status}</i>
+              </span>
+              <span class="eng__rowline">{mo.line}</span>
+              <span class="eng__rowmetric mono"><i aria-hidden="true"></i>Moves one number: {mo.metric}</span>
+            <svg class="eng__mark eng__mark--row" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+              {RING.map((a) => (
+                <path d="M24 10A14 14 0 0 1 34.7 15" transform={`rotate(${a} 24 24)`} />
+              ))}
+            </svg>
+            </span>
+            <svg class="eng__rowarrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── the metrics layer ── -->
+  <section class="eng__metrics" id="metrics" aria-label="The Metrics layer">
+    <div class="eng__inner eng__metricsgrid">
+      <div data-e-in>
+        <p class="eng__seyebrow eng__seyebrow--gold mono">The layer &mdash; Metrics</p>
+        <h2 class="eng__h2 eng__h2--dark">Everything reports here.</h2>
+        <p class="eng__body--dark">Board-grade growth analytics under all four systems, narrated by AI — CAC payback, pipeline, win rate, net revenue retention, Rule of 40 — with the "why it moved" written for you before board-deck week. Bundled with the Engine. Never sold separately. Never removed.</p>
+      </div>
+      <ul class="eng__mtiles" data-e-in>
+        <li><b class="mono">Share of Answer</b><span>via Visibility</span></li>
+        <li><b class="mono">Qualified pipeline</b><span>via Signals</span></li>
+        <li><b class="mono">No-decision rate</b><span>via Proof</span></li>
+        <li><b class="mono">Net revenue retention</b><span>via Pricing</span></li>
+        <li><b class="mono">CAC payback</b><span>blended</span></li>
+        <li><b class="mono">Rule of 40</b><span>blended</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── month one ── -->
+  <section class="eng__month" aria-label="What month one looks like">
+    <div class="eng__inner">
+      <p class="eng__seyebrow mono" data-e-in>What month one looks like</p>
+      <h2 class="eng__h2" data-e-in>No discovery theatre.<br />The build starts in week one.</h2>
+      <div class="eng__phases">
+        <i class="eng__phaseline" aria-hidden="true"><em data-e-draw></em></i>
+        <article class="eng__phase" data-e-in>
+          <p class="eng__phasewk mono"><i aria-hidden="true"></i>Weeks 1&ndash;2</p>
+          <h3>Audit</h3>
+          <p>AI visibility scored across 100+ questions. Revenue-system leaks mapped. Trigger hypothesis drafted from your closed-won history. You see everything we see.</p>
+        </article>
+        <article class="eng__phase" data-e-in>
+          <p class="eng__phasewk mono"><i aria-hidden="true"></i>Weeks 2&ndash;6</p>
+          <h3>Install</h3>
+          <p>CRM architecture, lead scoring, lifecycle automation, signal monitors, attribution dashboard. Positioning + ICP sprint runs in parallel. Systems go live as they’re built — not at a big reveal.</p>
+        </article>
+        <article class="eng__phase" data-e-in>
+          <p class="eng__phasewk mono"><i aria-hidden="true"></i>Week 6 &rarr;</p>
+          <h3>Operate &amp; compound</h3>
+          <p>Weekly cadence with a senior lead. Monthly numbers in board language. Every won and lost deal feeds the models back. The engine gets more accurate about <em>your</em> buyers every quarter.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── included + cadence ── -->
+  <section class="eng__included" aria-label="What's included">
+    <div class="eng__inner eng__incgrid">
+      <div data-e-in>
+        <p class="eng__seyebrow mono">What&rsquo;s included</p>
+        <h2 class="eng__h2">Everything. That&rsquo;s the point.</h2>
+        <ul class="eng__inclist">
+          <li>All four systems, calibrated to your GTM motion</li>
+          <li>The Metrics layer — board-grade analytics, AI-narrated</li>
+          <li>CRM and automation build-out, on your instances</li>
+          <li>Positioning + ICP sprint, refreshed quarterly</li>
+          <li>Senior operating lead — never a junior account manager</li>
+          <li>Quarterly strategy reviews against board metrics</li>
+        </ul>
+      </div>
+      <div class="eng__cadence" data-e-in>
+        <p class="eng__seyebrow mono">The operating cadence</p>
+        <ul class="eng__cadlist">
+          <li><b class="mono">Weekly</b><span>Signal review + proof queue + send approvals, with your senior lead</span></li>
+          <li><b class="mono">Monthly</b><span>Metrics narrative: what moved, why, and what we’re doing about it</span></li>
+          <li><b class="mono">Quarterly</b><span>Model recalibration + positioning refresh + strategy review</span></li>
+          <li><b class="mono">Always</b><span>Your data. Your instances. Your systems — we operate them, you own them</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── the guarantee, where pricing would sit ── -->
+  <section class="eng__guarantee" aria-label="The guarantee">
+    <div class="eng__inner" data-e-in>
+      <p class="eng__seyebrow eng__seyebrow--gold mono">The guarantee</p>
+      <p class="eng__gline">Installed and generating qualified pipeline within 90 days &mdash; <em>or we work free until it is.</em></p>
+      <p class="eng__gnote mono">Engine engagements only &middot; flat retainer &middot; 6-month minimum &middot; numbers given on the call, immediately</p>
+    </div>
+  </section>
+
+  <!-- ── faq ── -->
+  <section class="eng__faq" aria-label="Questions founders ask">
+    <div class="eng__inner">
+      <p class="eng__seyebrow mono" data-e-in>Questions founders actually ask</p>
+      <div class="eng__faqlist" data-e-in>
+        {FAQ.map((f) => (
+          <details class="eng__q">
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── final ── -->
+  <section class="eng__final" aria-label="Start">
+    <div class="eng__inner" data-e-in>
+      <p class="eng__finalline">Start with the audit. <em>See what buyers see.</em></p>
+      <a class="eng__finalbtn" href="/book">Start with the AI Visibility Audit
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <p class="eng__finalmeta mono">Fixed scope &middot; 10 business days &middot; no retainer required</p>
+    </div>
+  </section>
+
+  <footer class="mod__foot">
+    <p class="mono">&copy; 2026 ORL Media &mdash; Growth infrastructure for B2B</p>
+  </footer>
+</main>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const main = document.querySelector<HTMLElement>('.eng');
+
+  if (main && !reduce) {
+    const ins = [...main.querySelectorAll<HTMLElement>('[data-e-in]')];
+    gsap.set(ins, { autoAlpha: 0, y: 16 });
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        gsap.to(e.target, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' });
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -8%' });
+    ins.forEach((el) => io.observe(el));
+
+    /* Schematic pulses drain into the layer, staggered per system — the one
+       animated moment in the hero, and it earns its place by showing what the
+       diagram claims: each system feeding the metrics layer. Travel is read
+       from the rendered line height rather than hardcoded, since the line is
+       now clamped against viewport height. */
+    main.querySelectorAll<HTMLElement>('[data-e-schpulse]').forEach((p, i) => {
+      const track = p.parentElement as HTMLElement;
+      const run = () => {
+        const dist = track.getBoundingClientRect().height;
+        gsap.fromTo(p, { y: -3, autoAlpha: 0 }, {
+          y: dist, autoAlpha: 1, duration: 1.1, ease: 'power1.in',
+          repeat: -1, repeatDelay: 2.2, delay: i * 0.55,
+          onRepeat: () => gsap.set(p, { autoAlpha: 0 }),
+        });
+      };
+      run();
+      window.addEventListener('resize', () => { gsap.killTweensOf(p); run(); });
+    });
+
+    /* month-one line draw */
+    main.querySelectorAll<HTMLElement>('[data-e-draw]').forEach((el) => {
+      gsap.set(el, { scaleX: 0, transformOrigin: '0% 50%' });
+      new IntersectionObserver(([e], o) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        gsap.to(el, { scaleX: 1, duration: 1.6, ease: 'power2.inOut' });
+      }, { threshold: 0.1 }).observe(el.parentElement!);
+    });
+
+    setTimeout(() => {
+      ins.forEach((el) => {
+        if (gsap.getProperty(el, 'opacity') === 0) gsap.set(el, { autoAlpha: 1, y: 0 });
+      });
+    }, 5000);
+  }
+</script>
+</body>
+</html>

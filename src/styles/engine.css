@@ -1,0 +1,704 @@
+/* ═══════════════════════════════════════════════════════════
+   ENGINE PAGES — /engine and /engine/[module]
+   The visitor steps INTO the panel they watched on the homepage.
+   Minimal palette: ink, ivory, one accent per module (set as
+   --acc / --acc-d inline). Dark hero → ivory argument → dark
+   metric statement → CTA. Resting CSS is the finished page.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── the ground ──
+   Deep warm taupe rather than pale cream. The flat #f6f2ea read as paper —
+   edge-to-edge, unlit, no depth — which is what made the page feel like a
+   document. Depth comes from three stacked layers, all fixed to the viewport
+   so they behave as a lit room the content moves through rather than a
+   texture that scrolls with it. */
+/* `body.` prefix is required: global.css sets body.blg-body (specificity 0,1,1)
+   and a bare .eng-body (0,1,0) loses to it regardless of load order. */
+body.eng-body { background: #cfc7b8; }
+body.eng-body::before,
+body.eng-body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+/* light from above, weight at the base — the vignette that stops it reading flat */
+body.eng-body::before {
+  background:
+    radial-gradient(ellipse 95% 55% at 50% -5%, rgba(255, 250, 240, 0.55), rgba(255, 250, 240, 0) 62%),
+    radial-gradient(ellipse 85% 45% at 50% 105%, rgba(74, 62, 44, 0.26), rgba(74, 62, 44, 0) 60%);
+}
+/* fine grain: keeps large flat areas from banding and adds the tooth the
+   reference has. Multiply so it darkens rather than fogs the ground. */
+body.eng-body::after {
+  opacity: 0.055;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* content rides above the atmosphere */
+.eng, .mod { position: relative; z-index: 1; }
+
+/* shared tokens on both page types */
+.mod, .eng {
+  --ink: #1f1d19;
+  /* --ivory is "the page ground" semantically, so redefining it here also
+     fixes the .eng__sbar label that masks the metrics rule behind itself */
+  --ivory: #cfc7b8;
+  --card: #fdfbf6;
+  /* hairlines must now be DARKER than the ground, not lighter — the old
+     #e6ddcc glowed against taupe instead of receding */
+  --border: #a89c86;
+  /* secondary text darkened: #6f675a measured 3.33 on the taupe ground.
+     These values clear AA on the ground (4.7) and on the cards (7.7), so one
+     set works everywhere instead of needing a per-surface pair. */
+  --muted: #575046;
+  --soft: #575046;
+  --gold: #c9a86a;
+  --gold-text: #654d25;
+  /* Neutral graphite, not warm brown. #1b1815 → #121009 carried a strong
+     olive-brown cast (r18 g16 b9 at the deep end); against the taupe ground
+     that read as mud rather than as a dark substrate. These are hue-neutral,
+     so the dark sections now sit under the warm ground instead of fighting it.
+     Drives all five dark bands: metrics, guarantee, module hero, keeps, CTA. */
+  --dark-a: #1c1c1e;
+  --dark-b: #121214;
+  --dark-ink: #f3efe6;
+  --dark-muted: #b5ac9c;
+  color: var(--ink);
+}
+
+/* ─────────────── module hero (dark, accent-lit) ─────────────── */
+.mod__hero {
+  position: relative;
+  background: radial-gradient(130% 120% at 50% 0%, var(--dark-a), var(--dark-b) 75%);
+  color: var(--dark-ink);
+  padding: 9.5rem 1.5rem 4.5rem;
+  overflow: hidden;
+}
+.mod__watermark {
+  position: absolute; right: -1.5rem; top: 2.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(14rem, 30vw, 26rem);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--acc-d) 34%, transparent);
+  pointer-events: none;
+  user-select: none;
+}
+.mod__heroinner { position: relative; max-width: 52rem; margin: 0 auto; }
+.mod__crumb {
+  display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+  margin: 0; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--dark-muted);
+}
+.mod__crumb a { color: var(--dark-muted); text-decoration: none; border-bottom: 1px solid rgba(201, 168, 106, 0.4); padding-bottom: 1px; }
+.mod__crumb a:hover { color: var(--gold); }
+.mod__status {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  margin-left: 0.4rem; padding: 0.3rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 99px;
+  font-style: normal; font-size: 0.58rem; color: var(--dark-ink);
+}
+.mod__status b { width: 6px; height: 6px; border-radius: 50%; background: var(--acc-d); animation: vxpulse 2.2s ease-out infinite; }
+.mod__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(3.4rem, 9vw, 6.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 1.6rem 0 0;
+}
+.mod__title em { font-style: normal; color: var(--acc-d); }
+.mod__pos {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  color: var(--acc-d);
+  margin: 0.6rem 0 0;
+}
+.mod__sub { max-width: 36rem; margin: 1.4rem 0 0; font-size: 1rem; line-height: 1.7; color: var(--dark-muted); }
+
+.mod__metric {
+  display: inline-block; margin-top: 2.2rem;
+  padding: 1rem 1.3rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+}
+.mod__metriclabel { margin: 0; font-size: 0.56rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+.mod__metricrow { display: flex; align-items: baseline; gap: 0.8rem; margin: 0.5rem 0 0; flex-wrap: wrap; }
+.mod__metricrow strong {
+  font-size: 2.6rem; font-weight: 500; line-height: 1; letter-spacing: -0.02em;
+  color: #ffffff; font-variant-numeric: tabular-nums lining-nums;
+}
+.mod__metricrow span { font-size: 0.82rem; color: var(--dark-muted); }
+
+.mod__heroline {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: rgba(255, 255, 255, 0.06); overflow: hidden;
+}
+.mod__heroline em {
+  display: block; width: 10%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--acc-d), transparent);
+}
+
+/* ─────────────── shared section chrome ─────────────── */
+.mod__inner { max-width: 66rem; margin: 0 auto; }
+.mod__eyebrow {
+  margin: 0 0 0.9rem; font-size: 0.62rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--gold-text);
+}
+.mod__eyebrow--dark { color: var(--gold); }
+.mod__eyebrow--acc { color: var(--acc-d); }
+.mod__h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  line-height: 1.1; letter-spacing: -0.015em;
+  margin: 0;
+}
+.mod__h2--dark { color: #ffffff; }
+.mod__body { font-size: 0.97rem; line-height: 1.7; color: #4a463e; }
+.mod__body--dark { color: var(--dark-muted); }
+
+/* ─────────────── problem ─────────────── */
+.mod__problem { padding: 5.5rem 1.5rem; }
+.mod__problemgrid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); gap: 3.5rem; align-items: start; }
+.mod__bigstat { margin: 2rem 0 0; }
+.mod__bigstat strong {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(4.5rem, 10vw, 7rem); line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--acc-t, var(--acc));   /* text-safe accent: amber/green fail 3:1 on ivory */
+  font-variant-numeric: lining-nums;
+}
+.mod__bigstatline { margin: 0.8rem 0 0; max-width: 22rem; font-size: 0.66rem; line-height: 1.6; letter-spacing: 0.04em; text-transform: uppercase; color: var(--soft); }
+.mod__support { margin: 2rem 0 0; padding: 0; list-style: none; }
+.mod__support li {
+  display: flex; align-items: baseline; gap: 1rem;
+  padding: 0.85rem 0; border-top: 1px solid var(--border);
+}
+.mod__support strong { flex: none; min-width: 5.5rem; font-size: 0.8rem; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.mod__support span { font-size: 0.82rem; line-height: 1.5; color: var(--muted); }
+
+/* ─────────────── pipeline ─────────────── */
+/* on the taupe ground these bands now read as elevated panels rather than a
+   tonal shift, so they take a real edge and a soft lift instead of hairlines */
+.mod__pipe {
+  padding: 5.5rem 1.5rem; background: #fbf8f2;
+  border-top: 1px solid #bdb19c; border-bottom: 1px solid #bdb19c;
+  box-shadow: 0 1px 0 rgba(255, 253, 247, 0.6) inset, 0 -1px 0 rgba(255, 253, 247, 0.6) inset;
+}
+.mod__steps { position: relative; margin-top: 2.8rem; padding-left: 2.4rem; }
+.mod__pipeline {
+  position: absolute; left: 0.55rem; top: 0.6rem; bottom: 2.4rem; width: 2px;
+  background: var(--border);
+}
+.mod__pipeline em { display: block; width: 100%; height: 100%; background: var(--acc); }
+.mod__step { position: relative; max-width: 42rem; padding: 0 0 2.4rem; }
+.mod__stepnum {
+  display: flex; align-items: center; gap: 0.55rem;
+  margin: 0; font-size: 0.6rem; letter-spacing: 0.12em; color: var(--gold-text);
+}
+.mod__stepnum i {
+  position: absolute; left: -2.35rem; top: 0.1rem;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--card); border: 2.5px solid var(--acc);
+}
+.mod__stepname {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: 1.5rem; line-height: 1.15; letter-spacing: -0.01em;
+  margin: 0.5rem 0 0; color: var(--ink);
+}
+.mod__stepdesc { margin: 0.6rem 0 0; font-size: 0.9rem; line-height: 1.68; color: #4a463e; }
+.mod__loopnote { margin: 0.4rem 0 0; font-size: 0.62rem; letter-spacing: 0.05em; color: var(--gold-text); }
+
+/* ─────────────── keeps (dark strip) ─────────────── */
+.mod__keeps {
+  background: radial-gradient(120% 140% at 0% 0%, var(--dark-a), var(--dark-b) 75%);
+  color: var(--dark-ink);
+  padding: 4.5rem 1.5rem;
+}
+.mod__keepsgrid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); gap: 3rem; align-items: center; }
+.mod__keeplist { margin: 0; padding: 0; list-style: none; }
+.mod__keeplist li {
+  display: flex; align-items: baseline; gap: 0.7rem;
+  padding: 0.8rem 0; border-top: 1px solid rgba(255, 255, 255, 0.09);
+  font-size: 0.9rem; line-height: 1.55; color: var(--dark-ink);
+}
+.mod__check {
+  display: grid; place-items: center; flex: none;
+  width: 17px; height: 17px; border-radius: 50%;
+  background: color-mix(in srgb, var(--acc-d) 22%, transparent);
+  color: var(--acc-d);
+  transform: translateY(2px);
+}
+
+/* ─────────────── deliverables ─────────────── */
+.mod__deliver { padding: 5.5rem 1.5rem; }
+.mod__delivergrid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem; margin: 2.4rem 0 0; padding: 0; list-style: none;
+}
+.mod__delivergrid li {
+  position: relative;
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 1rem 1.1rem 1rem 2.1rem;
+  font-size: 0.86rem; line-height: 1.55; color: #4a463e;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
+}
+.mod__delivergrid li:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -14px rgba(31, 26, 18, 0.2); }
+.mod__delivergrid i {
+  position: absolute; left: 0.9rem; top: 1.32rem;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--acc);
+}
+
+/* ─────────────── metric panel (dark) ─────────────── */
+.mod__metricpanel {
+  background: radial-gradient(120% 140% at 50% 0%, var(--dark-a), var(--dark-b) 75%);
+  color: var(--dark-ink);
+  padding: 5rem 1.5rem;
+  text-align: center;
+}
+.mod__metricbig { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; margin: 1.6rem 0 0; }
+.mod__metricbig strong {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(4rem, 11vw, 7.5rem); line-height: 1;
+  letter-spacing: -0.02em; color: #ffffff;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.mod__metricbig span { font-size: 0.9rem; letter-spacing: 0.04em; color: var(--acc-d); }
+.mod__metricdef { max-width: 34rem; margin: 1.4rem auto 0; font-size: 0.92rem; line-height: 1.7; color: var(--dark-muted); }
+
+/* ─────────────── engine strip ─────────────── */
+.mod__strip { padding: 3.2rem 1.5rem 0; }
+.mod__stripline {
+  display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+  margin: 1.2rem 0 0; padding: 0; list-style: none;
+  counter-reset: none;
+}
+.mod__stripline li { display: flex; align-items: center; gap: 0.6rem; }
+.mod__stripline li:not(:last-child)::after {
+  content: '→'; color: #c9bda1; font-size: 0.8rem;
+}
+.mod__stripline a {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.5rem 0.95rem;
+  background: var(--card); border: 1px solid var(--border); border-radius: 99px;
+  font-size: 0.78rem; font-weight: 500; color: var(--ink); text-decoration: none;
+  transition: border-color 0.25s, transform 0.25s;
+}
+.mod__stripline a:hover { transform: translateY(-2px); border-color: #c9bda1; }
+.mod__stripline b { font-size: 0.6rem; font-weight: 500; color: var(--gold-text); }
+.mod__stripline .is-here a { background: var(--ink); color: #ffffff; border-color: var(--ink); }
+.mod__stripline .is-here b { color: var(--gold); }
+.mod__striplayer a { border-style: dashed; }
+
+/* ─────────────── cta ─────────────── */
+.mod__cta { padding: 4.5rem 1.5rem 5.5rem; text-align: center; }
+.mod__ctah {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.8rem, 4.2vw, 2.7rem); line-height: 1.12;
+  letter-spacing: -0.015em; margin: 0;
+}
+.mod__ctas { max-width: 36rem; margin: 1.1rem auto 0; font-size: 0.95rem; line-height: 1.7; color: var(--muted); }
+.mod__ctabtn {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  margin-top: 1.8rem; padding: 0.95rem 1.8rem;
+  background: var(--ink); color: #ffffff; border-radius: 99px;
+  font-size: 0.95rem; font-weight: 500; text-decoration: none;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s;
+}
+.mod__ctabtn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px -12px rgba(31, 26, 18, 0.45); }
+.mod__ctanote { margin: 1rem 0 0; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); }
+
+/* ─────────────── footer ─────────────── */
+.mod__foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;
+  max-width: 66rem; margin: 0 auto;
+  padding: 2rem 1.5rem 2.6rem;
+  border-top: 1px solid var(--border);
+}
+.mod__foot > p { margin: 0; font-size: 0.58rem; letter-spacing: 0.06em; color: var(--soft); }
+.mod__next {
+  display: inline-flex; align-items: center; gap: 0.8rem;
+  color: var(--ink); text-decoration: none;
+}
+.mod__next span { font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-text); }
+.mod__next strong { font-family: var(--font-display); font-weight: 400; font-size: 1.1rem; }
+.mod__next svg { transition: transform 0.25s; }
+.mod__next:hover svg { transform: translateX(4px); }
+
+/* ═══════════════ /engine flagship ═══════════════ */
+/* ─────────────── engine hero (ivory, airy) ───────────────
+   No background of its own: the body's ivory runs straight through, so the
+   floating nav sits on one unbroken field rather than on a dark slab with a
+   seam under it. Everything here is set in space and hairline weight — there
+   is no card, no border, no fill. The restraint IS the treatment, so the
+   spacing has to be exact.                                                  */
+.eng__hero {
+  background: transparent;
+  color: var(--ink);
+  /* tuned so the schematic clears the fold: the four systems over one rule
+     are the thesis of the page and shouldn't need a scroll to appear */
+  padding: clamp(6.5rem, 12vh, 9.5rem) 1.5rem clamp(3.5rem, 6vh, 5.5rem);
+}
+.eng__heroinner { max-width: 58rem; margin: 0 auto; text-align: center; }
+.eng__eyebrow {
+  margin: 0; font-size: 0.62rem; letter-spacing: 0.16em;
+  text-transform: uppercase;
+  /* --gold (#c9a86a) is a dark-ground colour and fails on ivory; --gold-text
+     is the AA-safe counterpart already defined for exactly this case */
+  color: var(--gold-text);
+}
+.eng__title {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(2.6rem, 6vw, 4.6rem); line-height: 1.04;
+  letter-spacing: -0.02em; color: var(--ink); margin: 1.5rem 0 0;
+}
+.eng__title em { font-style: italic; color: var(--gold-text); }
+.eng__sub {
+  max-width: 34rem; margin: 1.5rem auto 0;
+  font-size: 1.0625rem; line-height: 1.75; color: var(--muted);
+}
+
+/* ── the schematic ──
+   Four systems, each with the number it owns, over one shared rule. The
+   verticals meeting the horizontal is the architecture drawn rather than
+   stated: everything reports into the layer. */
+.eng__schematic {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.75rem, 3vw, 2.5rem);
+  max-width: 52rem;
+  margin: clamp(2.25rem, 5vh, 4rem) auto 0;
+}
+.eng__schip {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+/* ── the service mark ──
+   One braided ring, recoloured per module. Uses --acc-t (the ground-safe
+   accent) rather than the raw --acc: at 2.4px stroke this is a non-text
+   graphic, and the darkened value keeps it legible on taupe without the
+   raw accent's glare. */
+.eng__mark {
+  width: clamp(30px, 4.5vw, 40px);
+  height: clamp(30px, 4.5vw, 40px);
+  margin-bottom: 0.85rem;
+  color: var(--acc-t);
+}
+.eng__mark path {
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+/* slow counter-rotation: ambient, not attention-seeking. Each module offset
+   so the four never spin in lockstep. */
+.eng__schip .eng__mark { animation: engring 44s linear infinite; }
+.eng__schip:nth-child(2) .eng__mark { animation-duration: 52s; animation-direction: reverse; }
+.eng__schip:nth-child(3) .eng__mark { animation-duration: 48s; }
+.eng__schip:nth-child(4) .eng__mark { animation-duration: 56s; animation-direction: reverse; }
+@keyframes engring { to { transform: rotate(1turn); } }
+@media (prefers-reduced-motion: reduce) {
+  .eng__schip .eng__mark { animation: none; }
+}
+.eng__schnum {
+  font-size: 0.58rem; font-weight: 500; letter-spacing: 0.12em;
+  color: var(--acc-t);
+}
+.eng__schname {
+  margin-top: 0.55rem;
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.05rem, 2.4vw, 1.45rem); line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--acc-t);
+}
+.eng__schverb {
+  margin-top: 0.25rem;
+  font-size: 0.78rem; line-height: 1.35; color: var(--muted);
+}
+/* the drain line — hairline, not a bar */
+.eng__sline {
+  position: relative;
+  width: 1px; height: clamp(28px, 4vh, 38px);
+  margin-top: 0.8rem;
+  background: linear-gradient(180deg, var(--border), color-mix(in srgb, var(--border) 35%, transparent));
+}
+.eng__sline em {
+  position: absolute; left: 50%; top: 0;
+  width: 3px; height: 3px; margin-left: -1.5px;
+  border-radius: 50%;
+  /* solid dot, no glow: a bloom reads as light emitted from a dark ground
+     and looks like a smudge on ivory */
+  background: var(--acc);
+  opacity: 0;
+}
+.eng__schmetric {
+  margin-top: 0.7rem;
+  font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase;
+  line-height: 1.5; color: var(--soft);
+}
+/* the layer: one rule the four verticals drain into. The label sits ON the
+   rule with ivory behind it, so the line reads as passing underneath. */
+.eng__sbar {
+  grid-column: 1 / -1;
+  position: relative;
+  margin-top: clamp(1.5rem, 3.25vh, 2.4rem);
+  text-align: center;
+}
+.eng__sbar::before {
+  content: '';
+  position: absolute; left: 0; right: 0; top: 50%;
+  height: 1px; background: var(--border);
+}
+.eng__sbar span {
+  position: relative;
+  padding: 0 1.1rem;
+  background: var(--ivory);
+  font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold-text);
+}
+
+.eng__inner { max-width: 66rem; margin: 0 auto; }
+.eng__seyebrow { margin: 0 0 0.9rem; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-text); }
+/* --gold is a dark-ground colour; on the flattened page these take the
+   AA-safe --gold-text instead */
+.eng__seyebrow--gold { color: var(--gold-text); }
+.eng__h2 {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.9rem, 4vw, 2.8rem); line-height: 1.1;
+  letter-spacing: -0.015em; margin: 0;
+}
+.eng__h2--dark { color: var(--ink); }
+.eng__body--dark { margin: 1.1rem 0 0; font-size: 0.95rem; line-height: 1.7; color: var(--muted); }
+
+/* — system rows — */
+.eng__systems { padding: 5.5rem 1.5rem; }
+.eng__rows { margin-top: 2.6rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.eng__row {
+  position: relative;
+  display: flex; align-items: center; gap: 1.6rem;
+  /* no fill: the page is one ground. Affordance is carried by the border,
+     the hover lift, the accent bar and the arrow — not by a card surface. */
+  background: transparent; border: 1px solid var(--border); border-radius: 16px;
+  padding: 1.5rem 1.7rem;
+  text-decoration: none; color: var(--ink);
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s, border-color 0.3s;
+}
+.eng__row::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--acc);
+  transform: scaleY(0); transform-origin: 50% 100%;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.eng__row:hover { transform: translateY(-3px); box-shadow: 0 22px 48px -18px rgba(31, 26, 18, 0.2); border-color: #d9d0be; }
+.eng__row:hover::before { transform: scaleY(1); }
+/* the mark repeats on each row as a watermark, not a second icon — the row
+   already leads with its number, and a second same-size glyph would compete.
+   The row is position:relative + overflow:hidden, so it crops cleanly. */
+.eng__mark--row {
+  position: absolute;
+  right: -22px;
+  top: 50%;
+  width: 132px; height: 132px;
+  transform: translateY(-50%);
+  margin: 0;
+  color: var(--acc);
+  opacity: 0.09;
+  pointer-events: none;
+}
+.eng__mark--row path { stroke-width: 1.6; }
+.eng__row:hover .eng__mark--row { opacity: 0.16; }
+
+.eng__rownum {
+  /* Retuned twice: #c9bda1 measured 1.8:1 on the old card, #7c7261 cleared
+     4.58 there — but with the card fill removed these numerals now sit on the
+     taupe ground, where #7c7261 falls to 2.82. --muted clears 4.7 on the ground. */
+  flex: none; font-size: 1rem; color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.eng__rowmain { min-width: 0; flex: 1; }
+.eng__rowhead { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; }
+.eng__rowname { font-family: var(--font-display); font-weight: 400; font-size: 1.7rem; letter-spacing: -0.01em; }
+.eng__rowverb { font-style: italic; font-family: var(--font-display); font-size: 1.05rem; color: var(--acc-t, var(--acc)); }
+.eng__rowstatus {
+  margin-left: auto; padding: 0.22rem 0.6rem;
+  border: 1px solid var(--border); border-radius: 99px; background: transparent;
+  font-size: 0.54rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-text);
+  white-space: nowrap;
+}
+.eng__rowline { display: block; margin-top: 0.55rem; max-width: 46rem; font-size: 0.88rem; line-height: 1.62; color: #4a463e; }
+.eng__rowmetric {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  margin-top: 0.75rem; font-size: 0.6rem; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--soft);
+}
+.eng__rowmetric i { width: 6px; height: 6px; border-radius: 50%; background: var(--acc); }
+.eng__rowarrow { flex: none; color: #c9bda1; transition: transform 0.3s, color 0.3s; }
+.eng__row:hover .eng__rowarrow { transform: translateX(4px); color: var(--ink); }
+
+/* — metrics layer section — */
+/* ── ONE GROUND ──
+   Every band on this page is now transparent so the taupe runs unbroken
+   from nav to footer. These sections were previously a dark slab (metrics,
+   guarantee) and a lighter panel (included); the alternation is what made
+   the page read as stacked strips. Structure is now carried by spacing and
+   hairlines alone. NOTE: the .mod__* dark sections are deliberately left
+   alone — those belong to the module pages, not this one. */
+.eng__metrics {
+  background: transparent;
+  color: var(--ink);
+  padding: 5rem 1.5rem;
+  scroll-margin-top: 5rem;
+}
+.eng__metricsgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; align-items: center; }
+.eng__mtiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; margin: 0; padding: 0; list-style: none; }
+.eng__mtiles li {
+  padding: 0.85rem 0.95rem;
+  /* no fill at all — the border alone groups them. A faint ink wash was
+     tried here first, but it is still a second background colour, and it
+     dragged the tile captions to 4.45:1. Border-only keeps the ground
+     literally uniform and returns the captions to 4.7:1. */
+  background: transparent;
+  border: 1px solid var(--border); border-radius: 11px;
+}
+.eng__mtiles b { display: block; font-size: 0.62rem; font-weight: 500; letter-spacing: 0.04em; color: var(--ink); }
+.eng__mtiles span { display: block; margin-top: 0.3rem; font-size: 0.56rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+
+/* — month one — */
+.eng__month { padding: 5.5rem 1.5rem; }
+.eng__phases {
+  position: relative;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.6rem; margin-top: 3rem; padding-top: 1.6rem;
+}
+.eng__phaseline { position: absolute; left: 0.4rem; right: 0.4rem; top: 0; height: 2px; background: var(--border); }
+.eng__phaseline em { display: block; height: 100%; background: var(--gold); }
+.eng__phase { position: relative; }
+.eng__phasewk { display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-text); }
+.eng__phasewk i {
+  position: absolute; top: -2.05rem; left: 0.1rem;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--ivory); border: 2.5px solid var(--gold);
+}
+.eng__phase h3 {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: 1.45rem; letter-spacing: -0.01em; margin: 0.6rem 0 0;
+}
+.eng__phase p { margin: 0.6rem 0 0; font-size: 0.86rem; line-height: 1.65; color: #4a463e; }
+
+/* — included + cadence — */
+.eng__included {
+  padding: 5.5rem 1.5rem; background: transparent;
+  /* hairlines instead of a panel — the section boundary survives, the
+     second background colour does not */
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.eng__incgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; align-items: start; }
+.eng__inclist { margin: 1.8rem 0 0; padding: 0; list-style: none; }
+.eng__inclist li {
+  position: relative; padding: 0.6rem 0 0.6rem 1.4rem;
+  border-top: 1px solid #eee5d5;
+  font-size: 0.88rem; line-height: 1.55; color: #4a463e;
+}
+.eng__inclist li::before {
+  content: ''; position: absolute; left: 0; top: 1.15em;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+}
+.eng__cadence {
+  /* last remaining panel — border only, same ground as everything else */
+  background: transparent; border: 1px solid var(--border); border-radius: 16px;
+  padding: 1.6rem 1.6rem 1.2rem;
+}
+.eng__cadlist { margin: 1rem 0 0; padding: 0; list-style: none; }
+.eng__cadlist li { display: flex; gap: 1rem; align-items: baseline; padding: 0.7rem 0; border-top: 1px solid #f1ece1; }
+.eng__cadlist b { flex: none; width: 4.6rem; font-size: 0.58rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold-text); }
+.eng__cadlist span { font-size: 0.82rem; line-height: 1.55; color: #4a463e; }
+
+/* — guarantee — */
+.eng__guarantee {
+  background: transparent;
+  color: var(--ink);
+  padding: 4.5rem 1.5rem; text-align: center;
+}
+.eng__gline {
+  max-width: 44rem; margin: 1.2rem auto 0;
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.25;
+  letter-spacing: -0.01em; color: var(--ink);
+}
+.eng__gline em { font-style: italic; color: var(--gold-text); }
+.eng__gnote { margin: 1.4rem 0 0; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+/* — faq — */
+.eng__faq { padding: 5.5rem 1.5rem; }
+.eng__faqlist { max-width: 46rem; margin: 2rem 0 0; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.eng__q { background: transparent; border-bottom: 1px solid var(--border); }
+.eng__q:last-child { border-bottom: none; }
+.eng__q summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  font-family: 'General Sans', 'Inter', sans-serif; font-weight: 600;
+  font-size: 0.95rem; color: var(--ink);
+  transition: background 0.2s;
+}
+.eng__q summary::-webkit-details-marker { display: none; }
+.eng__q summary::after {
+  content: '+'; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 1.05rem; color: var(--gold-text); flex: none; transition: transform 0.25s;
+}
+.eng__q[open] summary { background: rgba(31, 29, 25, 0.05); }
+.eng__q[open] summary::after { transform: rotate(45deg); }
+.eng__q summary:hover { background: rgba(31, 29, 25, 0.05); }
+.eng__q p { margin: 0; padding: 0.2rem 1.4rem 1.25rem; font-size: 0.88rem; line-height: 1.68; color: #4a463e; }
+
+/* — final — */
+.eng__final { padding: 2rem 1.5rem 5.5rem; text-align: center; }
+.eng__finalline {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.6rem, 3.6vw, 2.3rem); line-height: 1.2;
+  letter-spacing: -0.01em; margin: 0;
+}
+.eng__finalline em { font-style: italic; color: var(--gold-text); }
+.eng__finalbtn {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  margin-top: 1.7rem; padding: 0.95rem 1.8rem;
+  background: var(--ink); color: #ffffff; border-radius: 99px;
+  font-size: 0.95rem; font-weight: 500; text-decoration: none;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s;
+}
+.eng__finalbtn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px -12px rgba(31, 26, 18, 0.45); }
+.eng__finalmeta { margin: 1rem 0 0; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); }
+
+/* ─────────────── responsive ─────────────── */
+@media (max-width: 900px) {
+  .mod__problemgrid, .mod__keepsgrid, .eng__metricsgrid, .eng__incgrid { grid-template-columns: 1fr; gap: 2rem; }
+  .mod__delivergrid { grid-template-columns: 1fr; }
+  .eng__phases { grid-template-columns: 1fr; padding-top: 0; padding-left: 1.8rem; }
+  .eng__phaseline { left: 0.32rem; right: auto; top: 0.4rem; bottom: 0.4rem; width: 2px; height: auto; }
+  .eng__phaseline em { width: 100%; height: 100%; }
+  .eng__phasewk i { top: 0.05rem; left: -1.78rem; }
+  .eng__schematic { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .eng__rowstatus { margin-left: 0; }
+}
+@media (max-width: 560px) {
+  .mod__hero { padding: 8rem 1.2rem 3.6rem; }
+  .mod__watermark { display: none; }
+  .mod__problem, .mod__pipe, .mod__deliver, .eng__systems, .eng__month, .eng__included, .eng__faq { padding-left: 1.2rem; padding-right: 1.2rem; }
+  .eng__row { flex-direction: column; align-items: flex-start; gap: 0.8rem; padding: 1.3rem 1.25rem; }
+  .eng__rowarrow { display: none; }
+  .mod__foot { flex-direction: column; align-items: flex-start; }
+}
+
+/* ─────────────── reduced motion ─────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .mod__status b { animation: none; }
+  .mod__heroline em, .eng__sline em { display: none; }
+  .mod__delivergrid li, .eng__row, .eng__row::before, .mod__stripline a,
+  .mod__ctabtn, .eng__finalbtn, .mod__next svg, .eng__rowarrow, .eng__q summary { transition: none; }
+  .mod__delivergrid li:hover, .eng__row:hover, .mod__ctabtn:hover, .eng__finalbtn:hover { transform: none; }
+}

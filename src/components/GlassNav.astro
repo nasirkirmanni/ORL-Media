@@ -1,0 +1,43 @@
+---
+/* ─────────────────────────────────────────────────────────────
+   GlassNav — behaviour only, no markup.
+
+   Drop <GlassNav /> into any page that renders .sitenav / .sitenav--page.
+   Six templates carry the nav, so the init lives here rather than being
+   copy-pasted into each one.
+
+   The module supplies the rim refraction (Chromium only). The glass
+   *material* — tint, blur, specular highlights, border — is CSS in
+   global.css, so the nav still reads as glass with JS disabled or in
+   Safari/Firefox. Refraction is never load-bearing.
+   ───────────────────────────────────────────────────────────── */
+---
+
+<script>
+  import '../lib/liquid-glass.js';
+
+  const nav = document.querySelector<HTMLElement>('.sitenav, .sitenav--page');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (nav && typeof (window as any).liquidGlass === 'function') {
+    /* Tuned down from the -112 default. The nav is a thin pill sitting over
+       body copy and product UI; at full strength the rim smears the content
+       passing under it. -64 keeps a visible bend at the edge while the
+       interior stays clean. */
+    const glass = (window as any).liquidGlass(nav, {
+      scale: -64,
+      chroma: 4,
+      mapBlur: 10,
+      blur: 6,
+      saturate: 1.5,
+      border: 0.16,
+      fallbackBlur: 18,
+    });
+
+    /* The homepage nav slides in on scroll; the module reads element size to
+       build its map, so regenerate once it has settled at full width. */
+    if (!reduce.matches) {
+      window.addEventListener('load', () => glass.refresh?.(), { once: true });
+    }
+  }
+</script>

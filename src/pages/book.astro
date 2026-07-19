@@ -1,0 +1,414 @@
+---
+import '../styles/global.css';
+import Seo from '../components/Seo.astro';
+import { graph, organization, website, breadcrumbs } from '../lib/schema';
+
+const ld = graph([
+  organization(),
+  website(),
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'Book a call', path: '/book/' },
+  ]),
+]);
+import GlassNav from '../components/GlassNav.astro';
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <Seo
+    title="Book a call — ORL Media"
+    description="Book a 30-minute call with ORL Media. We'll look at your AI visibility, buying signals, and pipeline — and show you what the Growth Engine would change."
+    ogTitle="Book a call with ORL Media"
+    image="/og/default.jpg"
+  >
+    <script type="application/ld+json" is:inline set:html={ld} />
+  </Seo>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
+</head>
+<body class="blg-body">
+
+<nav class="sitenav sitenav--page is-visible" aria-label="Site">
+  <a class="sitenav__brand" href="/">
+    <span class="sitenav__mark" aria-hidden="true"></span>
+    ORL Media
+  </a>
+  <div class="sitenav__links">
+    <a href="/engine" class="sitenav__link">Services</a>
+    <a href="/blog" class="sitenav__link">Blog</a>
+  </div>
+  <a class="sitenav__pill" href="/book" aria-current="page">Book a call</a>
+</nav>
+<GlassNav />
+
+<main class="bk" id="main">
+  <div class="bk__grid">
+
+    <!-- left: what this call is -->
+    <section class="bk__copy" aria-label="About this call">
+      <p class="bk__eyebrow mono">Book a call</p>
+      <h1 class="bk__title">Let&rsquo;s look at your growth engine.</h1>
+      <p class="bk__sub">Thirty minutes with a senior operator &mdash; not a sales script. We&rsquo;ll look at how AI answers your category, where revenue is leaking, and what installing the ORL Growth Engine would change.</p>
+      <ul class="bk__steps">
+        <li>
+          <span class="bk__stepnum mono" aria-hidden="true">01</span>
+          <div>
+            <strong>We audit before we talk</strong>
+            <p>You&rsquo;ll see your live Share of Answer across ChatGPT, Perplexity, and Gemini on the call.</p>
+          </div>
+        </li>
+        <li>
+          <span class="bk__stepnum mono" aria-hidden="true">02</span>
+          <div>
+            <strong>We map the gaps</strong>
+            <p>Visibility, signals, retention, metrics &mdash; where your current setup leaks and what it costs.</p>
+          </div>
+        </li>
+        <li>
+          <span class="bk__stepnum mono" aria-hidden="true">03</span>
+          <div>
+            <strong>You get the plan either way</strong>
+            <p>A written summary of findings and next steps lands in your inbox &mdash; whether we work together or not.</p>
+          </div>
+        </li>
+      </ul>
+      <p class="bk__trust mono">30 minutes &middot; No deck &middot; No obligation</p>
+    </section>
+
+    <!-- right: the booking card -->
+    <section aria-label="Booking form">
+      <form class="bk__card" novalidate data-bk-form>
+
+        <!-- step progress -->
+        <div class="bk__prog" aria-hidden="true">
+          <span class="bk__prog-item is-on" data-bk-prog="1"><b>01</b>Details</span>
+          <i></i>
+          <span class="bk__prog-item" data-bk-prog="2"><b>02</b>Pick a time</span>
+        </div>
+
+        <!-- ── STEP 1: details + budget ── -->
+        <div class="bk__step" data-bk-step1 role="group" aria-label="Step 1 of 2 — your details">
+          <fieldset>
+            <legend class="bk__legend mono">About you</legend>
+            <div class="bk__row">
+              <div class="bk-field" data-bk-field>
+                <label for="bk-name">Name <em aria-hidden="true">*</em></label>
+                <input id="bk-name" name="name" type="text" autocomplete="name" required placeholder="Sara Chen" />
+                <p class="bk__err"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-7h-2v5h2V9z"/></svg>Please enter your name.</p>
+              </div>
+              <div class="bk-field" data-bk-field>
+                <label for="bk-company">Company name <em aria-hidden="true">*</em></label>
+                <input id="bk-company" name="company" type="text" autocomplete="organization" required placeholder="Acme AI" />
+                <p class="bk__err"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-7h-2v5h2V9z"/></svg>Please enter your company name.</p>
+              </div>
+            </div>
+            <div class="bk-field" data-bk-field>
+              <label for="bk-email">Company email <em aria-hidden="true">*</em></label>
+              <input id="bk-email" name="email" type="email" autocomplete="work email" required placeholder="sara@acme.ai" inputmode="email" />
+              <p class="bk__err"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-7h-2v5h2V9z"/></svg>Please enter a valid email address.</p>
+            </div>
+            <div class="bk-field" data-bk-field data-optional>
+              <label for="bk-site">Website <small>(optional)</small></label>
+              <input id="bk-site" name="website" type="text" autocomplete="url" inputmode="url" placeholder="acme.ai" />
+              <p class="bk__err"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-7h-2v5h2V9z"/></svg>That doesn&rsquo;t look like a website address.</p>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend class="bk__legend mono">Monthly growth budget</legend>
+            <div class="bk__slider">
+              <p class="bk__slider-val"><strong data-bk-budget-val>$10K</strong><span>/ month</span></p>
+              <input
+                class="bk__range"
+                type="range"
+                min="0" max="10" step="1" value="1"
+                data-bk-range
+                aria-label="Monthly growth budget"
+                aria-valuetext="$10K per month"
+              />
+              <div class="bk__scale mono" aria-hidden="true"><span>$5K</span><span>$100K</span><span>$1M+</span></div>
+            </div>
+          </fieldset>
+
+          <button class="bk__submit" type="button" data-bk-next>
+            <span>Next &mdash; pick a time</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <p class="bk__fine mono">Step 1 of 2 &middot; takes about a minute</p>
+        </div>
+
+        <!-- ── STEP 2: calendar + time slots ── -->
+        <div class="bk__step" data-bk-step2 hidden role="group" aria-label="Step 2 of 2 — pick a time">
+          <fieldset class="bk__group" data-bk-when>
+            <legend class="bk__legend mono">Pick a time</legend>
+            <div class="bk__when2">
+              <div class="bk__cal">
+                <div class="bk__calhead">
+                  <span class="bk__calmonth" data-bk-month aria-live="polite">Month</span>
+                  <span class="bk__calnav">
+                    <button type="button" data-bk-prev aria-label="Previous month"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
+                    <button type="button" data-bk-next-month aria-label="Next month"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+                  </span>
+                </div>
+                <div class="bk__caldays mono" aria-hidden="true">
+                  <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+                </div>
+                <div class="bk__calgrid" data-bk-grid role="listbox" aria-label="Available dates"></div>
+              </div>
+              <aside class="bk__slotpanel" data-bk-slotpanel>
+                <p class="bk__slotdate" data-bk-slots-label aria-live="polite">Pick a date</p>
+                <div class="bk__slotlist" data-bk-slotgrid role="listbox" aria-label="Available times"></div>
+                <p class="bk__tz mono" data-bk-tz></p>
+              </aside>
+            </div>
+            <p class="bk__pick" data-bk-pick aria-live="polite">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+              <span data-bk-pick-text></span>
+            </p>
+            <p class="bk__err"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-7h-2v5h2V9z"/></svg>Please pick a time for the call.</p>
+          </fieldset>
+
+          <div class="bk__actions">
+            <button class="bk__back" type="button" data-bk-back>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5M11 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Back
+            </button>
+            <button class="bk__submit bk__submit--grow" type="submit" data-bk-submit>
+              <span class="bk__spin" aria-hidden="true"></span>
+              <span data-bk-submit-label>Confirm booking</span>
+            </button>
+          </div>
+          <p class="bk__fine mono">A confirmation &amp; calendar invite land in your inbox.</p>
+        </div>
+      </form>
+
+      <!-- success -->
+      <div class="bk__card bk__done" data-bk-done role="status" aria-live="polite">
+        <span class="bk__done-ic" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>
+        </span>
+        <h2 class="bk__done-t">Booking confirmed.</h2>
+        <p class="bk__done-s">You&rsquo;re on the calendar. A confirmation email with the meeting link is on its way &mdash; and we&rsquo;ll bring your live AI-visibility audit to the call.</p>
+        <div class="bk__done-sum">
+          <div><span>When</span><strong data-bk-sum-when></strong></div>
+          <div><span>Who</span><strong data-bk-sum-who></strong></div>
+          <div><span>Company</span><strong data-bk-sum-co></strong></div>
+          <div><span>Budget</span><strong data-bk-sum-budget></strong></div>
+        </div>
+        <a class="bk__done-back" href="/">&larr; Back to the site</a>
+      </div>
+    </section>
+  </div>
+
+  <footer class="blg__foot mono">&copy; 2026 ORL Media &mdash; Growth infrastructure for B2B</footer>
+</main>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-bk-form]')!;
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── budget slider ─────────────────────────────────────── */
+  const BUDGETS = ['$5K', '$10K', '$15K', '$20K', '$30K', '$50K', '$75K', '$100K', '$250K', '$500K', '$1M+'];
+  const range = form.querySelector<HTMLInputElement>('[data-bk-range]')!;
+  const budgetVal = form.querySelector<HTMLElement>('[data-bk-budget-val]')!;
+  function paintRange() {
+    const i = Number(range.value);
+    budgetVal.textContent = BUDGETS[i];
+    range.setAttribute('aria-valuetext', BUDGETS[i] + ' per month');
+    range.style.setProperty('--pct', (i / (BUDGETS.length - 1)) * 100 + '%');
+  }
+  range.addEventListener('input', paintRange);
+  paintRange();
+
+  /* ── step navigation ───────────────────────────────────── */
+  const step1 = form.querySelector<HTMLElement>('[data-bk-step1]')!;
+  const step2 = form.querySelector<HTMLElement>('[data-bk-step2]')!;
+  const progs = [...form.querySelectorAll<HTMLElement>('[data-bk-prog]')];
+  function showStep(n: 1 | 2) {
+    step1.hidden = n !== 1;
+    step2.hidden = n !== 2;
+    progs.forEach((p) => p.classList.toggle('is-on', Number(p.dataset.bkProg) === n));
+    const active = n === 1 ? step1 : step2;
+    if (!REDUCED) {
+      active.classList.remove('is-in');
+      void active.offsetWidth;           // restart the entrance animation
+      active.classList.add('is-in');
+    }
+  }
+
+  /* ── validation ────────────────────────────────────────── */
+  const fields = [...form.querySelectorAll<HTMLElement>('[data-bk-field]')];
+  const emailOk = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  const siteOk = (v: string) => /^(https?:\/\/)?[\w-]+(\.[\w-]+)+([/?#].*)?$/i.test(v);
+
+  function validateField(f: HTMLElement): boolean {
+    const input = f.querySelector<HTMLInputElement>('input')!;
+    const optional = f.hasAttribute('data-optional');
+    const v = input.value.trim();
+    let ok = true;
+    if (!optional && !v) ok = false;
+    else if (v && input.type === 'email') ok = emailOk(v);
+    else if (v && input.id === 'bk-site') ok = siteOk(v);
+    f.classList.toggle('is-err', !ok);
+    input.setAttribute('aria-invalid', String(!ok));
+    return ok;
+  }
+  fields.forEach((f) => {
+    const input = f.querySelector<HTMLInputElement>('input')!;
+    input.addEventListener('blur', () => { if (input.value.trim() || f.classList.contains('is-err')) validateField(f); });
+    input.addEventListener('input', () => { if (f.classList.contains('is-err')) validateField(f); });
+  });
+
+  /* ── calendar (step 2) ─────────────────────────────────── */
+  const SLOTS = ['9–10 AM', '10–11 AM', '11–12 PM', '1–2 PM', '2–3 PM', '4–5 PM'];
+  const today = new Date();
+  const minDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+  const maxDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 45);
+  let view = new Date(today.getFullYear(), today.getMonth(), 1);
+  let selDate: Date | null = null;
+  let selTime: string | null = null;
+
+  const grid = form.querySelector<HTMLElement>('[data-bk-grid]')!;
+  const monthEl = form.querySelector<HTMLElement>('[data-bk-month]')!;
+  const prevBtn = form.querySelector<HTMLButtonElement>('[data-bk-prev]')!;
+  const nextMonthBtn = form.querySelector<HTMLButtonElement>('[data-bk-next-month]')!;
+  const slotGrid = form.querySelector<HTMLElement>('[data-bk-slotgrid]')!;
+  const slotsLabel = form.querySelector<HTMLElement>('[data-bk-slots-label]')!;
+  const tzEl = form.querySelector<HTMLElement>('[data-bk-tz]')!;
+  const pick = form.querySelector<HTMLElement>('[data-bk-pick]')!;
+  const pickText = form.querySelector<HTMLElement>('[data-bk-pick-text]')!;
+  const whenGroup = form.querySelector<HTMLElement>('[data-bk-when]')!;
+
+  try {
+    tzEl.textContent = 'Times in ' + Intl.DateTimeFormat().resolvedOptions().timeZone.replace('_', ' ');
+  } catch { tzEl.textContent = 'Times in your local timezone'; }
+
+  const sameDay = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  const fmtLong = (d: Date) =>
+    d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const isWeekday = (d: Date) => { const dow = (d.getDay() + 6) % 7; return dow < 5; };
+
+  function nextAvailable(): Date {
+    const d = new Date(minDay);
+    while (!isWeekday(d)) d.setDate(d.getDate() + 1);
+    return d;
+  }
+
+  function renderCal() {
+    monthEl.textContent = view.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const first = new Date(today.getFullYear(), today.getMonth(), 1);
+    const last = new Date(today.getFullYear(), today.getMonth() + 2, 1);
+    prevBtn.disabled = view <= first;
+    nextMonthBtn.disabled = view >= last;
+
+    grid.innerHTML = '';
+    const firstDow = (new Date(view.getFullYear(), view.getMonth(), 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+    for (let i = 0; i < firstDow; i++) grid.appendChild(document.createElement('span'));
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(view.getFullYear(), view.getMonth(), d);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = String(d);
+      btn.setAttribute('role', 'option');
+      const open = isWeekday(date) && date >= minDay && date <= maxDay;
+      btn.disabled = !open;
+      if (sameDay(date, today)) btn.classList.add('is-today');
+      if (selDate && sameDay(date, selDate)) btn.classList.add('is-sel');
+      btn.setAttribute('aria-label', fmtLong(date) + (open ? '' : ' (unavailable)'));
+      btn.setAttribute('aria-selected', String(!!(selDate && sameDay(date, selDate))));
+      if (open) btn.addEventListener('click', () => { selDate = date; selTime = null; renderCal(); renderSlots(); updatePick(); });
+      grid.appendChild(btn);
+    }
+  }
+
+  function renderSlots() {
+    slotGrid.innerHTML = '';
+    if (!selDate) { slotsLabel.textContent = 'Pick a date'; return; }
+    slotsLabel.textContent = fmtLong(selDate);
+    SLOTS.forEach((t) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = t;
+      btn.setAttribute('role', 'option');
+      btn.setAttribute('aria-selected', String(selTime === t));
+      if (selTime === t) btn.classList.add('is-sel');
+      btn.addEventListener('click', () => {
+        selTime = t;
+        renderSlots();
+        updatePick();
+        whenGroup.classList.remove('is-err');
+      });
+      slotGrid.appendChild(btn);
+    });
+  }
+
+  function updatePick() {
+    if (selDate && selTime) {
+      pick.classList.add('is-on');
+      pickText.textContent = fmtLong(selDate) + ' · ' + selTime;
+    } else {
+      pick.classList.remove('is-on');
+    }
+  }
+
+  prevBtn.addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth() - 1, 1); renderCal(); });
+  nextMonthBtn.addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth() + 1, 1); renderCal(); });
+
+  /* ── step buttons ──────────────────────────────────────── */
+  form.querySelector<HTMLButtonElement>('[data-bk-next]')!.addEventListener('click', () => {
+    let firstBad: HTMLInputElement | null = null;
+    fields.forEach((f) => { if (!validateField(f) && !firstBad) firstBad = f.querySelector('input'); });
+    if (firstBad) { firstBad.focus(); return; }
+    // first entry: pre-select the next available weekday and show its slots
+    if (!selDate) {
+      selDate = nextAvailable();
+      view = new Date(selDate.getFullYear(), selDate.getMonth(), 1);
+    }
+    renderCal();
+    renderSlots();
+    updatePick();
+    showStep(2);
+    whenGroup.querySelector<HTMLElement>('.bk__legend')?.scrollIntoView({ block: 'nearest' });
+  });
+
+  form.querySelector<HTMLButtonElement>('[data-bk-back]')!.addEventListener('click', () => showStep(1));
+
+  /* ── submit → confirmation ─────────────────────────────── */
+  const submitBtn = form.querySelector<HTMLButtonElement>('[data-bk-submit]')!;
+  const submitLabel = form.querySelector<HTMLElement>('[data-bk-submit-label]')!;
+  const done = document.querySelector<HTMLElement>('[data-bk-done]')!;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const hasWhen = !!(selDate && selTime);
+    whenGroup.classList.toggle('is-err', !hasWhen);
+    if (!hasWhen) {
+      (slotGrid.querySelector('button') as HTMLButtonElement | null)?.focus();
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.classList.add('is-busy');
+    submitLabel.textContent = 'Confirming…';
+    setTimeout(() => {
+      const name = form.querySelector<HTMLInputElement>('#bk-name')!.value.trim();
+      const co = form.querySelector<HTMLInputElement>('#bk-company')!.value.trim();
+      document.querySelector('[data-bk-sum-when]')!.textContent = fmtLong(selDate!) + ' · ' + selTime;
+      document.querySelector('[data-bk-sum-who]')!.textContent = name;
+      document.querySelector('[data-bk-sum-co]')!.textContent = co;
+      document.querySelector('[data-bk-sum-budget]')!.textContent = BUDGETS[Number(range.value)] + ' / mo';
+      form.style.display = 'none';
+      done.classList.add('is-on');
+      done.scrollIntoView({ block: 'center', behavior: REDUCED ? 'auto' : 'smooth' });
+    }, 900);
+  });
+</script>
+</body>
+</html>

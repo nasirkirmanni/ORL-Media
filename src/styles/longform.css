@@ -1,0 +1,448 @@
+/* ═══════════════════════════════════════════════════════════
+   LONGFORM — editorial furniture for flagship research pieces.
+   Loaded only by /blog/[slug]. Reading progress, stat rows,
+   figures, callouts, comparison tables, accordions, and the
+   closing assessment panel.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════
+   EDITORIAL TYPE SYSTEM
+   Three faces, strict roles, no UI sans inside the article:
+
+     Instrument Serif — display voice (title, act breaks, pull
+       quotes, figures' numerals). The brand face, unchanged.
+     Newsreader       — the reading face. Variable optical size,
+       drawn for long-form screen text. Carries all body copy.
+     JetBrains Mono   — instrumentation. Labels, captions, table
+       headers, eyebrows. Signals "research report", not "blog".
+
+   Selectors are scoped under .post so they beat global.css on
+   specificity rather than relying on bundler import order.
+   ═══════════════════════════════════════════════════════════ */
+
+.post {
+  --serif-display: 'Instrument Serif', Georgia, serif;
+  --serif-text: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --ink: #211f1b;          /* body text — warmer and darker than #2c2924 */
+  --ink-strong: #14130f;   /* headings, bold */
+  --ink-soft: #5f584c;     /* secondary, captions */
+  /* Small labels sit at 10–12px, so they need the 4.5:1 floor for
+     small text. The old #8a8578 measured 3.56:1 and failed. */
+  --ink-faint: #635c50;    /* labels, meta */
+  --rule: #e6ddcc;
+  --gold: #a5824c;
+}
+
+/* measure ---------------------------------------------------------
+   Measured, not guessed: 35rem at 18.8px Newsreader lands at ~69
+   characters, mid-band. Was 48rem of 16.3px Inter — 94 characters,
+   well past the 60–75 comfort range for continuous reading. */
+.post .prose {
+  max-width: 35rem;
+  margin: 0 auto;
+  font-family: var(--serif-text);
+  font-optical-sizing: auto;
+  font-size: 1.175rem;
+  line-height: 1.72;
+  color: var(--ink);
+  hanging-punctuation: first last;
+}
+.post .post__head { max-width: 42rem; }
+
+/* Figures, tables and panels break past the text column. A narrow
+   measure for reading, a wide field for evidence — the layout move
+   that separates a research report from a blog post. */
+@media (min-width: 1000px) {
+  .post .prose .fig,
+  .post .prose .cmp,
+  .post .prose .stat-row,
+  .post .prose .acc-group,
+  .post .prose .finale { margin-left: -6.5rem; margin-right: -6.5rem; }
+  .post .prose .fig--wide { margin-left: -11rem; margin-right: -11rem; }
+}
+
+/* display voice ---------------------------------------------------- */
+.post .post__title {
+  font-family: var(--serif-display);
+  font-size: clamp(2.5rem, 5.2vw, 3.7rem);
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+  color: var(--ink-strong);
+  text-wrap: balance;
+}
+.post .post__desc {
+  font-family: var(--serif-text);
+  font-size: 1.3rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  font-weight: 400;
+  text-wrap: pretty;
+}
+
+/* act breaks — the four Part headings carry the display face */
+.post .prose h2 {
+  font-family: var(--serif-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 3.6vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--ink-strong);
+  margin: 2.6em 0 0.6em;
+  text-wrap: balance;
+}
+
+/* numbered sections — text face at display weight, with a hairline
+   above so chapters read as chapters without extra markup */
+.post .prose h3 {
+  font-family: var(--serif-text);
+  font-weight: 600;
+  font-size: 1.48rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--ink-strong);
+  margin: 2.4em 0 0.7em;
+  padding-top: 1.6em;
+  border-top: 1px solid var(--rule);
+  text-wrap: balance;
+}
+.post .prose h2 + h3 { padding-top: 0; border-top: none; margin-top: 1.4em; }
+
+/* stage headings inside the pipeline walkthrough */
+.post .prose h4 {
+  font-family: var(--serif-text);
+  font-weight: 600;
+  font-size: 1.12rem;
+  line-height: 1.35;
+  color: var(--ink-strong);
+  margin: 2em 0 0.5em;
+}
+
+/* body ------------------------------------------------------------- */
+.post .prose p { margin: 1.15em 0; text-wrap: pretty; }
+.post .prose strong { font-weight: 600; color: var(--ink-strong); }
+.post .prose em { font-style: italic; }
+
+/* drop cap opens the piece — only fires where an article leads with a
+   heading, so shorter posts are untouched */
+.post .prose > h2:first-of-type + p::first-letter {
+  font-family: var(--serif-display);
+  float: left;
+  font-size: 3.9em;
+  line-height: 0.82;
+  padding: 0.08em 0.09em 0 0;
+  color: var(--ink-strong);
+}
+
+/* links carry an underline, never colour alone */
+.post .prose a {
+  color: var(--ink-strong);
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s, color 0.2s;
+}
+.post .prose a:hover { color: var(--gold); text-decoration-color: var(--gold); }
+
+.post .prose ul, .post .prose ol { margin: 1.2em 0; padding-left: 1.3em; }
+.post .prose li { margin: 0.55em 0; padding-left: 0.2em; }
+.post .prose li::marker { color: var(--gold); font-size: 0.9em; }
+
+/* pull quotes — the display face doing what it is for */
+.post .prose blockquote {
+  margin: 2em 0;
+  padding: 0.1em 0 0.1em 1.5em;
+  border-left: 2px solid var(--gold);
+  font-family: var(--serif-display);
+  font-size: 1.62rem;
+  line-height: 1.34;
+  letter-spacing: -0.01em;
+  color: var(--ink-strong);
+  text-wrap: pretty;
+}
+.post .prose blockquote strong { font-weight: 400; }
+
+.post .prose hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 3.2em 0;
+}
+
+/* instrumentation — mono for anything that labels rather than reads */
+.post .post__cat, .post .post__meta,
+.post .stat__l, .post .srail a { font-family: var(--mono); }
+
+.post .fig__cap {
+  font-family: var(--serif-text);
+  font-size: 0.9rem;
+  line-height: 1.62;
+  color: var(--ink-soft);
+}
+.post .callout p { font-family: var(--serif-text); font-size: 1.06rem; line-height: 1.65; }
+.post .acc > summary { font-family: var(--serif-text); font-weight: 600; font-size: 1.06rem; }
+.post .acc > p, .post .acc > ul, .post .acc > ol { font-size: 1.06rem; line-height: 1.68; }
+.post .cmp table { font-family: var(--serif-text); font-size: 0.98rem; }
+.post .cmp thead th { font-family: var(--mono); }
+/* The closing panel is an h2 living on a dark ground, so the prose
+   h2 rules above would otherwise paint it ink-on-ink. Restate every
+   property they touch. */
+.post .prose .finale__t {
+  font-family: var(--serif-display);
+  letter-spacing: -0.015em;
+  color: #fff;
+  margin: 0.7rem 0 0;
+  padding-top: 0;
+  border-top: none;
+}
+.post .finale__s { font-family: var(--serif-text); font-size: 1.04rem; }
+/* raised off the dark gradient's lightest stop to clear 4.5:1 at 10px */
+.post .finale__k { color: #c9a86a; }
+.post .finale__f { color: #a49a89; }
+.post .cmp thead th { color: var(--ink-faint); }
+.post .src-note {
+  font-family: var(--serif-text); font-size: 0.92rem; line-height: 1.68;
+  color: var(--ink-soft);
+}
+/* small mono labels, raised to clear 4.5:1 */
+.post .stat__l, .post .post__meta, .post .srail a { color: var(--ink-faint); }
+.post .fig__cap { color: var(--ink-soft); }
+
+/* figures and data carry lining tabular numerals so columns align */
+.post .cmp td, .post .cmp th, .post .stat__n {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@media (max-width: 640px) {
+  .post .prose { font-size: 1.08rem; line-height: 1.68; }
+  .post .prose h3 { font-size: 1.3rem; }
+  .post .prose blockquote { font-size: 1.34rem; padding-left: 1.1em; }
+  .post .prose > h2:first-of-type + p::first-letter { font-size: 3.2em; }
+}
+
+/* reading progress ------------------------------------------------ */
+.rprog {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  background: transparent; z-index: 60; pointer-events: none;
+}
+.rprog__bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #a5824c, #279a58);
+  transition: width 0.08s linear;
+}
+
+/* sticky chapter rail --------------------------------------------- */
+.srail {
+  position: fixed; left: 2rem; top: 50%; transform: translateY(-50%);
+  display: none; flex-direction: column; gap: 0.55rem; z-index: 40;
+  max-width: 12rem;
+}
+@media (min-width: 1340px) { .srail { display: flex; } }
+.srail a {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.58rem; letter-spacing: 0.07em; text-transform: uppercase;
+  color: #b8ae9a; text-decoration: none; transition: color 0.25s;
+}
+.srail a i { width: 14px; height: 1px; background: #ded4c2; flex: none; transition: all 0.25s; }
+.srail a:hover { color: #6e6759; }
+.srail a.is-on { color: #1f1d19; }
+.srail a.is-on i { width: 26px; background: #a5824c; }
+
+/* lede rule ------------------------------------------------------- */
+.lede-rule {
+  width: 100%; height: 1px; margin: 0 0 2.6rem;
+  background: linear-gradient(90deg, #c9a86a, #e6ddcc 40%, transparent);
+}
+
+/* stat row -------------------------------------------------------- */
+.stat-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px; margin: 2.6em 0; background: #e6ddcc;
+  border: 1px solid #e6ddcc; border-radius: 10px; overflow: hidden;
+}
+.stat { background: #fdfbf6; padding: 1.4rem 1.2rem; }
+.stat__n {
+  display: block; font-family: var(--font-display); font-weight: 400;
+  font-size: 2.1rem; line-height: 1; color: #1f1d19; letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.stat__l {
+  display: block; margin-top: 0.55rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.62rem; line-height: 1.5; letter-spacing: 0.04em;
+  text-transform: uppercase; color: #8a8578;
+}
+
+/* figures --------------------------------------------------------- */
+.fig {
+  margin: 2.8em 0; padding: 1.6rem 1.4rem 1.2rem;
+  background: #fdfbf6; border: 1px solid #e6ddcc; border-radius: 12px;
+}
+.fig svg { display: block; width: 100%; height: auto; }
+.fig__cap {
+  margin: 1.1rem 0 0; padding-top: 0.9rem; border-top: 1px solid #efe7d8;
+  font-size: 0.82rem; line-height: 1.6; color: #6f675a;
+}
+.fig__cap strong { color: #1f1d19; }
+@media (min-width: 1120px) {
+  .fig--wide { margin-left: -4.5rem; margin-right: -4.5rem; }
+}
+
+/* figure entrance animations — also .js-gated, so charts render
+   fully drawn if the script never runs. */
+.js .fig__line { stroke-dasharray: 1400; stroke-dashoffset: 1400; }
+/* End state is declared, not just animated to — a dropped or frozen
+   animation must never leave a chart half-drawn. */
+.fig.is-in .fig__line {
+  stroke-dashoffset: 0;
+  animation: figDraw 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.fig.is-in .fig__line + .fig__line { animation-delay: 0.25s; }
+@keyframes figDraw { to { stroke-dashoffset: 0; } }
+
+.fig__bar { transform-origin: left center; }
+.js .fig__bar { transform: scaleX(0); }
+.fig.is-in .fig__bar {
+  transform: scaleX(1);
+  animation: figGrow 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.fig.is-in .fig__bar + .fig__bar { animation-delay: 0.16s; }
+@keyframes figGrow { to { transform: scaleX(1); } }
+
+.js .fig__funnel path, .js .fig__nodes circle, .js .fig__stage rect { opacity: 0; }
+.fig.is-in .fig__funnel path,
+.fig.is-in .fig__nodes circle,
+.fig.is-in .fig__stage rect { opacity: 1; animation: figPop 0.5s ease forwards; }
+.fig.is-in .fig__funnel path:nth-child(2) { animation-delay: 0.1s; }
+.fig.is-in .fig__funnel path:nth-child(3) { animation-delay: 0.2s; }
+.fig.is-in .fig__funnel path:nth-child(4) { animation-delay: 0.3s; }
+.fig.is-in .fig__nodes circle:nth-child(2) { animation-delay: 0.07s; }
+.fig.is-in .fig__nodes circle:nth-child(3) { animation-delay: 0.14s; }
+.fig.is-in .fig__nodes circle:nth-child(4) { animation-delay: 0.21s; }
+.fig.is-in .fig__nodes circle:nth-child(5) { animation-delay: 0.28s; }
+.fig.is-in .fig__nodes circle:nth-child(6) { animation-delay: 0.35s; }
+.fig.is-in .fig__stage rect:nth-child(odd) { animation-delay: 0.08s; }
+@keyframes figPop { from { opacity: 0; } to { opacity: 1; } }
+
+/* callouts -------------------------------------------------------- */
+.callout {
+  margin: 2.4em 0; padding: 1.5rem 1.6rem;
+  background: linear-gradient(180deg, #fbf7ee, #fdfbf6);
+  border: 1px solid #e6ddcc; border-left: 3px solid #c9a86a;
+  border-radius: 0 10px 10px 0;
+}
+.callout p { margin: 0; font-size: 0.98rem; line-height: 1.68; color: #4a463e; }
+.callout p + p { margin-top: 0.8em; }
+.callout--dark { background: #1f1d19; border-color: #1f1d19; border-left-color: #a5824c; }
+.callout--dark p { color: #d6cfc0; }
+.callout--dark strong, .callout--dark em { color: #fff; }
+
+/* comparison tables ----------------------------------------------- */
+.cmp { margin: 2.6em 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.cmp table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 0.9rem; }
+.cmp th, .cmp td {
+  padding: 0.85rem 1rem; text-align: left; vertical-align: top;
+  border-bottom: 1px solid #eee5d5; line-height: 1.55;
+}
+.cmp thead th {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #8a8578; font-weight: 500; border-bottom: 1px solid #ded4c2;
+}
+.cmp tbody tr { transition: background 0.2s; }
+.cmp tbody tr:hover { background: #fbf7ee; }
+.cmp td:first-child { color: #1f1d19; }
+.cmp tbody td:last-child { color: #6f675a; }
+
+/* accordions ------------------------------------------------------ */
+.acc-group { margin: 2.4em 0; border: 1px solid #e6ddcc; border-radius: 12px; overflow: hidden; }
+.acc { background: #fdfbf6; border-bottom: 1px solid #eee5d5; }
+.acc:last-child { border-bottom: none; }
+.acc > summary {
+  list-style: none; cursor: pointer; padding: 1.1rem 1.4rem;
+  font-family: 'General Sans', 'Inter', sans-serif; font-weight: 600;
+  font-size: 0.98rem; color: #1f1d19;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  transition: background 0.2s;
+}
+.acc > summary::-webkit-details-marker { display: none; }
+.acc > summary:hover { background: #f8f3e9; }
+.acc > summary::after {
+  content: '+'; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 1.1rem; color: #a5824c; flex: none; transition: transform 0.25s;
+}
+.acc[open] > summary { background: #f8f3e9; }
+.acc[open] > summary::after { transform: rotate(45deg); }
+.acc > *:not(summary) { padding-left: 1.4rem; padding-right: 1.4rem; }
+.acc > *:last-child { padding-bottom: 1.3rem; }
+.acc[open] > *:not(summary) { animation: accIn 0.35s ease; }
+@keyframes accIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* closing assessment panel ---------------------------------------- */
+.finale {
+  margin: 3.4em 0 2em; padding: 2.6rem 2.2rem;
+  background: radial-gradient(120% 140% at 0% 0%, #262320, #16150f 70%);
+  border-radius: 16px; color: #d6cfc0; position: relative; overflow: hidden;
+}
+.finale::before {
+  content: ''; position: absolute; inset: -40% -10% auto auto;
+  width: 340px; height: 340px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(39, 154, 88, 0.22), transparent 68%);
+  pointer-events: none;
+}
+.finale > * { position: relative; }
+.finale__k {
+  margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a5824c;
+}
+.finale__t {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.6rem, 3.4vw, 2.2rem); line-height: 1.15;
+  color: #fff; margin: 0.7rem 0 0; letter-spacing: -0.01em;
+}
+.finale__s { margin: 1rem 0 0; font-size: 0.96rem; line-height: 1.7; color: #b5ac9c; }
+.finale__s strong { color: #e8e1d4; }
+.finale__btn {
+  display: inline-block; margin: 1.7rem 0 0; padding: 0.85rem 1.5rem;
+  background: #fff; color: #16150f; border-radius: 999px;
+  font-family: 'General Sans', 'Inter', sans-serif; font-weight: 600;
+  font-size: 0.92rem; text-decoration: none;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s;
+}
+.finale__btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+.finale__f {
+  margin: 1.5rem 0 0; padding-top: 1.2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #7d7568;
+}
+
+.src-note {
+  margin: 2.4em 0 0; padding: 1.1rem 1.3rem;
+  background: #f8f5ee; border: 1px solid #eee5d5; border-radius: 10px;
+  font-size: 0.8rem; line-height: 1.65; color: #7d7568;
+}
+.src-note strong { color: #4a463e; }
+
+/* scroll reveal --------------------------------------------------- */
+/* Gated on .js so a failed or disabled script can never leave the
+   article invisible — no-JS readers get the fully revealed page. */
+.js [data-reveal] { opacity: 0; transform: translateY(18px); }
+.js [data-reveal].is-in {
+  opacity: 1; transform: none;
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal], .js [data-reveal].is-in { opacity: 1; transform: none; transition: none; }
+  .fig.is-in .fig__line, .fig.is-in .fig__bar,
+  .fig.is-in .fig__funnel path, .fig.is-in .fig__nodes circle,
+  .fig.is-in .fig__stage rect, .acc[open] > *:not(summary) { animation: none; }
+  .js .fig__line { stroke-dashoffset: 0; }
+  .js .fig__bar { transform: none; }
+  .js .fig__funnel path, .js .fig__nodes circle, .js .fig__stage rect { opacity: 1; }
+  .rprog__bar { transition: none; }
+  .finale__btn:hover { transform: none; }
+}
