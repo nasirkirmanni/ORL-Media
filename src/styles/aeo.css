@@ -601,6 +601,10 @@ html.vhpin-on .aeo__enter > .aeo__shift { will-change: transform; }
   /* the comparison table scrolls rather than squashing its three columns */
   .aeo__scroller { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .aeo__scroller .aeo__ctable { min-width: 32rem; }
+  /* mobile-only: drop the discovery-behaviour comparison table and the
+     diagnosis section (both kept on desktop) */
+  .aeo__compare { display: none; }
+  .aeo__sec[aria-labelledby="aeo-why-h"] { display: none; }
 }
 
 /* ─────────────── reduced motion ─────────────── */

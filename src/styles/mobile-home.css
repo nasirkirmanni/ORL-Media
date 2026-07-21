@@ -166,9 +166,4 @@
     color: var(--ca, #8a5320); opacity: 0.5;
   }
 
-  /* ═══════════ compact "how to start" (the kept ladder) ═══════════ */
-  .lad { padding: 3rem 1.4rem !important; }
-  .lad__step { padding: 1.3rem 1.3rem !important; }
-  .lad__stepname { font-size: 1.4rem !important; }
-  .lad__engine { display: none !important; }   /* decorative canvas overlay */
 }
