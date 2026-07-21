@@ -51,9 +51,9 @@ const slides = [
     line: 'AI that works while you rest — outbound, buyer trust, and analytics in one engine.',
     actLabel: 'Act Two',
     actName: 'Built to Compound',
-    img: '/p2.webp',
-    imgW: 552,
-    imgH: 1462,
+    img: '/rob.png',
+    imgW: 1024,
+    imgH: 1536,
   },
   {
     key: 'crew',
@@ -67,7 +67,7 @@ const slides = [
     line: 'Senior people who install the machine — and stay to run it.',
     actLabel: 'Act Three',
     actName: 'On Your Side',
-    img: '/p3.webp',
+    img: '/3.png',
     imgW: 1254,
     imgH: 1254,
     frame: true, // full-scene photo, shown framed & centered (not a cutout)
@@ -167,11 +167,23 @@ import GlassNav from '../components/GlassNav.astro';
   <p class="mhero__eye">Growth infrastructure for B2B SaaS &amp; AI startups</p>
   <h1 class="mhero__h1">We build the machine that grows your revenue.</h1>
   <p class="mhero__sub">We install AI-powered growth systems for B2B SaaS and AI startups &mdash; discovery, demand, deals, and monetization in one engine, on one set of numbers.</p>
-  <div class="mhero__cta">
-    <a class="mbtn mbtn--primary" href="/audit">Start with the Audit
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="mhero__svcs">
+    <a class="mhsvc" href="/engine/visibility" style="--ca:#8a5320">
+      <span class="mhsvc__tile"><img src="/logos/visibility.webp" width="160" height="160" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
+      <span class="mhsvc__name">Visibility</span>
     </a>
-    <a class="mbtn" href="/book">Book a call</a>
+    <a class="mhsvc" href="/engine/signals" style="--ca:#9a6417">
+      <span class="mhsvc__tile"><img src="/logos/signals.webp" width="160" height="160" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
+      <span class="mhsvc__name">Signals</span>
+    </a>
+    <a class="mhsvc" href="/engine/proof" style="--ca:#2f7d4c">
+      <span class="mhsvc__tile"><img src="/logos/proof.webp" width="160" height="160" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
+      <span class="mhsvc__name">Proof</span>
+    </a>
+    <a class="mhsvc" href="/engine/pricing" style="--ca:#1f6b72">
+      <span class="mhsvc__tile"><img src="/logos/pricing.webp" width="160" height="160" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
+      <span class="mhsvc__name">Pricing</span>
+    </a>
   </div>
   <p class="mhero__trust">Built for seed&ndash;Series B &middot; $1M&ndash;$20M ARR</p>
 </section>
@@ -349,7 +361,7 @@ import GlassNav from '../components/GlassNav.astro';
 
   <!-- ══════════ TEXT OVERLAYS (crossfade, mirrored by parity) ══════════ -->
   {slides.map((s, i) => (
-    <div class={`overlay ${i % 2 === 0 ? 'overlay--a' : 'overlay--b'} ${s.hero ? 'overlay--hero' : ''} ${s.frame ? 'overlay--frame' : ''}`} data-overlay={i}>
+    <div class={`overlay ${i % 2 === 0 || s.key === 'machine' ? 'overlay--a' : 'overlay--b'} ${s.hero ? 'overlay--hero' : ''} ${s.frame ? 'overlay--frame' : ''}`} data-overlay={i}>
       {s.hero ? (
         <>
           <div class="overlay__title">
@@ -2389,6 +2401,9 @@ import GlassNav from '../components/GlassNav.astro';
   panels.forEach((p, i) => gsap.set(p, { xPercent: i === 0 ? 0 : 100 }));
   inners.forEach((el, i) => gsap.set(el, { xPercent: i === 0 ? 0 : -50 }));
   overlays.forEach((o, i) => gsap.set(o, { opacity: i === 0 ? 1 : 0 }));
+  // GSAP now owns every transform; release the pre-JS CSS FOUC guard so it can
+  // never fight navigation to slides 2/3 (their panels + object images).
+  document.getElementById('stage')?.classList.add('is-hero-ready');
 
   // endless background: pans with each transition, wraps seamlessly.
   // The tile is bg + mirrored bg, so wrapping by one tile width is invisible.
@@ -4896,6 +4911,20 @@ import GlassNav from '../components/GlassNav.astro';
     backface-visibility: hidden;
   }
 
+  /* FOUC guard (pre-JS ONLY): until the slider script has positioned the
+     slides, hide every non-first slide + overlay so the hero can't flash all
+     three stacked. The script adds `is-hero-ready` to #stage right after its
+     init gsap.set() calls, switching this guard OFF.
+
+     IMPORTANT: hide with `visibility`, never a `transform`. GSAP reads the
+     panel's transform at init to seed its own x/xPercent; a CSS translateX on
+     the panel gets baked in and leaves a permanent offset, so the panel never
+     returns to centre and its object image never appears (only slide 0, which
+     the guard excludes, stayed correct). visibility doesn't touch the transform
+     GSAP reads, so panels position cleanly and navigation reveals every slide. */
+  #stage:not(.is-hero-ready) .slide:not([data-slide='0']) { visibility: hidden; }
+  #stage:not(.is-hero-ready) .overlay:not([data-overlay='0']) { opacity: 0; }
+
   /* ══════════ endless background world ══════════ */
   .bg {
     position: absolute;
@@ -4960,6 +4989,12 @@ import GlassNav from '../components/GlassNav.astro';
     display: block;
     backface-visibility: hidden;
   }
+  /* Machine slide (rob.png): GSAP parses the person's CSS translateX(-50%) as a
+     base x and adds its own xPercent:-50 on top, so the figure lands at an
+     effective translateX(-100%) — 50% too far left. The container transform is
+     GSAP-owned, so we can't correct it there; instead shift the IMG (which GSAP
+     never touches) right by 50% of its width to re-centre the hand. */
+  .slide[data-slide='1'] .person img { transform: translateX(50%); }
 
   /* ══════════ revolving orb (founder slide) ══════════
      The sphere PNG is a full square (gray field + corner labels). A soft
