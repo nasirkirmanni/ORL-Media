@@ -86,6 +86,24 @@
       closeBtn.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
       const list = document.createElement('div');
       list.className = 'navmenu__list';
+
+      /* Home is always the first item. The brand mark links home too, but a
+         labelled row is clearer in the stacked mobile menu. Built here (not in
+         each page's .sitenav__links) so every page's menu gets it, and so it
+         never appears in the desktop inline nav. Skip it only if a page's own
+         links already point at "/", to avoid a duplicate. */
+      const hasHome = Array.from(links.querySelectorAll('a')).some(
+        (a) => a.getAttribute('href') === '/',
+      );
+      if (!hasHome) {
+        const home = document.createElement('a');
+        home.className = 'navmenu__link';
+        home.href = '/';
+        home.textContent = 'Home';
+        if (window.location.pathname === '/') home.setAttribute('aria-current', 'page');
+        list.appendChild(home);
+      }
+
       links.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => {
         const href = a.getAttribute('href');
         if (!href) return;

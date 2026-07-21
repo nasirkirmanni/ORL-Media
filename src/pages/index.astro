@@ -13,7 +13,7 @@ const journalPosts = (await getCollection('blog'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 const CAT_COLOR: Record<string, string> = {
-  'AI Search': '#2e5cff',
+  'AI Search': '#8a5320',
   'Retention': '#b0532f',
   'Pipeline': '#279a58',
   'Market': '#a5824c',
@@ -204,27 +204,32 @@ import GlassNav from '../components/GlassNav.astro';
 
 <section class="m-only msvc" aria-label="Our services">
   <p class="msvc__eye">What we install</p>
-  <h2 class="msvc__h2">Four systems. Install one or all.</h2>
+  <h2 class="msvc__h1">How we fix.</h2>
+  <p class="msvc__sub">Four systems. Install one or all.</p>
   <div class="msvc__grid">
-    <a class="msvc__card" href="/engine/visibility" style="--ca:#2e5cff">
+    <a class="msvc__card" href="/engine/visibility" style="--ca:#8a5320">
+      <img class="msvc__logo" src="/logos/visibility.png" width="256" height="256" alt="" aria-hidden="true" loading="lazy" decoding="async" />
       <p class="msvc__num">01 &middot; Get discovered</p>
       <h3 class="msvc__name">Visibility</h3>
       <p class="msvc__desc">Be the company AI search engines recommend &mdash; not just Google. We put you inside the answer and keep you there.</p>
       <span class="msvc__arrow">Explore Visibility &rarr;</span>
     </a>
     <a class="msvc__card" href="/engine/signals" style="--ca:#9a6417">
+      <img class="msvc__logo" src="/logos/signals.png" width="256" height="256" alt="" aria-hidden="true" loading="lazy" decoding="async" />
       <p class="msvc__num">02 &middot; Find demand</p>
       <h3 class="msvc__name">Signals</h3>
       <p class="msvc__desc">Reach buyers the week they enter a buying window, with outreach written from real context &mdash; not spray-and-pray.</p>
       <span class="msvc__arrow">Explore Signals &rarr;</span>
     </a>
     <a class="msvc__card" href="/engine/proof" style="--ca:#2f7d4c">
+      <img class="msvc__logo" src="/logos/proof.png" width="256" height="256" alt="" aria-hidden="true" loading="lazy" decoding="async" />
       <p class="msvc__num">03 &middot; Win the deal</p>
       <h3 class="msvc__name">Proof</h3>
       <p class="msvc__desc">Arm the buying committee with third-party evidence that unsticks deals stalled in security review and no-decision.</p>
       <span class="msvc__arrow">Explore Proof &rarr;</span>
     </a>
     <a class="msvc__card" href="/engine/pricing" style="--ca:#1f6b72">
+      <img class="msvc__logo" src="/logos/pricing.png" width="256" height="256" alt="" aria-hidden="true" loading="lazy" decoding="async" />
       <p class="msvc__num">04 &middot; Monetize &amp; expand</p>
       <h3 class="msvc__name">Pricing</h3>
       <p class="msvc__desc">Turn packaging, usage, and expansion into revenue you can forecast &mdash; the other half of growth, at half the CAC.</p>
@@ -339,7 +344,7 @@ import GlassNav from '../components/GlassNav.astro';
   <header class="chrome-top">
     <a class="brand" href="/">
       <span class="brand__mark" aria-hidden="true"></span>
-      ORL Media
+      ORL
     </a>
     <nav class="menu" aria-label="Primary">
       <div class="menu__col">

@@ -286,8 +286,19 @@ html.vhpin-on .vh__fig {
 @media (max-width: 767px) {
   .vh { display: none !important; }
   /* the reveal-on-scroll nav belonged to the video hero; with the hero gone,
-     the nav is a normal sticky pill visible from the top */
-  html.vhnav-on .sitenav--page {
+     the nav is a normal sticky pill visible from the top.
+
+     The `.is-in` / `:focus-within` states must be listed here too: their
+     desktop rules set `transform: translate(-50%, 0)` to centre a
+     `position: fixed; left: 50%` bar, and they carry specificity (0,3,1).
+     A media query adds none, so the plain `html.vhnav-on .sitenav--page`
+     selector (0,2,1) can't beat them — once JS adds `.is-in`, the -50%
+     shove lands on this sticky (margin-auto-centred) bar and drags it half
+     its width off-screen left, hiding the back button and brand. Matching
+     the states at equal specificity, later in source order, lets `none` win. */
+  html.vhnav-on .sitenav--page,
+  html.vhnav-on .sitenav--page.is-in,
+  html.vhnav-on .sitenav--page:focus-within {
     position: sticky;
     top: 1rem;
     left: auto;

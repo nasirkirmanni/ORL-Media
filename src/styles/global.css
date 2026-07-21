@@ -8,7 +8,7 @@
   --gray-sky: #c2c2c0;
   --gray-mid: #8a8a88;
   --gray-deep: #3a3a38;
-  --accent: #2e5cff;
+  --accent: #8a5320;
 
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-ui: 'Inter', system-ui, sans-serif;
@@ -4479,7 +4479,7 @@ body.blg-body .mono {
 .sitenav .sitenav__link[aria-current='page'],
 .sitenav--page .sitenav__link:hover,
 .sitenav--page .sitenav__link[aria-current='page'] {
-  color: #1a327a;
+  color: #8a5320;
 }
 .sitenav .sitenav__link[aria-current='page'],
 .sitenav--page .sitenav__link[aria-current='page'] {
@@ -4576,8 +4576,10 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
 }
 .navmenu__list { display: flex; flex-direction: column; }
 .navmenu__link {
-  display: flex; align-items: center; min-height: 54px;
-  font-family: var(--font-display); font-weight: 400; font-size: 1.7rem; line-height: 1.1;
+  /* min-height stays ≥44px for a comfortable touch target even though the
+     type is smaller (was 1.7rem — too large once Home made it six rows). */
+  display: flex; align-items: center; min-height: 46px;
+  font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; line-height: 1.1;
   color: #1f1d19; text-decoration: none;
   border-bottom: 1px solid #e6ddcc;
 }
@@ -5175,61 +5177,45 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
-/* — budget slider — */
-.bk__slider { padding: 0.2rem 0.1rem 0; }
-.bk__slider-val { margin: 0; display: flex; align-items: baseline; gap: 0.45rem; }
-.bk__slider-val strong {
-  font-family: 'General Sans', 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 1.85rem;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  color: #1f1d19;
-  font-variant-numeric: tabular-nums;
-  min-width: 4.2ch;
-}
-.bk__slider-val span { font-size: 0.78rem; color: #a79d89; }
-.bk__range {
-  -webkit-appearance: none;
-  appearance: none;
+/* — budget select — */
+.bk__selectwrap { position: relative; }
+.bk__select {
   width: 100%;
-  height: 6px;
-  margin-top: 1.05rem;
-  border-radius: 99px;
-  background: linear-gradient(to right, #1f1d19 var(--pct, 10%), #eee6d6 var(--pct, 10%));
-  outline: none;
-  cursor: pointer;
-}
-.bk__range::-webkit-slider-thumb {
+  box-sizing: border-box;
+  min-height: 46px;
+  padding: 0.65rem 2.5rem 0.65rem 0.9rem;
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  color: #1f1d19;
+  background: #ffffff;
+  border: 1px solid #e6ddcc;
+  border-radius: 10px;
   -webkit-appearance: none;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: #1f1d19;
-  border: 4px solid #fffdf9;
-  box-shadow: 0 0 0 1px #d9cfba, 0 2px 6px rgba(31, 26, 18, 0.3);
-  cursor: grab;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
-.bk__range::-webkit-slider-thumb:active { cursor: grabbing; }
-.bk__range::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #1f1d19;
-  border: 4px solid #fffdf9;
-  box-shadow: 0 0 0 1px #d9cfba, 0 2px 6px rgba(31, 26, 18, 0.3);
-  cursor: grab;
+/* placeholder-grey while the disabled first option is still selected */
+.bk__select:required:invalid { color: #b9b09d; }
+.bk__select option { color: #1f1d19; }
+.bk__select option[disabled] { color: #b9b09d; }
+.bk__select:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(46, 92, 255, 0.14);
 }
-.bk__range::-moz-range-track { height: 6px; border-radius: 99px; background: #eee6d6; }
-.bk__range::-moz-range-progress { height: 6px; border-radius: 99px; background: #1f1d19; }
-.bk__range:focus-visible { box-shadow: 0 0 0 3px rgba(46, 92, 255, 0.2); }
-.bk__scale {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.55rem;
-  font-size: 0.56rem;
-  color: #a79d89;
+.bk__selectchev {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8a8272;
+  pointer-events: none;
 }
+.bk__budgetfield.is-err .bk__select { border-color: #c14a35; }
+.bk__budgetfield.is-err .bk__select:focus-visible { box-shadow: 0 0 0 3px rgba(193, 74, 53, 0.14); }
+.bk__budgetfield.is-err .bk__err { display: flex; align-items: center; gap: 0.35rem; }
 
 /* calendar */
 .bk__cal { border: 1px solid #efe8da; border-radius: 14px; background: #ffffff; padding: 0.9rem 1rem 1rem; }

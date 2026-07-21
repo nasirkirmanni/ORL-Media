@@ -122,17 +122,22 @@ import GlassNav from '../components/GlassNav.astro';
 
           <fieldset>
             <legend class="bk__legend mono">Monthly growth budget</legend>
-            <div class="bk__slider">
-              <p class="bk__slider-val"><strong data-bk-budget-val>$10K</strong><span>/ month</span></p>
-              <input
-                class="bk__range"
-                type="range"
-                min="0" max="10" step="1" value="1"
-                data-bk-range
-                aria-label="Monthly growth budget"
-                aria-valuetext="$10K per month"
-              />
-              <div class="bk__scale mono" aria-hidden="true"><span>$5K</span><span>$100K</span><span>$1M+</span></div>
+            <div class="bk__budgetfield" data-bk-budgetfield>
+              <div class="bk__selectwrap">
+                <select id="bk-budget" name="budget" class="bk__select" data-bk-budget required aria-label="Monthly growth budget">
+                  <option value="" disabled selected>Select monthly budget</option>
+                  <option value="$4K – $8K">$4K &ndash; $8K</option>
+                  <option value="$8K – $15K">$8K &ndash; $15K</option>
+                  <option value="$15K – $30K">$15K &ndash; $30K</option>
+                  <option value="$30K – $50K">$30K &ndash; $50K</option>
+                  <option value="$50K – $100K">$50K &ndash; $100K</option>
+                  <option value="$100K – $250K">$100K &ndash; $250K</option>
+                  <option value="$250K – $500K">$250K &ndash; $500K</option>
+                  <option value="$500K – $1M">$500K &ndash; $1M</option>
+                </select>
+                <svg class="bk__selectchev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <p class="bk__err"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-7h-2v5h2V9z"/></svg>Please select a monthly budget.</p>
             </div>
           </fieldset>
 
@@ -213,18 +218,16 @@ import GlassNav from '../components/GlassNav.astro';
   const form = document.querySelector<HTMLFormElement>('[data-bk-form]')!;
   const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ── budget slider ─────────────────────────────────────── */
-  const BUDGETS = ['$5K', '$10K', '$15K', '$20K', '$30K', '$50K', '$75K', '$100K', '$250K', '$500K', '$1M+'];
-  const range = form.querySelector<HTMLInputElement>('[data-bk-range]')!;
-  const budgetVal = form.querySelector<HTMLElement>('[data-bk-budget-val]')!;
-  function paintRange() {
-    const i = Number(range.value);
-    budgetVal.textContent = BUDGETS[i];
-    range.setAttribute('aria-valuetext', BUDGETS[i] + ' per month');
-    range.style.setProperty('--pct', (i / (BUDGETS.length - 1)) * 100 + '%');
+  /* ── budget select ─────────────────────────────────────── */
+  const budgetSel = form.querySelector<HTMLSelectElement>('[data-bk-budget]')!;
+  const budgetField = form.querySelector<HTMLElement>('[data-bk-budgetfield]')!;
+  function validateBudget(): boolean {
+    const ok = !!budgetSel.value;
+    budgetField.classList.toggle('is-err', !ok);
+    budgetSel.setAttribute('aria-invalid', String(!ok));
+    return ok;
   }
-  range.addEventListener('input', paintRange);
-  paintRange();
+  budgetSel.addEventListener('change', () => { if (budgetField.classList.contains('is-err')) validateBudget(); });
 
   /* ── step navigation ───────────────────────────────────── */
   const step1 = form.querySelector<HTMLElement>('[data-bk-step1]')!;
@@ -364,8 +367,9 @@ import GlassNav from '../components/GlassNav.astro';
 
   /* ── step buttons ──────────────────────────────────────── */
   form.querySelector<HTMLButtonElement>('[data-bk-next]')!.addEventListener('click', () => {
-    let firstBad: HTMLInputElement | null = null;
+    let firstBad: HTMLElement | null = null;
     fields.forEach((f) => { if (!validateField(f) && !firstBad) firstBad = f.querySelector('input'); });
+    if (!validateBudget() && !firstBad) firstBad = budgetSel;
     if (firstBad) { firstBad.focus(); return; }
     // first entry: pre-select the next available weekday and show its slots
     if (!selDate) {
@@ -403,7 +407,7 @@ import GlassNav from '../components/GlassNav.astro';
       document.querySelector('[data-bk-sum-when]')!.textContent = fmtLong(selDate!) + ' · ' + selTime;
       document.querySelector('[data-bk-sum-who]')!.textContent = name;
       document.querySelector('[data-bk-sum-co]')!.textContent = co;
-      document.querySelector('[data-bk-sum-budget]')!.textContent = BUDGETS[Number(range.value)] + ' / mo';
+      document.querySelector('[data-bk-sum-budget]')!.textContent = budgetSel.value + ' / mo';
       form.style.display = 'none';
       done.classList.add('is-on');
       done.scrollIntoView({ block: 'center', behavior: REDUCED ? 'auto' : 'smooth' });

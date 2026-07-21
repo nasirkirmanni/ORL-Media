@@ -36,7 +36,7 @@ export type ModuleSlug = (typeof ORDER)[number];
 
 export const MODULES: Record<string, Module> = {
   visibility: {
-    num: '01', name: 'Visibility', accent: '#2e5cff', accentDark: '#8fa4ff', accentText: '#2e5cff',
+    num: '01', name: 'Visibility', accent: '#8a5320', accentDark: '#c49a5e', accentText: '#8a5320',
     pos: 'Get discovered.',
     sub: 'Buyers now ask AI before they ever search your name. Visibility is the system that puts you inside the answer — and keeps you there.',
     status: { label: 'Live', tone: 'live' },

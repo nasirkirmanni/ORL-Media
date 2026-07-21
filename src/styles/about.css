@@ -45,6 +45,17 @@ body.eng-body.abt-body { background: #e6dfd0; }
   margin: 1.4rem 0 0;
 }
 .abt__h1 em { font-style: italic; color: var(--acc-t); }
+/* "ORL Media" wordmark — big Cormorant Garamond Light (scoped to the hero;
+   responsive for mobile + desktop). */
+.abt__hero .mod__eyebrow {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  text-transform: none;
+  font-size: clamp(3.4rem, 11vw, 6.2rem);
+  letter-spacing: 0.01em;
+  line-height: 1;
+  margin-bottom: 0;
+}
 
 /* — what broke — */
 .abt__break { margin: 0; padding: 0; list-style: none; max-width: 52rem; margin: 0 auto; }

@@ -103,8 +103,9 @@
 
   /* ═══════════ four services ═══════════ */
   .msvc { padding: 3rem 1.4rem 3.4rem; border-top: 1px solid #e6ddcc; }
-  .msvc__eye { margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: #9a6417; }
-  .msvc__h2 { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1.06; letter-spacing: -0.015em; color: #1f1d19; margin: 0.7rem 0 0; }
+  .msvc__eye { margin: 0; text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: #9a6417; }
+  .msvc__h1 { text-align: center; font-family: var(--font-display); font-weight: 400; font-size: 2.65rem; line-height: 1.02; letter-spacing: -0.02em; color: #1f1d19; margin: 0.5rem 0 0; }
+  .msvc__sub { text-align: center; margin: 0.55rem 0 0; font-size: 0.95rem; line-height: 1.45; color: #6f675a; }
   .msvc__grid { display: flex; flex-direction: column; gap: 0.85rem; margin: 1.5rem 0 0; }
   .msvc__card {
     position: relative; display: block;
@@ -117,6 +118,10 @@
   .msvc__name { font-family: var(--font-display); font-weight: 400; font-size: 1.65rem; line-height: 1.02; color: #1f1d19; margin: 0.55rem 0 0; }
   .msvc__desc { margin: 0.5rem 0 0; font-size: 0.9rem; line-height: 1.55; color: #6f675a; }
   .msvc__arrow { margin: 0.7rem 0 0; display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ca, #2e5cff); }
+  /* per-service woven emblem, top-right. Natural (monochrome) logo colours are
+     kept as on the Engine page; num + name reserve room so nothing collides. */
+  .msvc__logo { position: absolute; top: 1.3rem; right: 1.25rem; width: 48px; height: 48px; object-fit: contain; pointer-events: none; }
+  .msvc__num, .msvc__name { padding-right: 3.7rem; }
 
   /* ═══════════ compact "how to start" (the kept ladder) ═══════════ */
   .lad { padding: 3rem 1.4rem !important; }
