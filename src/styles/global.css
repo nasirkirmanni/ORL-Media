@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&display=swap');
 
 :root {
   --ink: #0d0d0d;
@@ -4434,18 +4435,17 @@ body.blg-body .mono {
 .sitenav--page .sitenav__brand {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  font-weight: 600;
-  font-size: 1.05rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  font-size: 1.6rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
   text-decoration: none;
   color: #111111;
+  white-space: nowrap;
+  flex: none;
 }
-.sitenav--page .sitenav__mark {
-  width: 14px;
-  height: 14px;
-  background: #111111;
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-}
+.sitenav--page .sitenav__mark { display: none; }
 .sitenav--page .sitenav__links {
   position: absolute;
   left: 50%;
@@ -4501,11 +4501,173 @@ body.blg-body .mono {
 }
 .sitenav--page .sitenav__pill:hover { transform: translateY(-2px); background: #111111; }
 @media (max-width: 1023px) {
+  /* Inline links give way to the hamburger menu (GlassNav.astro builds it). */
   .sitenav--page .sitenav__links { display: none; }
 }
 @media (max-width: 767px) {
-  .sitenav--page { padding: 0.6rem 0.6rem 0.6rem 1.25rem; }
-  .sitenav--page .sitenav__pill { padding: 0.6rem 1.15rem; font-size: 0.8rem; }
+  /* roomier, cleaner mobile bar (ref: Gallium): more width, tight gaps, brand
+     on one line, compact CTA, so back + brand + CTA + hamburger breathe */
+  .sitenav--page {
+    width: calc(100% - 1.4rem);
+    gap: 0.5rem;
+    padding: 0.5rem 0.6rem;
+  }
+  .sitenav--page .sitenav__brand { font-size: 1.35rem; }
+  .sitenav--page .sitenav__pill { padding: 0.6rem 1.05rem; font-size: 0.82rem; }
+  /* lighter glass on phones — full blur+saturate over scrolling content is a
+     GPU cost low-end devices feel; the pill still reads as glass */
+  .sitenav,
+  .sitenav--page {
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    backdrop-filter: blur(10px) saturate(1.2);
+  }
+}
+
+/* ═══════════════ mobile hamburger + menu ═══════════════
+   The button is injected into the nav by GlassNav.astro and the menu
+   is built from the nav's own links. Hidden ≥1024px so desktop is
+   untouched. */
+.navburger { display: none; }
+@media (max-width: 1023px) {
+  .navburger {
+    display: inline-flex; flex: none;
+    flex-direction: column; align-items: center; justify-content: center; gap: 4.5px;
+    width: 42px; height: 42px; padding: 0; margin-left: 0;
+    border: 1px solid rgba(31, 29, 25, 0.2);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+  }
+  .navburger span {
+    display: block; width: 17px; height: 2px; border-radius: 2px; background: #1f1d19;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  }
+  .navburger[aria-expanded="true"] { background: rgba(255, 255, 255, 0.7); }
+  .navburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .navburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .navburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+}
+/* scroll lock while the menu is open (class sits on <html>). Same problem the
+   hero lock has: overflow:hidden drops the scrollbar and scrollbar-gutter:stable
+   does NOT reserve it, so the centred nav/content would jump sideways. GlassNav
+   measures the scrollbar width into --navmenu-sbw on open and we pad it back. */
+.navmenu-lock, .navmenu-lock body { overflow: hidden; }
+html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
+.navmenu {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(20, 17, 12, 0.45);
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.navmenu.is-open { opacity: 1; }
+.navmenu__panel {
+  position: absolute; top: 0; left: 0; right: 0;
+  background: #f6f2ea;
+  padding: 4.6rem 1.6rem 2rem;
+  border-radius: 0 0 22px 22px;
+  box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.4);
+  transform: translateY(-101%);
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.navmenu.is-open .navmenu__panel { transform: translateY(0); }
+.navmenu__close {
+  position: absolute; top: 1rem; right: 1rem;
+  width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: none; color: #1f1d19; cursor: pointer;
+}
+.navmenu__list { display: flex; flex-direction: column; }
+.navmenu__link {
+  display: flex; align-items: center; min-height: 54px;
+  font-family: var(--font-display); font-weight: 400; font-size: 1.7rem; line-height: 1.1;
+  color: #1f1d19; text-decoration: none;
+  border-bottom: 1px solid #e6ddcc;
+}
+.navmenu__link[aria-current] { color: var(--accent); }
+.navmenu__cta {
+  margin-top: 1.5rem; padding: 0.95rem 1.4rem; text-align: center;
+  background: #1f1d19; color: #ffffff; border-radius: 99px;
+  font-family: 'General Sans', 'Inter', sans-serif; font-weight: 600; font-size: 0.95rem;
+  text-decoration: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .navmenu, .navmenu__panel, .navburger span { transition: none; }
+}
+
+/* ── back button (leftmost in the nav, desktop + mobile) ── */
+.navback {
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: none; width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(31, 29, 25, 0.18);
+  background: rgba(255, 255, 255, 0.35);
+  color: #1f1d19; cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.navback:hover { background: rgba(255, 255, 255, 0.72); }
+.navback:active { transform: scale(0.94); }
+@media (max-width: 767px) { .navback { width: 40px; height: 40px; } }
+
+/* layout grouping: back + brand sit left; nav links, the Book-a-call pill and
+   (on mobile) the hamburger group to the right. The auto margin absorbs the
+   free space before the pill, overriding the navs' space-between. Two-class
+   selectors so this beats the homepage's inline .sitenav__pill rule. */
+.sitenav .sitenav__pill,
+.sitenav--page .sitenav__pill { margin-left: auto; }
+
+/* ═══════════════ FAQ (objection handling) ═══════════════ */
+.faq {
+  position: relative;
+  z-index: 1;
+  background: #f6f2ea;
+  color: #1f1d19;
+  padding: 6rem 1.5rem 6.5rem;
+  border-top: 1px solid #e6ddcc;
+}
+.faq .mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.faq__inner { max-width: 52rem; margin: 0 auto; }
+.faq__head { margin: 0 0 2.6rem; text-align: left; }
+.faq__eyebrow { margin: 0 0 1.1rem; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.26em; color: #6f675a; }
+.faq__h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.faq__list { max-width: 46rem; margin: 0; }
+.faq__item { border-top: 1px solid #e6ddcc; }
+.faq__item:last-child { border-bottom: 1px solid #e6ddcc; }
+.faq__item summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.4rem 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.3rem;
+  color: #1f1d19;
+}
+.faq__item summary::-webkit-details-marker { display: none; }
+.faq__item summary::after {
+  content: '+';
+  flex: none;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--accent);
+  transition: transform 0.2s ease;
+}
+.faq__item[open] summary::after { content: '\2212'; }
+.faq__item p { margin: 0 0 1.5rem; max-width: 42rem; font-size: 0.98rem; line-height: 1.7; color: #575046; }
+@media (prefers-reduced-motion: reduce) {
+  .faq__item summary::after { transition: none; }
 }
 
 /* — homepage teaser section — */
@@ -4823,6 +4985,22 @@ body.blg-body .mono {
 }
 .prose blockquote p { margin: 0.4em 0; }
 .prose hr { border: none; border-top: 1px solid #e6ddcc; margin: 2.4em 0; }
+/* wide content stays overflow-safe on phones. Comparison tables in article
+   bodies are the `.cmp` component (longform.css) which already scrolls; these
+   rules only cover plain images/pre and any bare markdown <table> not wrapped
+   in .cmp. Universal img/pre are no-ops for in-bound content, so desktop is
+   untouched; the bare-table scroll treatment is mobile-scoped. */
+.prose img { max-width: 100%; height: auto; }
+.prose pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 768px) {
+  .prose > table,
+  .prose > *:not(.cmp) > table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
 
 .post__cta {
   max-width: 48rem;

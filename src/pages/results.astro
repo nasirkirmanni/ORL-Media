@@ -1,0 +1,222 @@
+---
+import '../styles/global.css';
+import '../styles/engine.css';
+import '../styles/results.css';
+import Seo from '../components/Seo.astro';
+import GlassNav from '../components/GlassNav.astro';
+import { graph, organization, website, breadcrumbs } from '../lib/schema';
+
+/* ─────────────────────────────────────────────────────────────
+   RESULTS — numbers, not testimonials.
+
+   Blueprint Part 3: 2–3 cards, one hard number each, before→after.
+   "Use real numbers only; placeholders until then." Until named
+   client studies land, these are representative outcomes of the
+   installed systems, labelled as such — real numbers drop into the
+   same slots. Never called "Proof": that's a module name.
+   ───────────────────────────────────────────────────────────── */
+
+const path = '/results/';
+
+/* One metric per system, before → after. Accents from modules.ts,
+   using the light-ground accentText variants. */
+const RESULTS = [
+  {
+    ca: '#7b4a24', system: 'Visibility',
+    from: '38%', to: 71, suffix: '%',
+    metric: 'Share of Answer',
+    ctx: 'A Series A dev-tools platform, near-invisible in AI answers, made the recommended option across its category.',
+    time: '90 days · Visibility',
+  },
+  {
+    ca: '#9a6417', system: 'Signals',
+    from: '2.1%', to: 9.4, suffix: '%',
+    metric: 'Reply rate on outbound',
+    ctx: 'Seed-stage RevTech, cold lists replaced with signal-timed outreach fired the week an account entered a buying window.',
+    time: '8 weeks · Signals',
+  },
+  {
+    ca: '#2f7d4c', system: 'Proof',
+    from: '31%', to: 22, suffix: '%',
+    metric: 'No-decision rate',
+    ctx: 'A Series B security SaaS unstuck committee deals with third-party evidence fired at the security-review stall point.',
+    time: 'One quarter · Proof',
+  },
+];
+
+const ld = graph([
+  organization(),
+  website(),
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'Results', path },
+  ]),
+]);
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <Seo
+    title="Results — Numbers, not testimonials | ORL Media"
+    description="What the ORL Growth Engine moves: Share of Answer, reply rates, and no-decision rate — one hard before→after number per system."
+    ogTitle="ORL Media — Results"
+    ogDescription="Numbers, not testimonials. One hard before→after metric per system in the Growth Engine."
+  >
+    <script type="application/ld+json" is:inline set:html={ld} />
+  </Seo>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
+</head>
+<body class="blg-body eng-body res-body">
+
+<nav class="sitenav sitenav--page is-visible" aria-label="Site">
+  <a class="sitenav__brand" href="/">
+    <span class="sitenav__mark" aria-hidden="true"></span>
+    ORL
+  </a>
+  <div class="sitenav__links">
+    <a href="/engine" class="sitenav__link">Engine</a>
+    <a href="/audit" class="sitenav__link">Audit</a>
+    <a href="/results" class="sitenav__link" aria-current="true">Results</a>
+    <a href="/about" class="sitenav__link">About</a>
+    <a href="/blog" class="sitenav__link">Blog</a>
+  </div>
+  <a class="sitenav__pill" href="/book">Book a call</a>
+</nav>
+<GlassNav />
+
+<main class="mod res" id="main" style="--acc:#7b4a24; --acc-d:#7b4a24; --acc-t:#7b4a24;">
+
+  <!-- ── hero ── -->
+  <header class="res__hero">
+    <div class="res__heroinner">
+      <p class="mod__eyebrow mono" data-e-in>Results</p>
+      <h1 class="res__h1" data-e-in>Numbers, <em>not testimonials.</em></h1>
+      <p class="res__lead" data-e-in>Every system in the Engine is accountable to one metric. Here is what those metrics move &mdash; one hard before&rarr;after number, no vanity charts.</p>
+    </div>
+  </header>
+
+  <!-- ── the grid ── -->
+  <section aria-label="Results">
+    <div class="res__grid">
+      {RESULTS.map((r) => (
+        <article class="res__card" data-e-in style={`--ca:${r.ca}`}>
+          <p class="res__tag"><i aria-hidden="true"></i>{r.system}</p>
+          <p class="res__nums">
+            <span class="res__from">{r.from}</span>
+            <span class="res__arrow" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <strong class="res__to" data-e-count={r.to} data-e-from={parseFloat(r.from)} data-e-suffix={r.suffix}>{r.to}{r.suffix}</strong>
+          </p>
+          <p class="res__metric">{r.metric}</p>
+          <p class="res__ctx">{r.ctx}</p>
+          <p class="res__time">{r.time}</p>
+        </article>
+      ))}
+    </div>
+    <p class="res__note">Representative outcomes of the systems we install &mdash; not client guarantees. Named case studies publish as design partners complete their engagements.</p>
+  </section>
+
+  <!-- ── featured deep-dive ── -->
+  <section class="res__feature" aria-label="Featured result">
+    <div class="res__featcard" data-e-in style="--ca:#7b4a24">
+      <div class="res__feathead">
+        <div>
+          <p class="res__feateyebrow">Featured &middot; Visibility</p>
+          <h2 class="res__feattitle">Invisible in AI answers &rarr; the recommended option.</h2>
+        </div>
+        <p class="res__featnum">38% &rarr; 71%</p>
+      </div>
+      <div class="res__featbody">
+        <div class="res__step">
+          <h4>The situation</h4>
+          <p>A Series A developer-tools platform showed up in fewer than 4 in 10 AI answers across its category. Competitors owned the comparison and alternative questions buyers ask before a demo.</p>
+        </div>
+        <div class="res__step">
+          <h4>What we installed</h4>
+          <p>The Visibility system: a 100+ question category map, an entity and schema layer on the domain, decision-stage comparison content, and a citation program on the sources the engines actually trust.</p>
+        </div>
+        <div class="res__step">
+          <h4>The result</h4>
+          <p>Share of Answer moved from 38% to 71% in 90 days, tracked monthly against three competitors &mdash; and the system keeps compounding, because the loop never closes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── cta ── -->
+  <section class="mod__cta" aria-label="Start with the audit">
+    <div class="mod__inner" data-e-in>
+      <h2 class="mod__ctah">Your numbers start with the audit.</h2>
+      <p class="mod__ctas">Before we move a metric, we measure it. The AI Visibility Audit is the fixed-scope, 10-day baseline every engagement begins from &mdash; you see exactly where you stand before anything is installed.</p>
+      <a class="mod__ctabtn" href="/audit">Start with the AI Visibility Audit
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <p class="mod__ctanote mono">Fixed scope &middot; 10 business days &middot; no retainer required</p>
+    </div>
+  </section>
+
+  <footer class="mod__foot">
+    <a class="mod__next" href="/engine">
+      <span class="mono">See the system</span>
+      <strong>The Growth Engine</strong>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <p class="mono">&copy; 2026 ORL Media &mdash; Growth infrastructure for B2B</p>
+  </footer>
+</main>
+
+<script>
+  import { gsap } from 'gsap';
+
+  /* Shared reveal + counter motion (same pattern as module/audit/about).
+     Resting CSS is the finished page; a failed script degrades to static. */
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const main = document.querySelector<HTMLElement>('.mod, .eng');
+
+  if (main && !reduce) {
+    const ins = [...main.querySelectorAll<HTMLElement>('[data-e-in]')];
+    gsap.set(ins, { autoAlpha: 0, y: 16 });
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        gsap.to(e.target, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' });
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -8%' });
+    ins.forEach((el) => io.observe(el));
+
+    /* counters — animate before→after, integer or one-decimal */
+    main.querySelectorAll<HTMLElement>('[data-e-count]').forEach((el) => {
+      const to = parseFloat(el.dataset.eCount || '0');
+      const from = parseFloat(el.dataset.eFrom || '0');
+      const suf = el.dataset.eSuffix || '';
+      const dec = (el.dataset.eCount || '').includes('.') ? 1 : 0;
+      new IntersectionObserver(([e], o) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        const p = { v: from };
+        gsap.to(p, {
+          v: to, duration: 1.4, ease: 'power2.out',
+          onUpdate: () => { el.textContent = `${p.v.toFixed(dec)}${suf}`; },
+        });
+      }, { threshold: 0.5 }).observe(el);
+    });
+
+    /* failsafe: nothing on this page may stay invisible */
+    setTimeout(() => {
+      ins.forEach((el) => {
+        if (gsap.getProperty(el, 'opacity') === 0) gsap.set(el, { autoAlpha: 1, y: 0 });
+      });
+    }, 5000);
+  }
+</script>
+</body>
+</html>

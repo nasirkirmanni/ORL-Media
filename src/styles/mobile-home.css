@@ -1,0 +1,126 @@
+/* ─────────────────────────────────────────────────────────────
+   mobile-home.css — the mobile-only homepage (≤767px).
+
+   The desktop homepage is a wheel-driven 3-slide hero plus heavy
+   animated sections (3D scene, live dashboards, pinned bridge). On
+   phones that whole experience is REPLACED by a lean, natively
+   scrollable layout: one hero → a two-line engine diagram → the
+   problems we solve → four service cards → a compact "how to start".
+
+   Desktop is untouched: every rule lives inside @media (max-width:
+   767px) except the single default that keeps the mobile blocks
+   hidden on desktop.
+
+   Kept in lockstep with index.astro's HERO_OFF (also 767px), which
+   disables the hero document-lock + Observer so the page scrolls
+   freely with .stage hidden.
+   ───────────────────────────────────────────────────────────── */
+
+.m-only { display: none; }
+
+@media (max-width: 767px) {
+  /* — hide the desktop sections replaced or removed on mobile — */
+  .stage,
+  .s3dpin,          /* tall scroll-pin wrapper around #infra */
+  #infra,
+  #section2,
+  #section2b,
+  #vaporbridge,
+  #section3,
+  .mlayer,
+  #why-orl { display: none !important; }
+
+  /* — reveal the mobile layout — */
+  .m-only { display: block; }
+
+  /* — the fixed nav shows from the top now the hero that triggered it is gone — */
+  .sitenav { transform: translateY(0) !important; }
+
+  /* — page ground (body has no class; the hero used to paint the top) — */
+  html, body { background: #f6f2ea; }
+
+  /* ═══════════ hero ═══════════ */
+  .mhero { padding: 6.6rem 1.4rem 3rem; background: #bfa588; }
+  .mhero__wordmark {
+    margin: 0 0 0.4rem;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(3.6rem, 19vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: #2b2117;
+  }
+  .mhero__eye { margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: #6b4a1c; }
+  .mhero__h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.5rem, 11.5vw, 3.5rem);
+    line-height: 1.03;
+    letter-spacing: -0.02em;
+    color: #1f1d19;
+    margin: 1rem 0 0;
+  }
+  .mhero__sub { margin: 1.1rem 0 0; font-size: 1rem; line-height: 1.6; color: #4a3d2c; }
+  .mhero__cta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin: 1.8rem 0 0; }
+  .mbtn {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.85rem 1.35rem; border-radius: 99px;
+    font-size: 0.9rem; font-weight: 500; text-decoration: none;
+    border: 1px solid rgba(43, 33, 23, 0.3); color: #2b2117; background: transparent;
+  }
+  .mbtn--primary { background: #2b2117; color: #f3ede2; border-color: #2b2117; }
+  .mhero__trust { margin: 1.7rem 0 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: #7a6a4f; }
+
+  /* ═══════════ the engine, in two lines (3D-section replacement) ═══════════ */
+  .mflow { padding: 3rem 1.4rem; border-top: 1px solid #e6ddcc; }
+  .mflow__eye { margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: #9a6417; }
+  .mflow__h2 { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1.06; letter-spacing: -0.015em; color: #1f1d19; margin: 0.7rem 0 0; }
+  .mflow__diagram { margin: 1.7rem 0 0; }
+  .mflow__row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin: 0; padding: 0; list-style: none; }
+  .mflow__row li {
+    text-align: center;
+    padding: 0.85rem 0.5rem;
+    background: #fdfbf6; border: 1px solid #e6ddcc; border-radius: 11px;
+    font-family: var(--font-display); font-size: 1.1rem; color: #1f1d19;
+  }
+  .mflow__row li span { display: block; margin-top: 0.15rem; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.52rem; letter-spacing: 0.08em; text-transform: uppercase; color: #9a8f7c; }
+  .mflow__bar {
+    margin: 0.55rem 0 0; padding: 0.85rem; text-align: center;
+    background: #1c1c1e; color: #cbb98f; border-radius: 11px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+
+  /* ═══════════ problems we solve ═══════════ */
+  .mprob { padding: 3rem 1.4rem; border-top: 1px solid #e6ddcc; }
+  .mprob__eye { margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: #9a6417; }
+  .mprob__h2 { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1.06; letter-spacing: -0.015em; color: #1f1d19; margin: 0.7rem 0 1.5rem; }
+  .mprob__list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+  .mprob__list li { display: flex; gap: 0.85rem; padding: 1.05rem 1.15rem; background: #fdfbf6; border: 1px solid #e6ddcc; border-radius: 13px; }
+  .mprob__n { flex: none; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.68rem; color: #c98b32; padding-top: 0.15rem; }
+  .mprob__list b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 1.18rem; line-height: 1.15; color: #1f1d19; }
+  .mprob__list p { margin: 0.4rem 0 0; font-size: 0.88rem; line-height: 1.5; color: #6f675a; }
+
+  /* ═══════════ four services ═══════════ */
+  .msvc { padding: 3rem 1.4rem 3.4rem; border-top: 1px solid #e6ddcc; }
+  .msvc__eye { margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: #9a6417; }
+  .msvc__h2 { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1.06; letter-spacing: -0.015em; color: #1f1d19; margin: 0.7rem 0 0; }
+  .msvc__grid { display: flex; flex-direction: column; gap: 0.85rem; margin: 1.5rem 0 0; }
+  .msvc__card {
+    position: relative; display: block;
+    padding: 1.4rem 1.35rem 1.45rem 1.6rem;
+    background: #fdfbf6; border: 1px solid #e6ddcc; border-radius: 15px;
+    text-decoration: none; overflow: hidden;
+  }
+  .msvc__card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--ca, #2e5cff); }
+  .msvc__num { margin: 0; display: flex; align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ca, #2e5cff); }
+  .msvc__name { font-family: var(--font-display); font-weight: 400; font-size: 1.65rem; line-height: 1.02; color: #1f1d19; margin: 0.55rem 0 0; }
+  .msvc__desc { margin: 0.5rem 0 0; font-size: 0.9rem; line-height: 1.55; color: #6f675a; }
+  .msvc__arrow { margin: 0.7rem 0 0; display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ca, #2e5cff); }
+
+  /* ═══════════ compact "how to start" (the kept ladder) ═══════════ */
+  .lad { padding: 3rem 1.4rem !important; }
+  .lad__step { padding: 1.3rem 1.3rem !important; }
+  .lad__stepname { font-size: 1.4rem !important; }
+  .lad__engine { display: none !important; }   /* decorative canvas overlay */
+}

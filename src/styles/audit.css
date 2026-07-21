@@ -323,6 +323,16 @@
   .aud__cardbody { grid-template-columns: 1fr; gap: 1.8rem; }
   .aud__soanum strong { font-size: 3.2rem; }
 }
+/* tighten the generous desktop section rhythm on phones (the .aud beige-theme
+   overrides otherwise keep full padding even below engine.css's 560 rules) */
+@media (max-width: 560px) {
+  /* .mod.aud beats the beige-theme's `.aud .mod__hero` (both classes on <main>) */
+  .mod.aud .mod__hero { padding: 7.5rem 1.3rem 3rem; }
+  .aud__covers,
+  .aud__faq { padding: 3.6rem 1.3rem; }
+  .aud__report { padding: 3.6rem 1.3rem 4rem; }
+  .aud__scope { padding: 3.2rem 1.3rem; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .aud__q summary::after { transition: none; }

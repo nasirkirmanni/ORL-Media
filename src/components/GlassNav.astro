@@ -40,4 +40,106 @@
       window.addEventListener('load', () => glass.refresh?.(), { once: true });
     }
   }
+
+  /* ─────────────────────────────────────────────────────────────
+     Mobile hamburger menu. Built from the nav's OWN links so every
+     page's menu matches its nav automatically. The button is
+     display:none ≥1024px, so this is inert on desktop. A11y: 44px
+     targets, aria-expanded, Escape + backdrop close, body scroll
+     lock, focus moves into the panel and returns on close.
+     ───────────────────────────────────────────────────────────── */
+  if (nav) {
+    /* ── back button (leftmost, desktop + mobile) ──
+       Browser back when there's in-site history to return to; otherwise home,
+       so a directly-opened page never dead-ends by leaving the site. */
+    const back = document.createElement('button');
+    back.type = 'button';
+    back.className = 'navback';
+    back.setAttribute('aria-label', 'Go back');
+    back.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>';
+    back.addEventListener('click', () => {
+      if (window.history.length > 1) window.history.back();
+      else window.location.href = '/';
+    });
+    nav.insertBefore(back, nav.firstChild);
+
+    const links = nav.querySelector<HTMLElement>('.sitenav__links');
+    const pill = nav.querySelector<HTMLAnchorElement>('.sitenav__pill');
+    if (links) {
+      const burger = document.createElement('button');
+      burger.type = 'button';
+      burger.className = 'navburger';
+      burger.setAttribute('aria-label', 'Open menu');
+      burger.setAttribute('aria-expanded', 'false');
+      burger.innerHTML = '<span></span><span></span><span></span>';
+      nav.appendChild(burger);
+
+      const overlay = document.createElement('div');
+      overlay.className = 'navmenu';
+      overlay.hidden = true;
+      const panel = document.createElement('div');
+      panel.className = 'navmenu__panel';
+      const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'navmenu__close';
+      closeBtn.setAttribute('aria-label', 'Close menu');
+      closeBtn.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+      const list = document.createElement('div');
+      list.className = 'navmenu__list';
+      links.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => {
+        const href = a.getAttribute('href');
+        if (!href) return;
+        const item = document.createElement('a');
+        item.className = 'navmenu__link';
+        item.href = href;
+        item.textContent = (a.textContent || '').trim();
+        const cur = a.getAttribute('aria-current');
+        if (cur) item.setAttribute('aria-current', cur);
+        list.appendChild(item);
+      });
+      if (pill) {
+        const cta = document.createElement('a');
+        cta.className = 'navmenu__cta';
+        cta.href = pill.getAttribute('href') || '/book';
+        cta.textContent = (pill.textContent || 'Book a call').trim();
+        list.appendChild(cta);
+      }
+      panel.appendChild(closeBtn);
+      panel.appendChild(list);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
+
+      let lastFocus: HTMLElement | null = null;
+      const open = () => {
+        lastFocus = document.activeElement as HTMLElement;
+        /* Measure the scrollbar BEFORE locking, then compensate its removal so
+           the centred nav doesn't jump sideways when overflow:hidden lands. */
+        const sbw = window.innerWidth - document.documentElement.clientWidth;
+        document.documentElement.style.setProperty('--navmenu-sbw', sbw + 'px');
+        overlay.hidden = false;
+        void overlay.offsetWidth;                 // reflow so the transition runs
+        overlay.classList.add('is-open');
+        burger.setAttribute('aria-expanded', 'true');
+        document.documentElement.classList.add('navmenu-lock');
+        (list.querySelector('a') as HTMLElement | null)?.focus();
+      };
+      const close = () => {
+        overlay.classList.remove('is-open');
+        burger.setAttribute('aria-expanded', 'false');
+        document.documentElement.classList.remove('navmenu-lock');
+        if (reduce.matches) {
+          overlay.hidden = true;
+        } else {
+          const done = () => { overlay.hidden = true; overlay.removeEventListener('transitionend', done); };
+          overlay.addEventListener('transitionend', done);
+        }
+        lastFocus?.focus();
+      };
+      burger.addEventListener('click', open);
+      closeBtn.addEventListener('click', close);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+      list.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('a')) close(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('is-open')) close(); });
+    }
+  }
 </script>

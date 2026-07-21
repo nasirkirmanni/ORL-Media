@@ -689,6 +689,53 @@ body.eng-body::after {
   .mod__foot { flex-direction: column; align-items: flex-start; }
 }
 
+/* ── module hero: brown band on mobile (signals / proof / pricing) ──
+   The dark, accent-lit hero becomes a warm brown band carrying the big
+   module name, matching the homepage + visibility mobile heroes. Audit
+   overrides this with its own beige treatment (higher specificity via
+   .mod.aud), and visibility uses its own .vmhero, so only the [module]
+   pages change here. Desktop keeps the dark hero. */
+@media (max-width: 767px) {
+  .mod__hero {
+    background: #bfa588;
+    color: #2b2117;
+    padding: 7.5rem 1.3rem 3rem;
+  }
+  .mod__watermark { display: none; }
+  .mod__crumb,
+  .mod__crumb a { color: #5a4327; }
+  .mod__crumb a { border-bottom-color: rgba(123, 74, 36, 0.5); }
+  .mod__status { border-color: rgba(43, 33, 23, 0.25); color: #2b2117; }
+  .mod__title { color: #2b2117; }
+  .mod__title em { color: #7b4a24; }
+  .mod__pos { color: #7b4a24; }
+  .mod__sub { color: #4a3d2c; }
+  .mod__metric { background: rgba(43, 33, 23, 0.06); border-color: rgba(43, 33, 23, 0.16); }
+  .mod__metriclabel { color: #7b4a24; }
+  .mod__metricrow strong { color: #2b2117; }
+  .mod__metricrow span { color: #5a4327; }
+  .mod__heroline { background: rgba(43, 33, 23, 0.12); }
+  .mod__heroline em { background: linear-gradient(90deg, transparent, #7b4a24, transparent); }
+}
+
+/* ── engine flagship page: mobile size-reduction pass ──
+   Same treatment as the homepage mobile pass — the full-viewport hero
+   collapses to a compact one, section vertical rhythm tightens, and the
+   headline steps down. All inside the query, so desktop is untouched. */
+@media (max-width: 640px) {
+  .eng__hero { height: auto; min-height: 0; padding: 7rem 1.3rem 2.6rem; }
+  .eng__title { font-size: clamp(2.1rem, 9vw, 3rem); margin-top: 1rem; }
+  .eng__sub { font-size: 0.98rem; margin-top: 1.1rem; }
+  .eng__systems,
+  .eng__month,
+  .eng__included,
+  .eng__faq,
+  .eng__metrics,
+  .eng__guarantee { padding: 3.2rem 1.3rem; }
+  .eng__final { padding: 1.4rem 1.3rem 3.4rem; }
+  .eng__h2 { font-size: clamp(1.7rem, 6.5vw, 2.2rem); }
+}
+
 /* ─────────────── reduced motion ─────────────── */
 @media (prefers-reduced-motion: reduce) {
   .mod__status b { animation: none; }

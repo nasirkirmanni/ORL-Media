@@ -4,6 +4,7 @@ import { graph, organization, website } from '../lib/schema';
 
 import '../styles/global.css';
 import '../styles/revenue-leak.css';
+import '../styles/mobile-home.css';
 import { getCollection } from 'astro:content';
 
 // ── The ORL Journal: featured posts for the Insights teaser ───
@@ -156,6 +157,82 @@ import GlassNav from '../components/GlassNav.astro';
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     MOBILE-ONLY HOMEPAGE (≤767px)
+     Replaces the wheel-driven hero + heavy animated sections with a
+     lean, natively-scrollable layout. Hidden on desktop via .m-only;
+     the desktop sections below are hidden on mobile in mobile-home.css.
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="m-only mhero" aria-label="ORL Media">
+  <p class="mhero__wordmark">ORL MEDIA</p>
+  <p class="mhero__eye">Growth infrastructure for B2B SaaS &amp; AI startups</p>
+  <h1 class="mhero__h1">We build the machine that grows your revenue.</h1>
+  <p class="mhero__sub">We install AI-powered growth systems for B2B SaaS and AI startups &mdash; discovery, demand, deals, and monetization in one engine, on one set of numbers.</p>
+  <div class="mhero__cta">
+    <a class="mbtn mbtn--primary" href="/audit">Start with the Audit
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a class="mbtn" href="/book">Book a call</a>
+  </div>
+  <p class="mhero__trust">Built for seed&ndash;Series B &middot; $1M&ndash;$20M ARR</p>
+</section>
+
+<section class="m-only mflow" aria-label="The Growth Engine">
+  <p class="mflow__eye">One system. Four modules.</p>
+  <h2 class="mflow__h2">Four systems.<br />One growth infrastructure.</h2>
+  <div class="mflow__diagram">
+    <ol class="mflow__row">
+      <li>Visibility<span>Get discovered</span></li>
+      <li>Signals<span>Find demand</span></li>
+      <li>Proof<span>Win the deal</span></li>
+      <li>Pricing<span>Monetize</span></li>
+    </ol>
+    <p class="mflow__bar">Metrics layer &middot; one set of numbers under all four</p>
+  </div>
+</section>
+
+<section class="m-only mprob" aria-label="What we solve">
+  <p class="mprob__eye">What we solve</p>
+  <h2 class="mprob__h2">Where B2B SaaS loses the revenue.</h2>
+  <ul class="mprob__list">
+    <li><span class="mprob__n">01</span><div><b>You&rsquo;re not in the AI answer.</b><p>Buyers ask ChatGPT before they ever search your name &mdash; and you&rsquo;re not the recommendation they get.</p></div></li>
+    <li><span class="mprob__n">02</span><div><b>Outbound timed by luck, not signals.</b><p>You emailed 10,000 people and 120 replied, because 95% of them weren&rsquo;t buying this quarter.</p></div></li>
+    <li><span class="mprob__n">03</span><div><b>Deals reach security review and go quiet.</b><p>Pipeline doesn&rsquo;t die at the top of the funnel. It dies in committee, in &ldquo;no decision.&rdquo;</p></div></li>
+    <li><span class="mprob__n">04</span><div><b>Board-deck week, shaky numbers.</b><p>Four days building the deck and attribution still can&rsquo;t say what actually drove revenue.</p></div></li>
+  </ul>
+</section>
+
+<section class="m-only msvc" aria-label="Our services">
+  <p class="msvc__eye">What we install</p>
+  <h2 class="msvc__h2">Four systems. Install one or all.</h2>
+  <div class="msvc__grid">
+    <a class="msvc__card" href="/engine/visibility" style="--ca:#2e5cff">
+      <p class="msvc__num">01 &middot; Get discovered</p>
+      <h3 class="msvc__name">Visibility</h3>
+      <p class="msvc__desc">Be the company AI search engines recommend &mdash; not just Google. We put you inside the answer and keep you there.</p>
+      <span class="msvc__arrow">Explore Visibility &rarr;</span>
+    </a>
+    <a class="msvc__card" href="/engine/signals" style="--ca:#9a6417">
+      <p class="msvc__num">02 &middot; Find demand</p>
+      <h3 class="msvc__name">Signals</h3>
+      <p class="msvc__desc">Reach buyers the week they enter a buying window, with outreach written from real context &mdash; not spray-and-pray.</p>
+      <span class="msvc__arrow">Explore Signals &rarr;</span>
+    </a>
+    <a class="msvc__card" href="/engine/proof" style="--ca:#2f7d4c">
+      <p class="msvc__num">03 &middot; Win the deal</p>
+      <h3 class="msvc__name">Proof</h3>
+      <p class="msvc__desc">Arm the buying committee with third-party evidence that unsticks deals stalled in security review and no-decision.</p>
+      <span class="msvc__arrow">Explore Proof &rarr;</span>
+    </a>
+    <a class="msvc__card" href="/engine/pricing" style="--ca:#1f6b72">
+      <p class="msvc__num">04 &middot; Monetize &amp; expand</p>
+      <h3 class="msvc__name">Pricing</h3>
+      <p class="msvc__desc">Turn packaging, usage, and expansion into revenue you can forecast &mdash; the other half of growth, at half the CAC.</p>
+      <span class="msvc__arrow">Explore Pricing &rarr;</span>
+    </a>
+  </div>
+</section>
+
 <div class="stage" id="stage" data-count={slides.length}>
 
   <!-- ══════════ ENDLESS BACKGROUND (one continuous world) ══════════ -->
@@ -267,13 +344,7 @@ import GlassNav from '../components/GlassNav.astro';
     <nav class="menu" aria-label="Primary">
       <div class="menu__col">
         <a href="/engine" class="menu__link">Services</a>
-        <a href="/audit" class="menu__link">Audit</a>
         <a href="/about" class="menu__link">About us</a>
-        <a href="#" class="menu__link">Case Studies</a>
-      </div>
-      <div class="menu__col">
-        <a href="/blog" class="menu__link">Blog</a>
-        <a href="#" class="menu__link">Pricing</a>
         <a href="#" class="menu__link">Contact</a>
       </div>
     </nav>
@@ -310,13 +381,13 @@ import GlassNav from '../components/GlassNav.astro';
 <nav class="sitenav" data-sitenav aria-label="Site">
   <a class="sitenav__brand" href="/">
     <span class="sitenav__mark" aria-hidden="true"></span>
-    ORL Media
+    ORL
   </a>
   <div class="sitenav__links">
     <a href="/engine" class="sitenav__link">Services</a>
     <a href="/audit" class="sitenav__link">Audit</a>
     <a href="/about" class="sitenav__link">About us</a>
-    <a href="#" class="sitenav__link">Case Studies</a>
+    <a href="/results" class="sitenav__link">Case Studies</a>
     <a href="/blog" class="sitenav__link">Blog</a>
     <a href="#" class="sitenav__link">Pricing</a>
   </div>
@@ -2184,6 +2255,69 @@ import GlassNav from '../components/GlassNav.astro';
   </div>
 </section>
 
+<!-- ══════════ SECTION — FAQ (objection handling) ══════════ -->
+<section class="faq" id="faq" aria-label="Frequently asked questions">
+  <div class="faq__inner">
+    <div class="faq__head">
+      <p class="faq__eyebrow mono" data-faq-in>Before you ask</p>
+      <h2 class="faq__h2" data-faq-in>Questions founders<br />actually ask.</h2>
+    </div>
+    <div class="faq__list" data-faq-in>
+      <details class="faq__item">
+        <summary>What exactly is the Growth Engine?</summary>
+        <p>The full system: Visibility, Signals, Proof, and Pricing running together on one Metrics layer &mdash; discovery, demand, deal conversion, and monetization, installed and operated for you. Start with a single module or install the whole machine.</p>
+      </details>
+      <details class="faq__item">
+        <summary>How does the AI Visibility Audit work?</summary>
+        <p>Fixed scope, 10 business days. We score how you appear across ChatGPT, Perplexity, Gemini, and Google AI Overviews for 100+ real buying questions, benchmark you against three competitors, and hand you a prioritized 90-day plan. It&rsquo;s where every engagement starts.</p>
+      </details>
+      <details class="faq__item">
+        <summary>Can we just buy one module?</summary>
+        <p>Yes &mdash; Visibility and Signals run standalone. Proof is design-partner only right now; Pricing is in build. The full Engine is for companies that want the whole machine on one set of numbers.</p>
+      </details>
+      <details class="faq__item">
+        <summary>How do you measure success?</summary>
+        <p>One metric per system &mdash; Share of Answer, qualified meetings booked, no-decision rate, and net revenue per account &mdash; all reporting into a board-grade Metrics layer that&rsquo;s bundled into every engagement and never sold separately.</p>
+      </details>
+      <details class="faq__item">
+        <summary>Do we keep the systems if we leave?</summary>
+        <p>Yes. Everything we install &mdash; the dashboards, the trigger models, the content and citation layer, the trust center &mdash; is yours and keeps running after the engagement ends. That&rsquo;s the difference between an installation and a retainer.</p>
+      </details>
+      <details class="faq__item">
+        <summary>How are you different from an agency?</summary>
+        <p>We install systems you own. Agencies rent you effort &mdash; when they leave, everything stops. Our own AI products run inside every engagement, and what we build keeps working after we&rsquo;re gone.</p>
+      </details>
+      <details class="faq__item">
+        <summary>What does it cost?</summary>
+        <p>Scoped on the call. Every engagement is a flat retainer matched to the modules and volume you need &mdash; never a percentage of ad spend. When you ask, we give you real numbers immediately.</p>
+      </details>
+      <details class="faq__item">
+        <summary>What if it doesn&rsquo;t work?</summary>
+        <p>Engine engagements carry a 90-day pipeline guarantee. If the systems aren&rsquo;t producing qualified pipeline, we keep working free until they are.</p>
+      </details>
+      <details class="faq__item">
+        <summary>Do you do social media or paid ads?</summary>
+        <p>Paid runs inside the Engine when it&rsquo;s the right channel. We don&rsquo;t sell channel management as a product &mdash; we sell the system that makes channels work.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+  const faq = document.getElementById('faq');
+  if (faq && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const bits = [...faq.querySelectorAll<HTMLElement>('[data-faq-in]')];
+    gsap.set(bits, { opacity: 0, y: 20 });
+    const io = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      io.disconnect();
+      gsap.to(bits, { opacity: 1, y: 0, duration: 0.55, ease: 'power2.out', stagger: 0.08 });
+    }, { threshold: 0.15 });
+    io.observe(faq);
+  }
+</script>
+
 <!-- ══════════ SECTION 4 — THE ORL JOURNAL (blog teaser) ══════════ -->
 <section class="ins" id="insights" aria-label="The ORL Journal">
   <div class="ins__inner">
@@ -2237,7 +2371,9 @@ import GlassNav from '../components/GlassNav.astro';
   // touch scroll feels better on phones). While the hero owns the wheel it's
   // paused; it resumes the moment the hero hands off to the page.
   let lenis: Lenis | null = null;
-  if (!REDUCED) {
+  /* Native momentum scroll on touch devices beats pumping Lenis' rAF every
+     frame; the hero handoff below is fully null-guarded for a missing lenis. */
+  if (!REDUCED && !window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
     lenis = new Lenis({
       // Both were set BELOW Lenis' own defaults (lerp 0.1, wheelMultiplier 1),
       // which is what made the page feel heavy: each notch travelled less than
@@ -2395,7 +2531,12 @@ import GlassNav from '../components/GlassNav.astro';
   // last hero image with no way back. A short guard after release prevents
   // the release scroll from instantly re-locking (the old freeze trap).
   const afterHero = document.getElementById('infra');
-  let heroLocked = true;
+  /* Mobile (≤767px) has no hero slideshow — a new single hero replaces it in
+     the layout and .stage is display:none. Never arm the wheel/touch hijack or
+     the document lock there, or the page would be frozen behind a hidden hero.
+     Width-based so it stays in lockstep with the mobile-redesign CSS. */
+  const HERO_OFF = window.matchMedia('(max-width: 767px)').matches;
+  let heroLocked = !HERO_OFF;
   let relockGuard = 0;             // suppress re-lock until this timestamp
 
   /* The document-level half of the lock. The Observer below only intercepts
@@ -2448,7 +2589,7 @@ import GlassNav from '../components/GlassNav.astro';
   }
 
   function relockHero() {
-    if (heroLocked) return;
+    if (heroLocked || HERO_OFF) return;
     heroLocked = true;
     animating = false;             // clear any stale transition state
     coolUntil = performance.now() + COOLDOWN;
@@ -2475,8 +2616,10 @@ import GlassNav from '../components/GlassNav.astro';
     },
   });
 
-  // the Observer that releases the lock now exists, so it is safe to lock
-  setDocScroll(true);
+  // the Observer that releases the lock now exists, so it is safe to lock —
+  // but on mobile the hero is off: disable the interceptor and never lock.
+  if (HERO_OFF) obs.disable();
+  else setDocScroll(true);
 
   // if the browser restored a mid-page scroll position (reload / back-nav),
   // the visitor is NOT at the hero — never hijack their wheel in that case
@@ -3002,7 +3145,9 @@ import GlassNav from '../components/GlassNav.astro';
     let deckInView = false, hovering = false, modalOpen = false;
     const queue = () => {
       autoTimer?.kill();
-      if (mqReduce.matches) return;
+      /* no auto-glide on touch — the deck stays fully swipeable/tappable; we
+         just don't run the periodic blur transition unprompted on mobile */
+      if (mqReduce.matches || window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
       autoTimer = gsap.delayedCall(5.5, () => {
         if (deckInView && !hovering && !modalOpen) go(1, 1.2);   // long, slow glide
         queue();
@@ -3646,8 +3791,11 @@ import GlassNav from '../components/GlassNav.astro';
   const pxChapter = document.querySelector<HTMLElement>('[data-chapter="proof"]');
   const pxRoot = pxChapter?.querySelector<HTMLElement>('[data-px]') ?? null;
   const pxReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* Mobile: skip the 8 ambient loops — resting CSS is the finished panel.
+     Gated on touch-primary devices (not width), so hybrid laptops keep it. */
+  const pxTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
-  if (pxChapter && pxRoot && !pxReduce) {
+  if (pxChapter && pxRoot && !pxReduce && !pxTouch) {
     const q = (sel: string) => pxChapter.querySelector<HTMLElement>(sel)!;
     const qa = (sel: string) => [...pxChapter.querySelectorAll<HTMLElement>(sel)];
 
@@ -3872,8 +4020,9 @@ import GlassNav from '../components/GlassNav.astro';
   const prChapter = document.querySelector<HTMLElement>('[data-chapter="pricing"]');
   const prRoot = prChapter?.querySelector<HTMLElement>('[data-pr]') ?? null;
   const prReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const prTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
-  if (prChapter && prRoot && !prReduce) {
+  if (prChapter && prRoot && !prReduce && !prTouch) {
     const q = (sel: string) => prChapter.querySelector<HTMLElement>(sel)!;
     const qa = (sel: string) => [...prChapter.querySelectorAll<HTMLElement>(sel)];
 
@@ -4381,7 +4530,9 @@ import GlassNav from '../components/GlassNav.astro';
        Runs only while on screen; skipped entirely under reduced motion. ── */
     const canvas = lad.querySelector<HTMLCanvasElement>('[data-lad-canvas]');
     let engineOn = false;
-    if (canvas && !ladReduce) {
+    /* decorative orbit overlay on a dark card — its absence is invisible;
+       skip the continuous rAF on touch devices */
+    if (canvas && !ladReduce && !window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
       const ctx = canvas.getContext('2d')!;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const ORBITS = [
@@ -4626,7 +4777,8 @@ import GlassNav from '../components/GlassNav.astro';
 
     /* ── ambient particles (vanilla port of the shadcn Particles component) ── */
     const pHost = o3.querySelector<HTMLElement>('[data-orl3-particles]');
-    if (pHost && !mqReduce.matches) {
+    /* decorative background canvas — skip its continuous rAF on touch devices */
+    if (pHost && !mqReduce.matches && !window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
       const canvas = document.createElement('canvas');
       pHost.appendChild(canvas);
       const ctx = canvas.getContext('2d')!;
@@ -5246,18 +5398,17 @@ import GlassNav from '../components/GlassNav.astro';
   .sitenav__brand {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    font-weight: 600;
-    font-size: 1.05rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    font-size: 1.6rem;
+    letter-spacing: 0.06em;
+    line-height: 1;
     text-decoration: none;
     color: #111111;
+    white-space: nowrap;
+    flex: none;
   }
-  .sitenav__mark {
-    width: 14px;
-    height: 14px;
-    background: #111111;
-    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-  }
+  .sitenav__mark { display: none; }
   /* links dead-centre in the island, independent of brand/CTA widths */
   .sitenav__links {
     position: absolute;
@@ -5294,8 +5445,9 @@ import GlassNav from '../components/GlassNav.astro';
     .sitenav__links { display: none; }
   }
   @media (max-width: 767px) {
-    .sitenav { top: 0.75rem; left: 0.75rem; right: 0.75rem; padding: 0.6rem 0.6rem 0.6rem 1.25rem; }
-    .sitenav__pill { padding: 0.6rem 1.15rem; font-size: 0.8rem; }
+    .sitenav { top: 0.75rem; left: 0.7rem; right: 0.7rem; gap: 0.5rem; padding: 0.5rem 0.6rem; }
+    .sitenav__brand { font-size: 1.35rem; }
+    .sitenav__pill { padding: 0.6rem 1.05rem; font-size: 0.82rem; }
   }
 
   /* ══════════ chrome top ══════════ */
@@ -5324,7 +5476,7 @@ import GlassNav from '../components/GlassNav.astro';
     clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
   }
   .menu { display: flex; gap: 3rem; }
-  .menu__col { display: flex; flex-direction: column; gap: 0.35rem; }
+  .menu__col { display: flex; flex-direction: row; gap: 1.6rem; }
   .menu__link {
     font-size: 0.78rem;
     font-weight: 500;

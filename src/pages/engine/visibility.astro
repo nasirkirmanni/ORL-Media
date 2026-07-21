@@ -277,11 +277,12 @@ const MODALS: Record<string, Modal> = {
 <nav class="sitenav sitenav--page is-visible" aria-label="Site">
   <a class="sitenav__brand" href="/">
     <span class="sitenav__mark" aria-hidden="true"></span>
-    ORL Media
+    ORL
   </a>
   <div class="sitenav__links">
     <a href="/engine" class="sitenav__link" aria-current="true">Engine</a>
     <a href="/audit" class="sitenav__link">Audit</a>
+    <a href="/results" class="sitenav__link">Results</a>
     <a href="/about" class="sitenav__link">About</a>
     <a href="/blog" class="sitenav__link">Blog</a>
   </div>
@@ -291,6 +292,17 @@ const MODALS: Record<string, Modal> = {
 
 <main class="vis" id="main" style={`--acc:${m.accent}; --acc-d:${m.accentDark}; --acc-t:${m.accentText};`}>
 
+  <!-- Mobile (≤767px): the 3-video wipe hero is hidden and its clips never
+       load; the page starts on this text hero instead. -->
+  <header class="vmhero">
+    <p class="vmhero__crumb mono">
+      <a href="/engine">The Growth Engine</a>
+      <span aria-hidden="true">/</span> System {m.num}
+    </p>
+    <h1 class="vmhero__title">{m.name}<em>.</em></h1>
+    <p class="vmhero__pos">{m.pos}</p>
+    <p class="vmhero__sub">{m.sub}</p>
+  </header>
 
   <!-- ══════════ the video hero ══════════
        Three full-bleed clips of AI engines answering a real buying question.
@@ -954,6 +966,13 @@ const MODALS: Record<string, Modal> = {
     const triggers = [...vh.querySelectorAll<HTMLElement>('[data-vh-trigger]')];
 
     const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    /* Touch devices take the same static-frame path as reduced-motion: a
+       scroll-jacked, pinned WebGL-shader wipe is the heaviest, most fragile
+       interaction on the site for a phone. That fallback is already designed. */
+    const mqTouch = window.matchMedia('(hover: none) and (pointer: coarse)');
+    /* ≤767px: the video hero is hidden entirely (a text hero replaces it in the
+       markup), so the clips must never load and the pin must never build. */
+    const mqMobile = window.matchMedia('(max-width: 767px)');
 
     let ST: any = null;
     let made: any[] = [];
@@ -1119,7 +1138,7 @@ const MODALS: Record<string, Modal> = {
     });
 
     async function enable() {
-      if (made.length || enabling || mqReduce.matches) return;
+      if (made.length || enabling || mqReduce.matches || mqTouch.matches || mqMobile.matches) return;
       enabling = true;
       if (!ST) {
         const mod = await import('gsap/ScrollTrigger');
@@ -1180,7 +1199,10 @@ const MODALS: Record<string, Modal> = {
     }
 
     function sync() {
-      if (mqReduce.matches) {
+      /* Mobile: the hero is hidden and a text hero replaces it — pause/reset
+         only, never build the WebGL shader for an element that never shows. */
+      if (mqMobile.matches) { disable(); return; }
+      if (mqReduce.matches || mqTouch.matches) {
         disable();
         /* still build it — one static frame reads far better than a black
            rectangle behind the statement */
@@ -1202,6 +1224,7 @@ const MODALS: Record<string, Modal> = {
        its mask lifts. */
     const mqPortrait = window.matchMedia('(max-width: 900px)');
     function pickSources() {
+      if (mqMobile.matches) return;   // hero hidden on mobile — never load the clips
       const p = mqPortrait.matches;
       videos.forEach((v) => {
         if (!v) return;

@@ -1,0 +1,203 @@
+/* ─────────────────────────────────────────────────────────────
+   results.css — the Results page.
+
+   Numbers, not testimonials. A grid of before→after cards (one hard
+   metric each, in its system's accent) plus one featured deep-dive.
+   Runs on the same light beige field as audit/about and borrows the
+   engine tokens (.mod) + the shared reveal/counter motion.
+
+   Honesty: until named client case studies land, the cards carry
+   representative outcomes of the installed systems, labelled as
+   such — never presented as guaranteed client results. Real numbers
+   drop straight into the same slots.
+   ───────────────────────────────────────────────────────────── */
+
+body.eng-body.res-body { background: #e6dfd0; }
+
+.res__inner { max-width: 66rem; margin: 0 auto; }
+
+/* — hero — */
+.res__hero { padding: 9.5rem 1.5rem 3.5rem; text-align: center; }
+.res__heroinner { max-width: 48rem; margin: 0 auto; }
+.res__h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.9rem, 7vw, 5.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 1.4rem 0 0;
+}
+.res__h1 em { font-style: italic; color: var(--acc-t); }
+.res__lead {
+  max-width: 38rem;
+  margin: 1.3rem auto 0;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* — the grid — */
+.res__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.2rem;
+  padding: 2.5rem 1.5rem 1rem;
+  max-width: 66rem;
+  margin: 0 auto;
+}
+.res__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.9rem 1.7rem 1.8rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.res__card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; right: 0;
+  height: 3px;
+  background: var(--ca, var(--acc));
+}
+.res__tag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ca, var(--acc));
+}
+.res__tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--ca, var(--acc)); flex: none; }
+
+.res__nums { display: flex; align-items: baseline; gap: 0.6rem; margin: 1.4rem 0 0; flex-wrap: wrap; }
+.res__from {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--soft);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--soft) 50%, transparent);
+}
+.res__arrow { color: var(--ca, var(--acc)); display: inline-flex; }
+.res__to {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 3.4rem;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.res__metric {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.res__ctx {
+  margin: 0.55rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.res__time {
+  margin: 1.3rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+
+.res__note {
+  max-width: 44rem;
+  margin: 1.6rem auto 0;
+  padding: 0 1.5rem;
+  text-align: center;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  color: var(--soft);
+}
+
+/* — featured deep-dive — */
+.res__feature { padding: 5rem 1.5rem 5.5rem; }
+.res__featcard {
+  max-width: 60rem;
+  margin: 0 auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.res__feathead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1.6rem 1.9rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--ca, var(--acc)) 7%, transparent);
+}
+.res__feateyebrow {
+  margin: 0;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ca, var(--acc));
+}
+.res__feattitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.1;
+  color: var(--ink);
+  margin: 0.3rem 0 0;
+}
+.res__featnum {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 6vw, 4rem);
+  line-height: 0.9;
+  color: var(--ca, var(--acc));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.res__featbody {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+  padding: 2rem 1.9rem 2.3rem;
+}
+.res__step h4 {
+  margin: 0;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+}
+.res__step p { margin: 0.7rem 0 0; font-size: 0.92rem; line-height: 1.65; color: #4a463e; }
+
+@media (max-width: 860px) {
+  .res__grid { grid-template-columns: 1fr; }
+  .res__featbody { grid-template-columns: 1fr; gap: 1.6rem; }
+}
+/* tighten desktop vertical rhythm on phones + step down the big stat so a
+   longer value can't overflow a card (horizontal padding unchanged) */
+@media (max-width: 560px) {
+  .res__hero { padding: 7rem 1.4rem 2.6rem; }
+  .res__feature { padding: 3.4rem 1.4rem 4rem; }
+  .res__to { font-size: 2.9rem; }
+}

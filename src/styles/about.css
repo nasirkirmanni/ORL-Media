@@ -182,3 +182,10 @@ body.eng-body.abt-body { background: #e6dfd0; }
   .abt__beliefs { gap: 0; }
   .abt__belief { margin-top: 1.6rem; }
 }
+/* tighten the generous desktop vertical rhythm on phones so sections don't
+   scroll through big empty gaps (horizontal padding unchanged) */
+@media (max-width: 560px) {
+  .abt__section { padding: 3.4rem 1.4rem; }
+  .abt__hero { padding: 7rem 1.4rem 2.8rem; }
+  .abt__head { margin-bottom: 2rem; }
+}
