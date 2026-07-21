@@ -1,0 +1,253 @@
+---
+import '../styles/global.css';
+import '../styles/engine.css';
+import '../styles/about.css';
+import Seo from '../components/Seo.astro';
+import GlassNav from '../components/GlassNav.astro';
+import { graph, organization, website, breadcrumbs } from '../lib/schema';
+
+/* ─────────────────────────────────────────────────────────────
+   ABOUT — conviction, not biography.
+
+   Blueprint Part 3: "why you're leaving the traditional agency
+   model, what you saw breaking, and why systems beat services in
+   an AI-first world." This page sells to founders more than any
+   feature list, so it argues a thesis rather than listing a team.
+
+   Light beige field like the audit page; engine tokens via .mod.
+   ───────────────────────────────────────────────────────────── */
+
+const path = '/about/';
+
+const BREAK = [
+  {
+    h: 'Buyers stopped starting at Google.',
+    p: 'Around <b>60%</b> of the buying journey now happens before a buyer ever contacts sales — and increasingly it starts inside an AI assistant that returns an answer and leaves no referrer to measure.',
+  },
+  {
+    h: 'Attribution quietly collapsed.',
+    p: 'An estimated <b>84%</b> of B2B content is shared in dark social that no dashboard can see. The CFO tends to find the gap before the agency reporting on it does.',
+  },
+  {
+    h: 'Agencies kept billing for motion.',
+    p: 'Retainers priced on activity — posts, sends, decks — while pipeline stalled. B2B win rates fell from <b>29%</b> to <b>19%</b> in a single year, and effort kept getting invoiced anyway.',
+  },
+  {
+    h: 'Deals began dying after the meeting.',
+    p: '<b>89%</b> of sellers report opportunities stalling into no decision — in the committee and the security review, the exact place no campaign has ever reached.',
+  },
+];
+
+const BELIEFS = [
+  {
+    h: 'Install systems, don’t rent effort.',
+    p: 'Everything we build keeps running after the engagement ends. The question that matters is what still exists the day after we leave — and the answer is: your machine.',
+  },
+  {
+    h: 'Senior operators only.',
+    p: 'Two senior operators plus AI systems outperform a ten-person account team. You are never handed to a junior, and there is no account-management theatre.',
+  },
+  {
+    h: 'Capacity is capped, on purpose.',
+    p: 'Signal quality degrades with scale, so we don’t scale it. When we’re full there’s a waitlist. Scarcity here is honesty about quality, not a sales tactic.',
+  },
+  {
+    h: 'Flat fees. Never a percentage of ad spend.',
+    p: 'We are paid for installed systems and outcomes, not for spending your money. The incentive points at your revenue, not your budget.',
+  },
+  {
+    h: 'AI is the architecture, not a buzzword.',
+    p: 'Our own AI products run inside every engagement — signal monitors, drafting, the metrics narrative. Not a tool we mention on a call. The system itself.',
+  },
+  {
+    h: 'Engineer’s honesty.',
+    p: 'If the audit says your budget belongs somewhere other than us, we say so. Founders smell hype instantly, and the fastest way to lose them is to sell it.',
+  },
+];
+
+const ld = graph([
+  organization(),
+  website(),
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'About', path },
+  ]),
+]);
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <Seo
+    title="About ORL Media — We build the machine, not the marketing"
+    description="Why we left the agency model: what broke in B2B growth, why systems beat services in an AI-first market, and who we build for — AI startups and B2B SaaS from seed to Series B."
+    ogTitle="About ORL Media"
+    ogDescription="Agencies sell activity. We install revenue infrastructure for AI startups and B2B SaaS — systems you own and keep."
+  >
+    <script type="application/ld+json" is:inline set:html={ld} />
+  </Seo>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
+</head>
+<body class="blg-body eng-body abt-body">
+
+<nav class="sitenav sitenav--page is-visible" aria-label="Site">
+  <a class="sitenav__brand" href="/">
+    <span class="sitenav__mark" aria-hidden="true"></span>
+    ORL Media
+  </a>
+  <div class="sitenav__links">
+    <a href="/engine" class="sitenav__link">Engine</a>
+    <a href="/audit" class="sitenav__link">Audit</a>
+    <a href="/about" class="sitenav__link" aria-current="true">About</a>
+    <a href="/blog" class="sitenav__link">Blog</a>
+  </div>
+  <a class="sitenav__pill" href="/book">Book a call</a>
+</nav>
+<GlassNav />
+
+<main class="mod abt" id="main" style="--acc:#2e5cff; --acc-d:#2e5cff; --acc-t:#2e5cff;">
+
+  <!-- ── hero ── -->
+  <header class="abt__hero">
+    <div class="abt__heroinner">
+      <p class="mod__eyebrow mono" data-e-in>About ORL Media</p>
+      <h1 class="abt__h1" data-e-in>The agency model is quietly broken. <em>We left to build what replaces it.</em></h1>
+      <p class="abt__lead" data-e-in>ORL Media installs AI-powered growth systems for B2B SaaS and AI startups. Not campaigns you rent by the month &mdash; revenue infrastructure you own, operate, and keep.</p>
+    </div>
+  </header>
+
+  <!-- ── what broke ── -->
+  <section class="abt__section" aria-label="What broke">
+    <div class="abt__inner">
+      <div class="abt__head">
+        <p class="mod__eyebrow mono" data-e-in>What we watched break</p>
+        <h2 class="abt__h2" data-e-in>Four things stopped working at once.</h2>
+      </div>
+      <ul class="abt__break">
+        {BREAK.map((b, i) => (
+          <li class="abt__breakitem" data-e-in>
+            <span class="abt__breaknum">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="abt__breakh">{b.h}</h3>
+            <p class="abt__breakp" set:html={b.p}></p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── the thesis ── -->
+  <section class="abt__section abt__thesis" aria-label="Why systems beat services">
+    <div class="abt__inner">
+      <p class="mod__eyebrow mono" data-e-in style="text-align:center">Why systems beat services</p>
+      <p class="abt__quote" data-e-in>Your data trains your engine. Your engine compounds. <em>That’s the difference between renting effort and owning infrastructure.</em></p>
+      <p class="abt__thesisbody" data-e-in>A service ends the day the invoice stops &mdash; the decks close, the logins expire, and you are back where you started. A system keeps running. It learns from every deal, every answer, every send, and it belongs to you. In an AI-first market, the compounding advantage goes to the company that owns its machine, not the one that rents a team.</p>
+    </div>
+  </section>
+
+  <!-- ── who we build for ── -->
+  <section class="abt__section" aria-label="Who we build for">
+    <div class="abt__inner">
+      <div class="abt__head">
+        <p class="mod__eyebrow mono" data-e-in>Who we build for</p>
+        <h2 class="abt__h2" data-e-in>Built for AI startups and B2B SaaS.</h2>
+      </div>
+      <div class="abt__whogrid">
+        <article class="abt__whocard" data-e-in>
+          <p class="abt__wholabel"><i aria-hidden="true"></i>AI startups</p>
+          <h3>Priced on usage, not seats.</h3>
+          <p>AI-native companies where the product is billed on consumption or credits &mdash; and MQLs are the wrong deliverable. We build for activation, consumption, and expansion, because that is where your revenue actually lives.</p>
+        </article>
+        <article class="abt__whocard" data-e-in>
+          <p class="abt__wholabel"><i aria-hidden="true"></i>B2B SaaS</p>
+          <h3>Pipeline pressure, no growth team.</h3>
+          <p>Software companies with real pipeline pressure and no room for a ten-person department. We install the discovery, demand, and deal-conversion systems a full team would &mdash; run by senior operators, measured on one layer.</p>
+        </article>
+      </div>
+      <p class="abt__whofoot" data-e-in>Seed to Series B &middot; $1M&ndash;$20M ARR &middot; technical founder &middot; 0&ndash;2 marketing hires</p>
+    </div>
+  </section>
+
+  <!-- ── what we believe ── -->
+  <section class="abt__section" aria-label="What we believe">
+    <div class="abt__inner">
+      <div class="abt__head">
+        <p class="mod__eyebrow mono" data-e-in>What we believe</p>
+        <h2 class="abt__h2" data-e-in>Six things we won’t compromise on.</h2>
+      </div>
+      <ul class="abt__beliefs">
+        {BELIEFS.map((b) => (
+          <li class="abt__belief" data-e-in>
+            <h3>{b.h}</h3>
+            <p>{b.p}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── vision ── -->
+  <section class="abt__section abt__vision" aria-label="Our vision">
+    <div class="abt__inner">
+      <p class="mod__eyebrow mono" data-e-in style="text-align:center">Where this goes</p>
+      <p class="abt__visionline" data-e-in>To be the name a founder gives when someone asks &mdash; <em>“who built your revenue engine?”</em></p>
+    </div>
+  </section>
+
+  <!-- ── cta ── -->
+  <section class="mod__cta" aria-label="Start with the audit">
+    <div class="mod__inner" data-e-in>
+      <h2 class="mod__ctah">See what buyers see. Start with the audit.</h2>
+      <p class="mod__ctas">Ten business days, fixed scope, and the exact picture of how you show up across four AI engines. It is the honest first step &mdash; and where every engagement begins.</p>
+      <a class="mod__ctabtn" href="/audit">Start with the AI Visibility Audit
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <p class="mod__ctanote mono">Fixed scope &middot; 10 business days &middot; no retainer required</p>
+    </div>
+  </section>
+
+  <footer class="mod__foot">
+    <a class="mod__next" href="/engine">
+      <span class="mono">See the system</span>
+      <strong>The Growth Engine</strong>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <p class="mono">&copy; 2026 ORL Media &mdash; Growth infrastructure for B2B</p>
+  </footer>
+</main>
+
+<script>
+  import { gsap } from 'gsap';
+
+  /* Shared reveal motion (same pattern as the module + audit pages).
+     Resting CSS is the finished page; a failed script degrades to static. */
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const main = document.querySelector<HTMLElement>('.mod, .eng');
+
+  if (main && !reduce) {
+    const ins = [...main.querySelectorAll<HTMLElement>('[data-e-in]')];
+    gsap.set(ins, { autoAlpha: 0, y: 16 });
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        gsap.to(e.target, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' });
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -8%' });
+    ins.forEach((el) => io.observe(el));
+
+    /* failsafe: nothing on this page may stay invisible */
+    setTimeout(() => {
+      ins.forEach((el) => {
+        if (gsap.getProperty(el, 'opacity') === 0) gsap.set(el, { autoAlpha: 1, y: 0 });
+      });
+    }, 5000);
+  }
+</script>
+</body>
+</html>

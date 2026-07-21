@@ -1,0 +1,1506 @@
+---
+import '../../styles/global.css';
+import '../../styles/engine.css';
+import '../../styles/visibility.css';
+import '../../styles/aeo.css';
+import Seo from '../../components/Seo.astro';
+import GlassNav from '../../components/GlassNav.astro';
+import { graph, organization, website, service, breadcrumbs } from '../../lib/schema';
+import { MODULES, ORDER } from '../../lib/modules';
+
+/* ─────────────────────────────────────────────────────────────
+   VISIBILITY — system 01, forked from the shared module template.
+
+   Why this page is bespoke: Visibility is the entry point of the
+   ladder (Audit → Modules → Engine). On the shared template it
+   looked identical to the module that is still in build.
+
+   The hero is a pinned scroll scene: the giant word recedes in Z
+   while three cards emerge from behind it, hold as one composition
+   at three depths, then separate to reveal the transition into the
+   Problem section. Everything below the hero is the shared
+   .mod__* markup, unchanged.
+
+   Sections 2–8 read from the SAME record the other three modules
+   use (src/lib/modules.ts), so the copy cannot drift.
+   ───────────────────────────────────────────────────────────── */
+
+const m = MODULES.visibility;
+const slug = 'visibility';
+const nextSlug = 'signals';
+const next = MODULES[nextSlug];
+const metricRest = `${m.metric.to}${m.metric.fmt}`;
+
+const modPath = `/engine/${slug}/`;
+const ld = graph([
+  organization(),
+  website(),
+  service({ name: m.name, description: m.sub, path: modPath }),
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'The Growth Engine', path: '/engine/' },
+    { name: m.name, path: modPath },
+  ]),
+]);
+
+/* The three hero clips.
+
+   ASPECT — the primary is LANDSCAPE 1920x1080, H.264, no audio track,
+   faststart. The stage is object-fit:cover at full bleed, so the source
+   aspect is cropped to whatever the viewport is:
+     • a 9:16 source on a 1440x900 desktop loses 65% of its HEIGHT
+     • a 16:9 source on a 375x812 phone loses 74% of its WIDTH
+   No single file survives both. So: shoot 16:9 and keep everything that
+   carries meaning inside the CENTRE SQUARE of the frame — the desktop then
+   gets the full composition and the mobile crop still contains it.
+
+   `portrait` is optional. Set it only once a real 1080x1920 cut exists at
+   <src>-p.mp4, and the swap below picks it up under 900px. Leaving it off
+   is the safe default — a missing file would fall through to the tint. */
+type Clip = {
+  kind?: 'video' | 'shader';   // default 'video'
+  src?: string;                // video only
+  alt: string;             // the accessible description of the footage
+  tint: string;            // fallback ground while the file loads
+  hold: number;            // ms on screen before the hero glides to the next
+  /* Brand-mark tone for this clip. Measured top-left luma of each master:
+     vis-01 ~210, vis-02 ~145, vis-03 ~2. Black reads on the first two and is
+     literally invisible on the third, so the mark flips per clip. */
+  mark: 'dark' | 'light';
+  statement?: string[];    // big type burned over this clip; one entry per line
+  portrait?: boolean;
+};
+const CLIPS: Clip[] = [
+  /* 01 — a buyer types the question. Encoded at 1.5x (baked into the file
+     with setpts, not set via playbackRate: it removes a runtime dependency
+     and made the file a third shorter, 10.0s -> 6.75s). */
+  { src: '/video/vis-01', tint: '#1d2b4a', hold: 3500, mark: 'dark',
+    alt: 'A person typing a question to an AI assistant, asking which companies solve their problem.' },
+
+  /* 02 — the assistant answers. */
+  { src: '/video/vis-02', tint: '#232a2e', hold: 4000, mark: 'dark',
+    alt: 'An AI assistant replying with its answer.' },
+
+  /* 03 — the shader. Not footage: a live WebGL fragment shader (see
+     src/lib/shader-animation.ts). Near-black with bright diagonal light bands
+     sweeping the corners, so the mark goes light here or it vanishes.
+     `tint` is the pre-init / no-WebGL ground and is matched to the shader's
+     own black so the fallback is invisible rather than a brown flash.
+     `hold` is unused on the last clip: nothing follows it inside the hero and
+     the statement is never scrolled away automatically. */
+  { kind: 'shader', tint: '#050507', hold: 4000, mark: 'light',
+    alt: 'An animated field of diagonal light bands.',
+    statement: ['Discover ORL Visibility'] },
+];
+
+/* Journey pills for the "Why it matters" section — icon + label. The icons
+   are small stroke SVGs (lucide-style), rendered via set:html so the paths
+   inherit currentColor. Kept as data so the two rows stay in sync. */
+const ICON: Record<string, string> = {
+  search: '<circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>',
+  link: '<path d="M9 15l6-6"/><path d="M11.5 6.5l1-1a3.5 3.5 0 0 1 5 5l-1 1"/><path d="M12.5 17.5l-1 1a3.5 3.5 0 0 1-5-5l1-1"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  clipboard: '<rect x="8.5" y="3.5" width="7" height="4" rx="1"/><path d="M8.5 5.5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-12a2 2 0 0 0-2-2h-2.5"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/>',
+  cart: '<circle cx="9.5" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3.5h3l2.2 11a1.6 1.6 0 0 0 1.6 1.3h8.2a1.6 1.6 0 0 0 1.6-1.3L21 7.5H6"/>',
+  question: '<circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4.8c0 1.9-2.7 2.4-2.7 2.4"/><circle cx="12" cy="16.6" r="0.7" fill="currentColor" stroke="none"/>',
+  sparkle: '<path d="M12 3.5l1.9 5.6L19.5 11l-5.6 1.9L12 18.5l-1.9-5.6L4.5 11l5.6-1.9z"/>',
+  thumb: '<path d="M7 11.5v8.5H4.5a1 1 0 0 1-1-1v-6.5a1 1 0 0 1 1-1z"/><path d="M7 11.5l3.7-6.6a1.8 1.8 0 0 1 3.3 1.3l-.7 3.3h4.6a1.8 1.8 0 0 1 1.8 2.2l-1.2 5.6A1.8 1.8 0 0 1 16.7 20H7"/>',
+};
+const OLD_JOURNEY: Array<[string, string]> = [
+  ['search', 'Google search'], ['link', 'Ten blue links'], ['globe', 'Website'],
+  ['clipboard', 'Research'], ['cart', 'Purchase'],
+];
+const NEW_JOURNEY: Array<[string, string]> = [
+  ['question', 'Question'], ['sparkle', 'AI answer'], ['thumb', 'Brand recommendation'],
+  ['clipboard', 'Research'], ['cart', 'Purchase'],
+];
+const GRAPH: Array<[string, number]> = [
+  ['2022', 12], ['2023', 27], ['2024', 44], ['2025', 57], ['2026', 71],
+];
+const COMPARE: Array<[string, string]> = [
+  ['Search keywords', 'Ask complete questions'],
+  ['Open multiple links', 'Receive synthesised answers'],
+  ['Compare websites manually', 'Ask AI to compare options'],
+  ['Find companies', 'Get recommended companies'],
+  ['Rankings matter', 'Mentions and citations matter'],
+];
+
+/* Deep-dive content for the clickable diagnosis and service cards. Each card
+   carries a data-modal key; clicking it opens a shared <dialog> populated
+   from here. Keeping the copy as data (not in markup) means the cards, their
+   summaries and the modal bodies can't drift apart. */
+type Modal = { eyebrow: string; title: string; lead: string; points: string[] };
+const MODALS: Record<string, Modal> = {
+  'diag-authority': {
+    eyebrow: 'Diagnosis',
+    title: 'Not enough authoritative mentions',
+    lead: 'AI models rank sources by trust. If the places they read — review platforms, analyst pages, industry publications — rarely name you next to your category, the model has little evidence that you belong in the answer.',
+    points: [
+      'Language models weight third-party sources far more heavily than your own website when deciding who to recommend.',
+      'A brand named by three trusted sources loses to one named by thirty, even when its product is better.',
+      'We map which sources each AI engine actually cites in your category, then build presence in the ones that move the answer.',
+    ],
+  },
+  'diag-competitors': {
+    eyebrow: 'Diagnosis',
+    title: 'Competitors own the conversation',
+    lead: 'The models are not biased against you — they reflect the web as it is. If competitors appear more often across the pages AI reads, they become the default answer, and every new query reinforces it.',
+    points: [
+      'AI recommendations compound: the more a brand is cited, the more it gets recommended, the more it gets cited.',
+      'Being absent is not neutral — it trains the model that the category is solved without you.',
+      'We quantify the citation gap between you and each competitor, question by question, so the fight is specific rather than vague.',
+    ],
+  },
+  'diag-positioning': {
+    eyebrow: 'Diagnosis',
+    title: "Your positioning isn't clear",
+    lead: 'The model may understand what you do, but not the moment you are the right choice. Without a clear, machine-readable answer to "when and why choose this," you get left out of the comparison even when you would win it.',
+    points: [
+      'AI answers are decision-shaped: "best for X," "alternative to Y," "when you need Z." If your positioning does not map to those, you are invisible to them.',
+      'Vague, feature-led messaging reads as noise to a model trying to match a buyer’s specific situation.',
+      'We restructure your entity and content around the exact decisions buyers put to AI, so the model can place you with confidence.',
+    ],
+  },
+  'diag-coverage': {
+    eyebrow: 'Diagnosis',
+    title: 'Missing answer coverage',
+    lead: 'Buyers ask AI dozens of questions before they ever reach a vendor. If your brand shows up for only a handful of them, you lose the ones you never knew were being asked.',
+    points: [
+      'Most categories have 100+ real buying questions; most brands appear in only a fraction of them.',
+      'The questions you are missing are often mid-funnel comparisons — exactly where decisions get made.',
+      'We map the full question set, score where you appear, and prioritise the gaps with the most buying intent.',
+    ],
+  },
+  'svc-audit': {
+    eyebrow: 'Deliverable 01',
+    title: 'AI Visibility Audit',
+    lead: 'A complete read of where your brand stands across the AI engines buyers actually use — ChatGPT, Gemini, Claude and AI-powered search — for the real questions in your category.',
+    points: [
+      'We test 100+ category questions across four engines and record where you appear, where you don’t, and in what light.',
+      'You get a single Share-of-Answer baseline plus a question-by-question breakdown.',
+      'Fixed scope, delivered in days, with a prioritised list of what to fix first.',
+    ],
+  },
+  'svc-benchmark': {
+    eyebrow: 'Deliverable 02',
+    title: 'Competitor Benchmark',
+    lead: 'Visibility only means something relative to the people you are up against. We show exactly who the AI recommends in your place, and how far ahead they are.',
+    points: [
+      'Side-by-side Share of Answer for you and up to eight competitors.',
+      'The specific questions where a competitor wins and you are absent.',
+      'Which of their citations and sources are doing the work — your roadmap to close the gap.',
+    ],
+  },
+  'svc-questions': {
+    eyebrow: 'Deliverable 03',
+    title: 'Question Intelligence',
+    lead: 'Not every question is worth winning. We identify the prompts and buyer questions that actually precede a purchase, so effort goes where the revenue is.',
+    points: [
+      'We separate high-intent, decision-stage questions from top-of-funnel curiosity.',
+      'Each question is scored by buying intent and by how winnable it is today.',
+      'The result is a focused target list, not a spray of keywords.',
+    ],
+  },
+  'svc-citation': {
+    eyebrow: 'Deliverable 04',
+    title: 'Citation Intelligence',
+    lead: 'AI recommendations are built on sources. We trace the exact pages, reviews and references each engine leans on for your category — the leverage points for changing the answer.',
+    points: [
+      'We identify which domains and source types each AI engine trusts most in your space.',
+      'We find where competitors earn their citations and where you realistically can too.',
+      'Presence is then built deliberately in the sources that move the model.',
+    ],
+  },
+  'svc-strategy': {
+    eyebrow: 'Deliverable 05',
+    title: 'AEO Strategy',
+    lead: 'The audit tells you where you stand; the strategy tells you what to change. A concrete plan for content, entities and authority signals, sequenced by impact.',
+    points: [
+      'Entity and structured-data work so engines understand what you are and when to recommend you.',
+      'Decision-stage content mapped to the specific questions you are losing.',
+      'A citation and third-party-proof plan targeting the sources that count.',
+    ],
+  },
+  'svc-measurement': {
+    eyebrow: 'Deliverable 06',
+    title: 'Ongoing Measurement',
+    lead: 'AI answers change constantly. We re-score your Share of Answer every month so you can see whether the work is moving the number — and where next month’s effort goes.',
+    points: [
+      'Monthly re-scoring across every tracked question and engine.',
+      'Movement attributed to specific changes, so you know what is working.',
+      'A living priority list, not a one-off report.',
+    ],
+  },
+};
+
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <Seo
+    title={`${m.name} — ${m.pos} | ORL Growth Engine`}
+    description={`System ${m.num} of the ORL Growth Engine. ${m.sub}`}
+    ogTitle={`ORL ${m.name} — ${m.pos}`}
+    image={`/og/${slug}.jpg`}
+  >
+    <script type="application/ld+json" is:inline set:html={ld} />
+  </Seo>
+  <!-- No font preload here on purpose. The Switzer preload that used to sit
+       on this line became dead weight once the statement moved to Pierson —
+       Switzer is now only a fallback in that stack, and preloading a fallback
+       fetches 14KB nothing renders (and trips Chrome's "preloaded but not
+       used" warning). Pierson is not preloaded either: the statement is laid
+       out from first paint even though the mask clips it, so the browser
+       fetches the face on its own, and clip 03 is several seconds of
+       scrolling away. The video is the thing worth the bandwidth. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <!-- Cormorant Garamond is loaded on THIS page only, for the hero brand mark.
+       It is a fifth family site-wide, so it is deliberately not added to the
+       shared font link the other pages use. -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
+  <!-- Gate for the hide-then-reveal nav, set before first paint so the nav
+       never flashes over the opening frame of the hero. Deliberately inline
+       and blocking — it is one class, and deferring it would cost the flash
+       it exists to prevent.
+       With JS off the class is never added, the rules under html.vhnav-on
+       never apply, and the nav stays visible and sticky as on every other
+       page. Navigation must not depend on a script running. -->
+  <script is:inline>document.documentElement.classList.add('vhnav-on');</script>
+</head>
+<body class="blg-body eng-body">
+
+<nav class="sitenav sitenav--page is-visible" aria-label="Site">
+  <a class="sitenav__brand" href="/">
+    <span class="sitenav__mark" aria-hidden="true"></span>
+    ORL Media
+  </a>
+  <div class="sitenav__links">
+    <a href="/engine" class="sitenav__link" aria-current="true">Engine</a>
+    <a href="/audit" class="sitenav__link">Audit</a>
+    <a href="/about" class="sitenav__link">About</a>
+    <a href="/blog" class="sitenav__link">Blog</a>
+  </div>
+  <a class="sitenav__pill" href="/book">Book a call</a>
+</nav>
+<GlassNav />
+
+<main class="vis" id="main" style={`--acc:${m.accent}; --acc-d:${m.accentDark}; --acc-t:${m.accentText};`}>
+
+
+  <!-- ══════════ the video hero ══════════
+       Three full-bleed clips of AI engines answering a real buying question.
+       Landscape 16:9 masters, composed centre-safe; an optional 9:16 cut is
+       swapped in under 900px (see the `portrait` flag in CLIPS).
+
+       The reveal is a masked curtain wipe, not a slide. The outer mask moves
+       yPercent 100 → 0 while the inner figure moves -100 → 0 — equal and
+       opposite, so the footage never travels across the screen. The mask
+       sweeps OFF it and the clip appears to be uncovered in place. That is
+       what makes it read as expensive rather than as a slideshow.
+       (Mechanic verified against bennettandclive.com's implementation.)
+
+       Scroll budget lives in .vh__triggers: a zero-width column of one spacer
+       per clip. Retiming the whole sequence is one number — --vh-step.
+
+       Ungated (no html.vhpin-on) this is an ordinary stack of three posters in
+       normal flow. That is the no-JS and reduced-motion state, and it is a
+       finished layout rather than a broken one. -->
+  <section class="vh" data-vh aria-label="AI engines answering buying questions">
+    <div class="vh__wrapper">
+
+      <!-- zero-width scroll budget: the spacers give the section its height -->
+      <div class="vh__triggers" aria-hidden="true">
+        {CLIPS.map(() => <div class="vh__trigger" data-vh-trigger></div>)}
+      </div>
+
+      <div class="vh__inner">
+        <div class="vh__sticky" data-vh-sticky>
+
+          <div class="vh__assets" data-vh-assets>
+            {CLIPS.map((c, i) => (
+              <div class="vh__asset" data-vh-asset data-i={i} data-hold={c.hold} data-mark={c.mark}>
+                <figure class="vh__fig" data-vh-fig style={`--tint:${c.tint}`}>
+                  {/* No `autoplay` attribute by design: JS starts clip 01 only
+                      when motion is allowed, so reduced-motion and no-JS both
+                      rest on the poster instead of playing footage at someone
+                      who asked for stillness. */}
+                  {/* Sources are set by JS, not by <source media>: browsers
+                      evaluate <source> once at parse time and never re-check
+                      it on resize, and Safari's support for `media` on a
+                      video source is unreliable. data-* + one matchMedia read
+                      is deterministic. Nothing is wasted — clips 2 and 3 are
+                      preload="none" until they're needed. */}
+                  {c.kind === 'shader' ? (
+                    /* The WebGL canvas is created and appended by JS. If
+                       WebGL is unavailable, or the context is lost, this stays
+                       empty and the figure's own --tint shows through — which
+                       is why that tint is matched to the shader's black. */
+                    <div class="vh__shader" data-vh-shader role="img" aria-label={c.alt}></div>
+                  ) : (
+                    <video
+                      class="vh__video"
+                      data-vh-video
+                      data-src={`${c.src}.mp4`}
+                      data-src-p={c.portrait ? `${c.src}-p.mp4` : undefined}
+                      data-poster={`${c.src}.jpg`}
+                      data-poster-p={c.portrait ? `${c.src}-p.jpg` : undefined}
+                      poster={`${c.src}.jpg`}
+                      muted
+                      loop
+                      playsinline
+                      disablepictureinpicture
+                      preload="auto"
+                      aria-label={c.alt}
+                    ></video>
+                  )}
+
+                  {/* The statement rides INSIDE the figure, not in a separate
+                      overlay layer. Two consequences, both wanted:
+                        • the mask reveals the words and the footage together,
+                          as one image, instead of text fading in on top
+                        • it counter-translates with the figure, so the type
+                          holds dead still while the curtain sweeps off it
+                      Only clip 03 carries one — clips 01 and 02 are clean
+                      footage, nothing over them. */}
+                  {c.statement && (
+                    <figcaption class="vh__statement">
+                      {c.statement.map((line) => <span>{line}</span>)}
+                    </figcaption>
+                  )}
+                </figure>
+              </div>
+            ))}
+          </div>
+
+
+          {/* Brand mark. Lives in the sticky layer rather than inside a figure,
+              so it sits above every clip and holds still through the wipes
+              instead of being masked away with the footage. aria-hidden: the
+              site nav already carries "ORL Media" as a link, and a second
+              copy would just be noise to a screen reader. */}
+          <p class="vh__mark" data-vh-mark aria-hidden="true">ORL Media</p>
+
+          {/* The hero is deliberately wordless, so the document still needs a
+              level-one heading for structure and for anything reading the
+              outline. Visually hidden, not display:none — it has to stay in
+              the accessibility tree. */}
+          <h1 class="vis__sr">{m.name} — {m.pos} {m.sub}</h1>
+
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ══════════════════════════════════════════════════════════
+       VISIBILITY — everything below the locked 3-video hero.
+
+       Order is the argument: state the shift (01), define AEO by
+       showing it (02), prove the behaviour change (03), make it
+       personal (04), introduce the system (05), only then reveal
+       the product (06), diagnose (07), sell the deliverable (08),
+       show the outcome (09), and close on the question the page
+       opened with (10).
+
+       Beige and white throughout — no dark slabs. Every section
+       title is centred and large so the section is identifiable
+       at a glance. Every box is a .aeo__card and animates in on
+       the same depth-graded rise the homepage service cards use.
+       ══════════════════════════════════════════════════════════ -->
+  <div class="aeo">
+
+  <!-- ── 01 · the shift ── -->
+  <div class="aeo__enterslot" data-aeo-enterslot>
+  <div class="aeo__enter" data-aeo-enter>
+  <section class="aeo__sec aeo__shift" aria-labelledby="aeo-shift-h">
+    <div class="aeo__in--narrow">
+      <h2 class="aeo__h2" id="aeo-shift-h" data-aeo-card>The shift</h2>
+      <p class="aeo__sub aeo__sub--lead" data-aeo-card>
+        Your customers are asking AI who to choose.
+        <span>The question is whether AI chooses you.</span>
+      </p>
+      <p class="aeo__lede" data-aeo-card>
+        Search is moving beyond Google. Buyers now ask ChatGPT, Gemini, Claude
+        and AI-powered search engines for recommendations, comparisons and
+        solutions.
+      </p>
+      <div class="aeo__ctacenter" data-aeo-card>
+        <a class="aeo__btn" href="/audit">
+          Discover your AI visibility
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+  </div>
+  </div>
+
+  <!-- ── 02 · what is AEO ── -->
+  <section class="aeo__sec aeo__sec--beige" aria-labelledby="aeo-what-h">
+    <div class="aeo__in">
+      <div class="aeo__head">
+        <h2 class="aeo__h2" id="aeo-what-h" data-aeo-card>What is AEO?</h2>
+        <p class="aeo__sub" data-aeo-card>
+          SEO helps you rank in search.<br />AEO helps you <em>become the answer</em>.</p>
+      </div>
+
+      <div class="aeo__convo">
+        <div class="aeo__bubble aeo__bubble--user" data-aeo-card>
+          <span class="aeo__bubbletag">Buyer asks</span>
+          What are the best growth partners for B2B SaaS companies?
+        </div>
+        <div class="aeo__bubble aeo__bubble--ai" data-aeo-card>
+          <span class="aeo__bubbletag">AI responds</span>
+          Based on visibility, expertise and market presence, here are several
+          companies worth considering…
+        </div>
+      </div>
+
+      <div class="aeo__picks">
+        <article class="aeo__card aeo__pick" data-aeo-card>
+          <span class="aeo__pickrank">Recommended 01</span>
+          <p class="aeo__pickname">Northwind Growth</p>
+          <p class="aeo__pickmeta">Cited by 14 sources</p>
+        </article>
+        <article class="aeo__card aeo__pick" data-aeo-card>
+          <span class="aeo__pickrank">Recommended 02</span>
+          <p class="aeo__pickname">Meridian Partners</p>
+          <p class="aeo__pickmeta">Cited by 11 sources</p>
+        </article>
+        <article class="aeo__card aeo__pick" data-aeo-card>
+          <span class="aeo__pickrank">Recommended 03</span>
+          <p class="aeo__pickname">Halcyon Labs</p>
+          <p class="aeo__pickmeta">Cited by 9 sources</p>
+        </article>
+      </div>
+
+      <p class="aeo__absent" data-aeo-card>
+        <i class="aeo__dot" aria-hidden="true"></i>
+        <span><b>Your company isn't mentioned.</b></span>
+      </p>
+
+      <p class="aeo__define" data-aeo-card>
+        <b>Answer Engine Optimization (AEO)</b> is the process of increasing how
+        often your brand is discovered, cited and recommended when people ask AI
+        systems questions relevant to your market.
+      </p>
+
+      <p class="aeo__note">Company names above are illustrative.</p>
+    </div>
+  </section>
+
+  <!-- ── 03 · why it matters ──
+       Scoped maroon (aeo__why overrides --ai) so the graph, chips and accents
+       read as one deep-red block against the blue used elsewhere. -->
+  <section class="aeo__sec aeo__sec--paper aeo__why" aria-labelledby="aeo-change-h">
+    <div class="aeo__in">
+      <div class="aeo__head">
+        <h2 class="aeo__h2 aeo__h2--plainem" id="aeo-change-h" data-aeo-card>Why it <em>matters</em></h2>
+        <p class="aeo__sub" data-aeo-card>The way people discover businesses is changing.</p>
+        <p class="aeo__lede" data-aeo-card>
+          Your customers aren't only searching. <b class="aeo__mark">They're asking.</b>
+        </p>
+      </div>
+
+      <!-- the graph: label block left, animated bars right -->
+      <div class="aeo__graph" data-aeo-card data-aeo-graph>
+        <div class="aeo__graphhead">
+          <p class="aeo__grapheyebrow">AI assistants are now the starting point</p>
+          <p class="aeo__graphlead">Share of B2B buyers using AI assistants during vendor research.</p>
+          <span class="aeo__graphchip">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="20" x2="6" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg>
+            Directionally illustrated
+          </span>
+        </div>
+        <ul class="aeo__graphrows">
+          {GRAPH.map(([year, pct], i) => (
+            <li>
+              <span class="aeo__graphyear">{year}</span>
+              <span class="aeo__graphtrack"><i class="aeo__graphbar" style={`--w:${pct}%; --i:${i}`}></i></span>
+              <span class="aeo__graphval" data-aeo-count={pct}>0%</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p class="aeo__graphsource">
+        Source: 2024 B2B Buyer Report, Demandwave &middot; Directional illustration — replace with sourced figures before launch.
+      </p>
+
+      <!-- comparison: traditional → AI, an arrow badge on every row -->
+      <div class="aeo__compare aeo__scroller" data-aeo-card>
+        <table class="aeo__ctable">
+          <caption>How discovery behaviour has changed</caption>
+          <thead>
+            <tr>
+              <th scope="col">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+                Traditional search
+              </th>
+              <th scope="col"><span class="vis__sr">becomes</span></th>
+              <th scope="col">
+                <svg class="aeo__diamond" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l9 10-9 10-9-10z"/></svg>
+                AI discovery
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {COMPARE.map(([a, b]) => (
+              <tr>
+                <td>{a}</td>
+                <td class="aeo__arrowcell"><span class="aeo__arrowbadge" aria-hidden="true">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </span></td>
+                <td class="aeo__ai">{b}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- the two journeys, pills with icons -->
+      <div class="aeo__journeys">
+        <article class="aeo__card aeo__journey" data-aeo-card>
+          <p class="aeo__journeytag">The old buyer journey</p>
+          <ul class="aeo__steps">
+            {OLD_JOURNEY.map(([icon, label], i) => (
+              <>
+                {i > 0 && <span class="aeo__arrow" aria-hidden="true">→</span>}
+                <li><span class="aeo__pillicon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={ICON[icon]} /></span>{label}</li>
+              </>
+            ))}
+          </ul>
+        </article>
+        <article class="aeo__card aeo__journey aeo__journey--new" data-aeo-card>
+          <p class="aeo__journeytag">The new buyer journey</p>
+          <ul class="aeo__steps">
+            {NEW_JOURNEY.map(([icon, label], i) => (
+              <>
+                {i > 0 && <span class="aeo__arrow" aria-hidden="true">→</span>}
+                <li><span class="aeo__pillicon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={ICON[icon]} /></span>{label}</li>
+              </>
+            ))}
+          </ul>
+        </article>
+      </div>
+
+      <p class="aeo__turn" data-aeo-card>
+        AI is moving closer to the <em>beginning</em> of the buying decision.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── 04 · but are you visible ── -->
+  <section class="aeo__sec aeo__sec--beige" aria-labelledby="aeo-you-h">
+    <div class="aeo__in">
+      <div class="aeo__head">
+        <h2 class="aeo__h2" id="aeo-you-h" data-aeo-card>Your market</h2>
+        <p class="aeo__sub" data-aeo-card>
+          AI is answering questions about your market.<br />Are you part of the answer?</p>
+      </div>
+
+      <div class="aeo__asks">
+        <article class="aeo__card aeo__ask" data-aeo-card>
+          <p class="aeo__askq">"Best platforms for enterprise analytics?"</p>
+          <div class="aeo__askrow">
+            <span class="aeo__chip">Northwind</span>
+            <span class="aeo__chip">Meridian</span>
+            <span class="aeo__chip">Halcyon</span>
+            <span class="aeo__chip aeo__chip--you"><i class="aeo__dot" aria-hidden="true"></i>You — not mentioned</span>
+          </div>
+        </article>
+        <article class="aeo__card aeo__ask" data-aeo-card>
+          <p class="aeo__askq">"Top alternatives to the category leader?"</p>
+          <div class="aeo__askrow">
+            <span class="aeo__chip">Meridian</span>
+            <span class="aeo__chip">Aperture</span>
+            <span class="aeo__chip aeo__chip--you"><i class="aeo__dot" aria-hidden="true"></i>You — not mentioned</span>
+          </div>
+        </article>
+        <article class="aeo__card aeo__ask" data-aeo-card>
+          <p class="aeo__askq">"Best AI startups for customer support?"</p>
+          <div class="aeo__askrow">
+            <span class="aeo__chip">Halcyon</span>
+            <span class="aeo__chip">Northwind</span>
+            <span class="aeo__chip">Lumen</span>
+            <span class="aeo__chip aeo__chip--you"><i class="aeo__dot" aria-hidden="true"></i>You — not mentioned</span>
+          </div>
+        </article>
+        <article class="aeo__card aeo__ask" data-aeo-card>
+          <p class="aeo__askq">"Which companies solve this problem best?"</p>
+          <div class="aeo__askrow">
+            <span class="aeo__chip">Aperture</span>
+            <span class="aeo__chip">Meridian</span>
+            <span class="aeo__chip aeo__chip--you"><i class="aeo__dot" aria-hidden="true"></i>You — not mentioned</span>
+          </div>
+        </article>
+      </div>
+
+      <p class="aeo__turn" data-aeo-card>
+        Your competitors don't need to outrank you on Google to beat you here.
+        They need to be <em>mentioned when you're not</em>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── 05 · the diagnosis ── -->
+  <section class="aeo__sec aeo__sec--paper" aria-labelledby="aeo-why-h">
+    <div class="aeo__in">
+      <div class="aeo__head">
+        <h2 class="aeo__h2" id="aeo-why-h" data-aeo-card>The diagnosis</h2>
+        <p class="aeo__sub" data-aeo-card>
+          Why aren't AI engines recommending you?</p>
+      </div>
+
+      <div class="aeo__diag">
+        {[
+          ['diag-authority', 'Not enough authoritative mentions', "AI systems don't see enough trusted sources connecting your brand to the category."],
+          ['diag-competitors', 'Competitors own the conversation', 'Other brands appear more frequently across the sources AI systems rely on.'],
+          ['diag-positioning', "Your positioning isn't clear", 'AI understands what you do, but not necessarily when or why to recommend you.'],
+          ['diag-coverage', 'Missing answer coverage', 'Your brand is absent from important questions buyers ask before making decisions.'],
+        ].map(([key, title, desc]) => (
+          <button type="button" class="aeo__card aeo__cardbtn" data-aeo-card data-modal={key} aria-haspopup="dialog">
+            <span class="aeo__cardplus" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+            <h3 class="aeo__h3">{title}</h3>
+            <p>{desc}</p>
+            <span class="aeo__cardmore mono">Read more</span>
+          </button>
+        ))}
+      </div>
+
+      <p class="aeo__turn" data-aeo-card>
+        ORL Visibility finds these gaps. Then we build a strategy to <em>close them</em>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── 06 · introducing ORL Visibility (the service) ── -->
+  <section class="aeo__sec aeo__sec--beige" aria-labelledby="aeo-svc-h">
+    <div class="aeo__in">
+      <div class="aeo__head">
+        <h2 class="aeo__h2" id="aeo-svc-h" data-aeo-card>Introducing ORL Visibility</h2>
+        <p class="aeo__sub" data-aeo-card>From invisible to recommended.</p>
+      </div>
+
+      <ul class="aeo__pipe" data-aeo-card>
+        <li>Audit</li><span class="aeo__arrow" aria-hidden="true">→</span>
+        <li>Benchmark</li><span class="aeo__arrow" aria-hidden="true">→</span>
+        <li>Opportunity map</li><span class="aeo__arrow" aria-hidden="true">→</span>
+        <li>AEO strategy</li><span class="aeo__arrow" aria-hidden="true">→</span>
+        <li>Execution</li><span class="aeo__arrow" aria-hidden="true">→</span>
+        <li>Continuous tracking</li>
+      </ul>
+
+      <div class="aeo__deliver">
+        {[
+          ['svc-audit', '01', 'AI Visibility Audit', 'Where you currently appear across relevant AI answers.'],
+          ['svc-benchmark', '02', 'Competitor Benchmark', 'Who is being recommended instead of you.'],
+          ['svc-questions', '03', 'Question Intelligence', 'Which prompts and buyer questions matter.'],
+          ['svc-citation', '04', 'Citation Intelligence', 'Which sources influence those answers.'],
+          ['svc-strategy', '05', 'AEO Strategy', 'What needs to change to improve visibility.'],
+          ['svc-measurement', '06', 'Ongoing Measurement', 'Whether your share of AI answers is actually increasing.'],
+        ].map(([key, num, title, desc]) => (
+          <button type="button" class="aeo__card aeo__cardbtn" data-aeo-card data-modal={key} aria-haspopup="dialog">
+            <span class="aeo__cardplus" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+            <span class="aeo__cardnum">{num}</span>
+            <h3 class="aeo__h3">{title}</h3>
+            <p>{desc}</p>
+            <span class="aeo__cardmore mono">Read more</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 07 · the system ── -->
+  <section class="aeo__sec aeo__sec--paper" aria-labelledby="aeo-sys-h">
+    <div class="aeo__in">
+      <div class="aeo__head">
+        <h2 class="aeo__h2" id="aeo-sys-h" data-aeo-card>The system</h2>
+        <p class="aeo__sub" data-aeo-card>
+          You can't improve what you can't see.</p>
+        <p class="aeo__lede" data-aeo-card>
+          ORL Visibility shows you how AI sees your brand.
+        </p>
+      </div>
+
+      <div class="aeo__four">
+        <article class="aeo__card" data-aeo-card>
+          <span class="aeo__cardnum">01 — Track</span>
+          <h3 class="aeo__h3">The questions</h3>
+          <p>We monitor the questions that matter in your market.</p>
+        </article>
+        <article class="aeo__card" data-aeo-card>
+          <span class="aeo__cardnum">02 — Measure</span>
+          <h3 class="aeo__h3">The appearances</h3>
+          <p>See where your brand appears, where competitors appear, and where you're invisible.</p>
+        </article>
+        <article class="aeo__card" data-aeo-card>
+          <span class="aeo__cardnum">03 — Understand</span>
+          <h3 class="aeo__h3">The signals</h3>
+          <p>Identify the sources and signals influencing AI recommendations.</p>
+        </article>
+        <article class="aeo__card" data-aeo-card>
+          <span class="aeo__cardnum">04 — Improve</span>
+          <h3 class="aeo__h3">The share</h3>
+          <p>Build the authority and presence needed to increase your share of AI answers.</p>
+        </article>
+      </div>
+
+      <ul class="aeo__flow" data-aeo-card>
+        <li>Questions</li><span class="aeo__arrow" aria-hidden="true">→</span>
+        <li>AI models</li><span class="aeo__arrow" aria-hidden="true">→</span>
+        <li class="is-orl">ORL Visibility</li><span class="aeo__arrow" aria-hidden="true">→</span>
+        <li>Action</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── 09 · proof ── -->
+  <section class="aeo__sec aeo__sec--beige" aria-labelledby="aeo-proof-h">
+    <div class="aeo__in">
+      <div class="aeo__head">
+        <h2 class="aeo__h2" id="aeo-proof-h" data-aeo-card>The outcome</h2>
+        <p class="aeo__sub" data-aeo-card>What changes in 90 days.</p>
+      </div>
+
+      <div class="aeo__proof">
+        <article class="aeo__card aeo__proofcard" data-aeo-card>
+          <p class="aeo__prooftag">Before ORL Visibility</p>
+          <ul class="aeo__prooflist">
+            <li><span>AI visibility</span><b>14%</b></li>
+            <li><span>Competitor gap</span><b>&minus;43%</b></li>
+            <li><span>High-value questions won</span><b>8</b></li>
+          </ul>
+        </article>
+        <article class="aeo__card aeo__proofcard aeo__proofcard--after" data-aeo-card>
+          <p class="aeo__prooftag">After 90 days</p>
+          <ul class="aeo__prooflist">
+            <li><span>AI visibility</span><b>41% &uarr;</b></li>
+            <li><span>Competitor gap</span><b>&minus;12% &uarr;</b></li>
+            <li><span>High-value questions won</span><b>37 &uarr;</b></li>
+          </ul>
+        </article>
+      </div>
+
+      <p class="aeo__note">
+        Illustrative demonstration data, not a client result. Replaced with real,
+        attributable figures once available.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── 10 · final CTA — back to the opening question ── -->
+  <section class="aeo__sec aeo__final" aria-labelledby="aeo-cta-h">
+    <div class="aeo__in--narrow">
+      <div class="aeo__head">
+        <h2 class="aeo__h2" id="aeo-cta-h" data-aeo-card>Start here</h2>
+        <p class="aeo__sub" data-aeo-card>Find out what AI says about you.</p>
+        <p class="aeo__lede" data-aeo-card>
+          See where your brand appears, who's being recommended instead, and what
+          it would take to improve your visibility.
+        </p>
+      </div>
+      <div class="aeo__ctacenter" data-aeo-card>
+        <a class="aeo__btn" href="/audit">
+          Discover your AI visibility
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <p class="aeo__btnnote">Start with the ORL AI Visibility Audit</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── shared deep-dive dialog ──
+       One native <dialog>, populated on open from the MODALS record. Native
+       showModal() gives focus trapping, Escape-to-close and focus restore for
+       free; ::backdrop carries the background blur. If JS never runs the cards
+       are still buttons that do nothing visually harmful, and the content is
+       not lost — every card still shows its summary. -->
+  <dialog class="aeo__modal" data-aeo-modal aria-labelledby="aeo-modal-title">
+    <div class="aeo__modalcard">
+      <button type="button" class="aeo__modalclose" data-aeo-modalclose aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <p class="aeo__modaleyebrow mono" data-aeo-modaleyebrow></p>
+      <h3 class="aeo__modaltitle" id="aeo-modal-title" data-aeo-modaltitle></h3>
+      <p class="aeo__modallead" data-aeo-modallead></p>
+      <ul class="aeo__modalpoints" data-aeo-modalpoints></ul>
+      <a class="aeo__modalcta" href="/audit">
+        Start with the AI Visibility Audit
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </dialog>
+  <script type="application/json" data-aeo-modals set:html={JSON.stringify(MODALS)}></script>
+
+  <!-- ── position in the engine ── -->
+  <nav class="aeo__strip" aria-label="The Growth Engine systems">
+    <div class="aeo__in">
+      <p class="aeo__eyebrow">Part of the Growth Engine</p>
+      <ol class="aeo__stripline">
+        {ORDER.map((s) => (
+          <li class={s === slug ? 'is-here' : ''}>
+            <a href={`/engine/${s}`}><b>{MODULES[s].num}</b>{MODULES[s].name}</a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </nav>
+
+  <footer class="aeo__foot">
+    <div class="aeo__footin">
+      <a class="aeo__next" href={`/engine/${nextSlug}`}>
+        <span>Next system</span>
+        <strong>{next.num} &mdash; {next.name}</strong>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <p>&copy; 2026 ORL Media &mdash; Growth infrastructure for B2B</p>
+    </div>
+  </footer>
+
+  </div>
+
+</main>
+
+<script>
+  import { gsap } from 'gsap';
+
+  /* ══════════ shared engine-page motion ══════════
+     Reveals, counters, line draws — identical to [module].astro.
+     Resting CSS is the finished page; a failed script degrades to static. */
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const main = document.querySelector<HTMLElement>('.vis');
+
+  if (main && !reduce) {
+    const ins = [...main.querySelectorAll<HTMLElement>('[data-e-in]')];
+    gsap.set(ins, { autoAlpha: 0, y: 16 });
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        gsap.to(e.target, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' });
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -8%' });
+    ins.forEach((el) => io.observe(el));
+
+    main.querySelectorAll<HTMLElement>('[data-e-count]').forEach((el) => {
+      const to = parseFloat(el.dataset.eCount || '0');
+      const from = parseFloat(el.dataset.eFrom || '0');
+      const suf = el.dataset.eSuffix || '';
+      new IntersectionObserver(([e], o) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        const p = { v: from };
+        gsap.to(p, {
+          v: to, duration: 1.4, ease: 'power2.out',
+          onUpdate: () => { el.textContent = `${Math.round(p.v)}${suf}`; },
+        });
+      }, { threshold: 0.5 }).observe(el);
+    });
+
+    main.querySelectorAll<HTMLElement>('[data-e-draw]').forEach((el) => {
+      gsap.set(el, { scaleY: 0, transformOrigin: '50% 0%' });
+      new IntersectionObserver(([e], o) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        gsap.to(el, { scaleY: 1, duration: 1.6, ease: 'power2.inOut' });
+      }, { threshold: 0.1 }).observe(el.parentElement!);
+    });
+
+    /* failsafe: nothing on this page may stay invisible */
+    setTimeout(() => {
+      ins.forEach((el) => {
+        if (gsap.getProperty(el, 'opacity') === 0) gsap.set(el, { autoAlpha: 1, y: 0 });
+      });
+    }, 5000);
+  }
+</script>
+
+<script>
+  /* ══════════ the video hero ══════════
+     Architecture mirrors bennettandclive.com, whose source I read rather than
+     guessed at:
+
+       • Pin is CSS `position: sticky` on .vh__sticky, gated by html.vhpin-on.
+         Not ScrollTrigger's pin — that injects a spacer and switches to fixed,
+         which fights the `html { overflow-x: hidden }` in global.css.
+       • Scroll budget is a zero-width column of spacers, one per clip, so the
+         pacing is CSS (--vh-step) and never hard-coded here.
+       • Each clip owns its own trigger: start 'top center', end 'bottom
+         center', scrubbed, ease 'none'.
+       • The wipe is the equal-and-opposite pair — mask yPercent 100 → 0 while
+         the figure inside goes -100 → 0. Because they cancel, the footage
+         holds still and the mask sweeps off it.
+       • Clip 01 never animates. It is the permanent base layer underneath.
+       • Every clip plays continuously. Pausing the inactive ones saved a
+         decode but left the incoming clip frozen on a still frame for the
+         first half of its own wipe, which is what made the transitions snag.
+
+     ScrollTrigger is dynamically imported so reduced-motion users never
+     download it. */
+  import { gsap } from 'gsap';
+
+  const vh = document.querySelector<HTMLElement>('[data-vh]');
+
+  if (vh) {
+    const root = document.documentElement;
+    const assets = [...vh.querySelectorAll<HTMLElement>('[data-vh-asset]')];
+    const figs = assets.map((a) => a.querySelector<HTMLElement>('[data-vh-fig]')!);
+    const videos = assets.map((a) => a.querySelector<HTMLVideoElement>('video')!);
+    const triggers = [...vh.querySelectorAll<HTMLElement>('[data-vh-trigger]')];
+
+    const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    let ST: any = null;
+    let made: any[] = [];
+    let enabling = false;
+    let active = -1;
+
+    /* One decode at a time. play() rejects if the tab is backgrounded or the
+       file is missing — neither is an error worth surfacing. */
+    function attemptPlay(v: HTMLVideoElement) {
+      const p = v.play();
+      /* A refusal is expected and recoverable — a tab opened in the
+         background, iOS low-power mode, a strict autoplay setting. Swallow it
+         here and let the visibilitychange handler below re-assert. */
+      if (p) p.catch(() => {});
+    }
+
+    /* ── auto-advance ──
+       Four seconds after a clip becomes active, glide to the next one. The
+       hero plays itself for a visitor who does nothing, and stays fully
+       scrubbable for one who doesn't.
+
+       Rules it will not break:
+       • Any real input — wheel, touch, key, pointer — hands control back
+         permanently. Nothing is worse than a page that fights your scroll,
+         and re-arming after the visitor has taken over would do exactly that.
+         Note these are input events, NOT 'scroll': the glide below moves the
+         scroll position itself and would otherwise cancel itself instantly.
+       • Never advances from the last clip — the statement is the payoff and
+         yanking it away mid-read would be the one unforgivable move.
+       • Never scrolls backwards. If the visitor is already past the target,
+         it stands down.
+       • Nothing runs while the tab is hidden. */
+    /* per-clip, read off the same data the markup is built from — clip 01 is
+       shorter so the opening beat does not outstay its 6.75s loop */
+    /* ── the shader clip ──
+       Clip 03 is a live WebGL fragment shader rather than footage. Three
+       rules, because a full-viewport shader left running is one of the
+       cheapest ways to flatten a laptop battery:
+         • the module is dynamically imported, so anyone who never reaches
+           clip 03 never downloads it and no GL context is ever created
+         • it only animates while it is the active clip AND the tab is visible
+         • under prefers-reduced-motion it renders exactly one frame and stops,
+           so the panel is a still image rather than either black or moving */
+    const shaderHost = vh.querySelector<HTMLElement>('[data-vh-shader]');
+    const shaderIndex = assets.findIndex((a) => a.querySelector('[data-vh-shader]'));
+    let shader: import('../../lib/shader-animation').ShaderHandle | null = null;
+    let shaderRequested = false;
+
+    function syncShader() {
+      if (!shader) return;
+      const run =
+        active === shaderIndex && !mqReduce.matches && document.visibilityState === 'visible';
+      if (run) shader.start();
+      else {
+        shader.stop();
+        /* on screen but not animating — leave a frame up, not a black hole.
+           Under reduced motion the hero is an ordinary stack and every panel
+           is on screen, so that panel gets its still frame too. */
+        if (active === shaderIndex || mqReduce.matches) shader.renderOnce();
+      }
+    }
+
+    async function ensureShader() {
+      if (shaderRequested || !shaderHost) return;
+      shaderRequested = true;
+      try {
+        const mod = await import('../../lib/shader-animation');
+        shader = mod.createShaderAnimation(shaderHost);
+      } catch {
+        shader = null;
+      }
+      /* null means no WebGL or a failed compile — the figure's --tint is
+         matched to the shader's black, so the fallback is simply a dark panel */
+      syncShader();
+    }
+
+    const HOLD = assets.map((a) => Number(a.dataset.hold) || 4000);
+    /* per-clip brand-mark tone, read off the same markup */
+    const MARK = assets.map((a) => a.dataset.mark || 'dark');
+    const markEl = vh.querySelector<HTMLElement>('[data-vh-mark]');
+    let advTimer = 0;
+    let advTween: gsap.core.Tween | null = null;
+    let autoAdvance = true;
+
+    function stopAdvance(permanent = false) {
+      clearTimeout(advTimer);
+      if (advTween) { advTween.kill(); advTween = null; }
+      if (permanent) autoAdvance = false;
+    }
+
+    function scheduleAdvance(i: number) {
+      clearTimeout(advTimer);
+      /* triggers.length - 1 is the last clip: there is nothing after it */
+      if (!autoAdvance || i < 0 || i >= triggers.length - 1) return;
+      advTimer = window.setTimeout(() => {
+        if (!autoAdvance || document.visibilityState !== 'visible') return;
+        const t = triggers[i + 1];
+        /* matches the wipe trigger's own `end: 'bottom center'` — the point at
+           which the next clip is fully revealed */
+        const target =
+          t.getBoundingClientRect().top + window.scrollY + t.offsetHeight - window.innerHeight / 2;
+        if (target <= window.scrollY + 2) return;      // already past it
+        const proxy = { y: window.scrollY };
+        advTween = gsap.to(proxy, {
+          y: target,
+          duration: 1.1,
+          ease: 'power2.inOut',
+          onUpdate: () => window.scrollTo(0, proxy.y),
+          onComplete: () => { advTween = null; },
+        });
+      }, HOLD[i] ?? 4000);
+    }
+
+    (['wheel', 'touchstart', 'pointerdown', 'keydown'] as const).forEach((ev) =>
+      window.addEventListener(ev, () => stopAdvance(true), { passive: true }),
+    );
+
+    /* Every clip plays, all the time.
+
+       This used to pause everything except the active clip — one decode at a
+       time, which is cheaper. But the playback trigger fires at 'top center',
+       which is AFTER its clip has already begun wiping into view, so the
+       incoming clip was frozen on a still frame for the first part of its own
+       reveal and only started once it was half on screen. That reads as a
+       stutter, and it is the reason the wipes felt like they were snagging.
+       Three muted 720p/1080p loops is a cost worth paying to have every clip
+       already in motion the instant its mask starts to lift. */
+    function playAll() {
+      videos.forEach((v) => { if (v && v.paused) attemptPlay(v); });
+    }
+
+    function setActive(i: number) {
+      if (i === active) return;
+      active = i;
+      playAll();
+      /* the mark is black over the two bright clips and light over the shader,
+         which is near-black in the corner */
+      if (markEl && i >= 0) markEl.classList.toggle('is-light', MARK[i] === 'light');
+      /* build the GL context one clip early so it is warm before the wipe,
+         rather than compiling a program mid-transition */
+      if (shaderIndex >= 0 && i >= shaderIndex - 1) ensureShader();
+      syncShader();
+      scheduleAdvance(i);
+    }
+
+    /* Without this the hero can stay frozen on a poster permanently: open the
+       page in a background tab and the browser refuses the initial play(),
+       nothing retries, and the clip is still paused when the visitor finally
+       switches to it. Re-assert the active clip whenever the page becomes
+       visible. Cheap, and it is the difference between a working hero and a
+       still image for anyone who middle-clicks a link. */
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') {
+        /* don't let a timer fire against a tab nobody is looking at — the
+           visitor would return to find the hero had scrolled without them */
+        stopAdvance();
+        syncShader();          // and stop burning GPU on a tab nobody sees
+        return;
+      }
+      playAll();
+      syncShader();
+      scheduleAdvance(active);
+    });
+
+    async function enable() {
+      if (made.length || enabling || mqReduce.matches) return;
+      enabling = true;
+      if (!ST) {
+        const mod = await import('gsap/ScrollTrigger');
+        ST = mod.ScrollTrigger;
+        gsap.registerPlugin(ST);
+      }
+      /* the query may have flipped while the chunk was in flight */
+      if (mqReduce.matches) { enabling = false; return; }
+
+      root.classList.add('vhpin-on');
+
+      assets.forEach((a, i) => {
+        /* clip 01 is the base layer — nothing to wipe it over */
+        if (i > 0) {
+          gsap.set(a, { yPercent: 100 });
+          gsap.set(figs[i], { yPercent: -100 });
+          const tl = gsap.timeline()
+            .to(a, { yPercent: 0, force3D: true, duration: 1, ease: 'none' }, 0)
+            .to(figs[i], { yPercent: 0, force3D: true, duration: 1, ease: 'none' }, 0);
+          made.push(ST.create({
+            animation: tl,
+            trigger: triggers[i],
+            start: 'top center',
+            end: 'bottom center',
+            scrub: 0.6,
+            invalidateOnRefresh: true,
+          }));
+        }
+        /* playback + label, one per clip including the first */
+        made.push(ST.create({
+          trigger: triggers[i],
+          start: 'top center',
+          end: 'bottom center',
+          onEnter: () => setActive(i),
+          onEnterBack: () => setActive(i),
+        }));
+      });
+
+      /* trigger 0's start is already behind us at scroll 0, so onEnter will
+         never fire for it — prime it explicitly */
+      setActive(0);
+      enabling = false;
+    }
+
+    function disable() {
+      /* reduced-motion or teardown: no pinned scene means nothing to advance
+         through, and a stray timer would scroll a page that is now ordinary
+         flow */
+      stopAdvance();
+      made.forEach((t) => t.kill());
+      made = [];
+      root.classList.remove('vhpin-on');
+      gsap.set([...assets, ...figs], { clearProps: 'all' });
+      videos.forEach((v) => v && v.pause());
+      active = -1;
+      /* reduced motion / teardown: leave one still frame, never a loop */
+      if (shader) { shader.stop(); shader.renderOnce(); }
+    }
+
+    function sync() {
+      if (mqReduce.matches) {
+        disable();
+        /* still build it — one static frame reads far better than a black
+           rectangle behind the statement */
+        ensureShader();
+      } else enable();
+    }
+
+    /* ── pick the cut that matches the stage's aspect ──
+       object-fit:cover crops the source to the viewport, and the loss is
+       brutal in both directions: a 16:9 master on a 375x812 phone loses 74%
+       of its width; a 9:16 cut on a 1440x900 desktop loses 65% of its height.
+       Where a portrait variant exists we swap to it under 900px.
+
+       Assigned here rather than via <source media>: browsers evaluate
+       <source> once at parse time and never re-check on resize, and Safari's
+       handling of `media` on a video source is unreliable. All three clips are
+       preload="auto" now that all three play continuously — together they are
+       ~1MB, which is the cost of having every clip already in motion before
+       its mask lifts. */
+    const mqPortrait = window.matchMedia('(max-width: 900px)');
+    function pickSources() {
+      const p = mqPortrait.matches;
+      videos.forEach((v) => {
+        if (!v) return;
+        const want = (p && v.dataset.srcP) || v.dataset.src || '';
+        if (v.dataset.applied === want) return;   // no needless reload
+        v.dataset.applied = want;
+        const wasPlaying = !v.paused;
+        v.poster = (p && v.dataset.posterP) || v.dataset.poster || '';
+        v.src = want;
+        if (wasPlaying) { const pr = v.play(); if (pr) pr.catch(() => {}); }
+      });
+    }
+    pickSources();
+    mqPortrait.addEventListener('change', pickSources);
+
+    /* ── the nav ──
+       Hidden while the hero owns the screen, slid in once it releases.
+       Keyed to the hero's real bottom edge rather than a magic scroll number,
+       so it stays correct when --vh-step is retuned or a clip is added.
+       A plain passive scroll listener toggling one class is cheaper than a
+       ScrollTrigger here, and it keeps working in the reduced-motion branch
+       where ScrollTrigger is never loaded. */
+    const nav = document.querySelector<HTMLElement>('.sitenav--page');
+    if (nav) {
+      const onScroll = () => {
+        /* 72px ≈ the nav's own height: it starts arriving just before the
+           last frame of video clears, so the two motions overlap instead of
+           leaving a bare gap */
+        nav.classList.toggle('is-in', vh.getBoundingClientRect().bottom <= 72);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
+      onScroll();
+    }
+
+    sync();
+    mqReduce.addEventListener('change', sync);
+
+    /* Height changes (mobile chrome show/hide, rotation) move every trigger.
+       ScrollTrigger.refresh remeasures; the debounce keeps it off the
+       scroll path. */
+    let rt = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = window.setTimeout(() => ST && ST.refresh(), 150);
+    }, { passive: true });
+
+    if (import.meta.env.DEV) {
+      (window as any).__vh = {
+        gsap, assets, figs, videos, triggers, setActive, ensureShader, shaderHost, shaderIndex,
+        get made() { return made; },
+        get shader() { return shader; },
+      };
+    }
+  }
+</script>
+
+
+
+
+
+<script>
+  /* ══════════ the fourth wipe ══════════
+     Carries the hero's clip-to-clip move one step further, so the AEO content
+     is uncovered over the held shader rather than arriving as a new page.
+
+     Same equal-and-opposite pair the hero uses: the mask travels
+     yPercent 100 → 0 while the section inside travels -100 → 0, which cancels,
+     so the content holds still and the mask sweeps off it.
+
+     This lives entirely outside the hero. It waits for the hero's own
+     html.vhpin-on class rather than setting it, reads the hero's geometry
+     rather than changing it, and adds nothing to the hero's DOM. */
+  import { gsap } from 'gsap';
+
+  const slotEl = document.querySelector<HTMLElement>('[data-aeo-enterslot]');
+  const enterEl = slotEl?.querySelector<HTMLElement>('[data-aeo-enter]');
+  const shiftEl = enterEl?.querySelector<HTMLElement>('.aeo__shift');
+
+  if (slotEl && enterEl && shiftEl) {
+    const root = document.documentElement;
+    const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    /* The hero pins asynchronously — it dynamically imports ScrollTrigger
+       before adding the class — so the class is usually not there yet when
+       this runs. Watch for it instead of racing it. */
+    function whenPinned(cb: () => void) {
+      if (root.classList.contains('vhpin-on')) { cb(); return; }
+      const mo = new MutationObserver(() => {
+        if (!root.classList.contains('vhpin-on')) return;
+        mo.disconnect();
+        cb();
+      });
+      mo.observe(root, { attributes: true, attributeFilter: ['class'] });
+      /* if the hero never pins (reduced motion, or it bailed on the fit
+         check) there is nothing to wipe over — stop watching */
+      setTimeout(() => mo.disconnect(), 10000);
+    }
+
+    async function build() {
+      if (mqReduce.matches) return;      // CSS already removed the overlap
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      gsap.registerPlugin(ScrollTrigger);
+
+      const tl = gsap.timeline({ paused: true, defaults: { ease: 'none' } })
+        .fromTo(enterEl, { yPercent: 100 }, { yPercent: 0, force3D: true, duration: 1 }, 0)
+        .fromTo(shiftEl, { yPercent: -100 }, { yPercent: 0, force3D: true, duration: 1 }, 0);
+
+      ScrollTrigger.create({
+        animation: tl,
+        /* The SLOT, never the mask. ScrollTrigger measures its trigger's rect
+           including any transform already on it, so pointing this at enterEl
+           measured it with its own parked yPercent:100 and put start/end a
+           full element-height late. The slot carries the overlap and is never
+           animated, so its rect is the true layout position. */
+        trigger: slotEl,
+        /* 40vh of travel, matching the -40lvh overlap in the CSS. The slot's
+           top starts at the viewport bottom and finishes at 60% — which is
+           the exact moment the hero's wrapper bottom reaches the viewport
+           bottom and its sticky lets go. The wipe therefore ends precisely as
+           the hero hands over, never sweeping against the page below it. */
+        start: 'top bottom',
+        /* 'top top', not 'top 60%'. With a full-viewport overlap the slot's
+           top reaching the viewport top IS the moment the hero's wrapper
+           bottom reaches the viewport bottom and the sticky lets go — so the
+           curtain finishes covering the screen on the exact frame the hero
+           hands over. At the old 40% overlap this had to stop short, which is
+           what left the sweep looking unfinished. */
+        end: 'top top',
+        scrub: 0.6,
+        invalidateOnRefresh: true,
+      });
+    }
+
+    whenPinned(build);
+    mqReduce.addEventListener('change', () => { if (!mqReduce.matches) whenPinned(build); });
+  }
+</script>
+
+
+<script>
+  /* ══════════ box entrance ══════════
+     Every box on the page rises into place while de-blurring, staggered —
+     the same treatment the four service cards use on the homepage
+     (index.astro: opacity 0 → 1, y offset → 0, blur(7px) → 0, 0.9s,
+     power3.out, 70ms apart). Reused deliberately so the two pages feel
+     like one product.
+
+     Stagger is per ROW, not per element across the whole page: a global
+     index would give the last card on a six-card grid a 0.42s delay, which
+     reads as lag rather than rhythm. Elements are grouped by their top
+     offset so a row animates together and the next row follows.
+
+     Resting CSS is the finished page — JS applies the hidden state, so a
+     failed script leaves everything visible rather than blank. */
+  import { gsap } from 'gsap';
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const aeo = document.querySelector<HTMLElement>('.aeo');
+
+  if (aeo && !reduce) {
+    const boxes = [...aeo.querySelectorAll<HTMLElement>('[data-aeo-card]')];
+
+    /* group into rows by vertical position so the stagger reads as a row
+       arriving, not as a queue draining */
+    const rowOf = new Map<HTMLElement, number>();
+    const seen: number[] = [];
+    boxes.forEach((el) => {
+      const top = Math.round(el.getBoundingClientRect().top + window.scrollY);
+      let row = seen.findIndex((t) => Math.abs(t - top) < 40);
+      if (row === -1) { seen.push(top); row = seen.length - 1; }
+      rowOf.set(el, row);
+    });
+    const indexInRow = new Map<HTMLElement, number>();
+    const counts = new Map<number, number>();
+    boxes.forEach((el) => {
+      const r = rowOf.get(el)!;
+      const n = counts.get(r) ?? 0;
+      indexInRow.set(el, n);
+      counts.set(r, n + 1);
+    });
+
+    gsap.set(boxes, { opacity: 0, y: 26, filter: 'blur(7px)' });
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        const el = e.target as HTMLElement;
+        gsap.to(el, {
+          opacity: 1, y: 0, filter: 'blur(0px)',
+          duration: 0.9,
+          delay: (indexInRow.get(el) ?? 0) * 0.07,
+          ease: 'power3.out',
+          /* drop the filter once done — leaving blur(0) on dozens of boxes
+             keeps them all on their own composited layers for nothing */
+          clearProps: 'filter',
+        });
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -6%' });
+    boxes.forEach((el) => io.observe(el));
+
+    /* ── the discovery graph: bars draw + values count up on entry ──
+       The bars grow via a staggered CSS transition off .is-drawn (one class
+       beats tweening five elements). The percentages count 0 → target on the
+       same trigger, each delayed to land as its own bar finishes filling, so
+       the number and the bar arrive together. */
+    const graph = aeo.querySelector<HTMLElement>('[data-aeo-graph]');
+    function countGraph() {
+      graph?.querySelectorAll<HTMLElement>('[data-aeo-count]').forEach((el, i) => {
+        const to = Number(el.dataset.aeoCount || '0');
+        const p = { v: 0 };
+        gsap.to(p, {
+          v: to, duration: 1, ease: 'power2.out',
+          delay: 0.22 + i * 0.12,               // matches the bar's --i stagger
+          onUpdate: () => { el.textContent = `${Math.round(p.v)}%`; },
+          onComplete: () => { el.textContent = `${to}%`; },
+        });
+      });
+    }
+    if (graph) {
+      new IntersectionObserver(([e], o) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        setTimeout(() => graph.classList.add('is-drawn'), 220);
+        countGraph();
+      }, { threshold: 0.4 }).observe(graph);
+    }
+
+    /* failsafe: nothing on this page may stay invisible */
+    setTimeout(() => {
+      boxes.forEach((el) => {
+        if (gsap.getProperty(el, 'opacity') === 0) {
+          gsap.set(el, { opacity: 1, y: 0, clearProps: 'filter' });
+        }
+      });
+      if (graph && !graph.classList.contains('is-drawn')) {
+        graph.classList.add('is-drawn');
+        graph.querySelectorAll<HTMLElement>('[data-aeo-count]').forEach((el) => {
+          el.textContent = `${el.dataset.aeoCount || '0'}%`;
+        });
+      }
+    }, 6000);
+  } else if (aeo) {
+    /* reduced motion: resting CSS is the finished design. Bars sit at full
+       width and the numbers show their real values, just without animating. */
+    const g = aeo.querySelector('[data-aeo-graph]');
+    g?.classList.add('is-drawn');
+    g?.querySelectorAll<HTMLElement>('[data-aeo-count]').forEach((el) => {
+      el.textContent = `${el.dataset.aeoCount || '0'}%`;
+    });
+  }
+</script>
+
+<script>
+  /* ══════════ card deep-dive modals ══════════
+     The diagnosis and service cards are buttons that open a shared native
+     <dialog>. Native showModal() is doing the accessibility heavy lifting:
+     focus is trapped inside the dialog, Escape closes it, and focus returns
+     to the card that opened it when it closes — none of which I have to
+     hand-roll. The ::backdrop blur is pure CSS. */
+  const modal = document.querySelector<HTMLDialogElement>('[data-aeo-modal]');
+  const dataEl = document.querySelector<HTMLElement>('[data-aeo-modals]');
+
+  if (modal && dataEl && typeof modal.showModal === 'function') {
+    const DATA = JSON.parse(dataEl.textContent || '{}') as Record<string, {
+      eyebrow: string; title: string; lead: string; points: string[];
+    }>;
+    const eyebrow = modal.querySelector<HTMLElement>('[data-aeo-modaleyebrow]')!;
+    const title = modal.querySelector<HTMLElement>('[data-aeo-modaltitle]')!;
+    const lead = modal.querySelector<HTMLElement>('[data-aeo-modallead]')!;
+    const points = modal.querySelector<HTMLElement>('[data-aeo-modalpoints]')!;
+    const closeBtn = modal.querySelector<HTMLButtonElement>('[data-aeo-modalclose]')!;
+
+    function open(key: string) {
+      const d = DATA[key];
+      if (!d) return;
+      eyebrow.textContent = d.eyebrow;
+      title.textContent = d.title;
+      lead.textContent = d.lead;
+      points.replaceChildren(
+        ...d.points.map((p) => { const li = document.createElement('li'); li.textContent = p; return li; }),
+      );
+      const card = modal.querySelector<HTMLElement>('.aeo__modalcard');
+      if (card) card.scrollTop = 0;
+      /* showModal() throws if already open — can't happen through the UI (the
+         modal blocks the page) but guard anyway so a stray call is harmless */
+      if (!modal.open) modal.showModal();
+    }
+
+    document.querySelectorAll<HTMLElement>('[data-modal]').forEach((card) => {
+      card.addEventListener('click', () => open(card.dataset.modal!));
+    });
+
+    closeBtn.addEventListener('click', () => modal.close());
+    /* click the dimmed area (the dialog element itself, not the card inside)
+       to dismiss — the everyday expectation for a modal */
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.close(); });
+  }
+</script>
+</body>
+</html>

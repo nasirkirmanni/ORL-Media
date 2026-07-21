@@ -36,11 +36,17 @@ body.eng-body::after {
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-/* content rides above the atmosphere */
-.eng, .mod { position: relative; z-index: 1; }
+/* content rides above the atmosphere.
+   .vis is the bespoke Visibility page — without it here the new <main>
+   paints UNDER body.eng-body::after (the grain layer at z-index 0) and the
+   whole page reads fogged. */
+.eng, .mod, .vis { position: relative; z-index: 1; }
 
-/* shared tokens on both page types */
-.mod, .eng {
+/* shared tokens on all three page types.
+   .vis reuses every .mod__* section from the problem block down, so it needs
+   the identical token set — without it those sections render with initial
+   values (no ink, no borders, no card fill). */
+.mod, .eng, .vis {
   --ink: #1f1d19;
   /* --ivory is "the page ground" semantically, so redefining it here also
      fixes the .eng__sbar label that masks the metrics rule behind itself */
@@ -338,6 +344,16 @@ body.eng-body::after {
    is no card, no border, no fill. The restraint IS the treatment, so the
    spacing has to be exact.                                                  */
 .eng__hero {
+  height: 100vh;
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Tightened so --hero-fit stays as close to 1 as possible: every px reclaimed
+   here is a px the scale doesn't have to shrink. */
+.eng__hero {
   background: transparent;
   color: var(--ink);
   /* tuned so the schematic clears the fold: the four systems over one rule
@@ -387,22 +403,43 @@ body.eng-body::after {
   width: clamp(30px, 4.5vw, 40px);
   height: clamp(30px, 4.5vw, 40px);
   margin-bottom: 0.85rem;
-  color: var(--acc-t);
+  /* --mark carries the reference-logo colour per module (ring + emblem);
+     falls back to the ground-safe accent where it isn't set (the cards). */
+  color: var(--mark, var(--acc-t));
+}
+/* real brand-logo image: same footprint as the drawn mark, a touch larger
+   since the logos carry their own tighter internal padding */
+.eng__logo {
+  width: clamp(34px, 5vw, 46px);
+  height: clamp(34px, 5vw, 46px);
+  margin-bottom: 0.85rem;
+  object-fit: contain;
 }
 .eng__mark path {
   stroke: currentColor;
   stroke-width: 2.4;
   stroke-linecap: round;
 }
-/* slow counter-rotation: ambient, not attention-seeking. Each module offset
-   so the four never spin in lockstep. */
-.eng__schip .eng__mark { animation: engring 44s linear infinite; }
-.eng__schip:nth-child(2) .eng__mark { animation-duration: 52s; animation-direction: reverse; }
-.eng__schip:nth-child(3) .eng__mark { animation-duration: 48s; }
-.eng__schip:nth-child(4) .eng__mark { animation-duration: 56s; animation-direction: reverse; }
+/* the centre emblem: a finer stroke than the ring so it reads as detail, and
+   held STILL while the ring turns around it */
+.eng__glyph {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* slow counter-rotation on the RING GROUP only (was on the whole mark — the
+   emblem must not spin with it). Each module offset so the four never spin in
+   lockstep. transform-box/origin keep the rotation centred on the 48 viewBox. */
+.eng__ring { transform-box: view-box; transform-origin: 24px 24px; }
+.eng__schip .eng__ring { animation: engring 44s linear infinite; }
+.eng__schip:nth-child(2) .eng__ring { animation-duration: 52s; animation-direction: reverse; }
+.eng__schip:nth-child(3) .eng__ring { animation-duration: 48s; }
+.eng__schip:nth-child(4) .eng__ring { animation-duration: 56s; animation-direction: reverse; }
 @keyframes engring { to { transform: rotate(1turn); } }
 @media (prefers-reduced-motion: reduce) {
-  .eng__schip .eng__mark { animation: none; }
+  .eng__schip .eng__ring { animation: none; }
 }
 .eng__schnum {
   font-size: 0.58rem; font-weight: 500; letter-spacing: 0.12em;
@@ -474,73 +511,31 @@ body.eng-body::after {
 .eng__h2--dark { color: var(--ink); }
 .eng__body--dark { margin: 1.1rem 0 0; font-size: 0.95rem; line-height: 1.7; color: var(--muted); }
 
-/* — system rows — */
+/* ── the four systems — 2×2 tiles ──
+   Was a stack of four full-width rows; the list read as a menu and buried
+   Pricing at the bottom. Four equal tiles say "one system, four parts" and
+   give each module the same weight. Dark panels lit by the module accent
+   stand in for photography — the site has no per-module imagery and stock
+   photos would fight the editorial ground. */
 .eng__systems { padding: 5.5rem 1.5rem; }
-.eng__rows { margin-top: 2.6rem; display: flex; flex-direction: column; gap: 0.9rem; }
-.eng__row {
-  position: relative;
-  display: flex; align-items: center; gap: 1.6rem;
-  /* no fill: the page is one ground. Affordance is carried by the border,
-     the hover lift, the accent bar and the arrow — not by a card surface. */
-  background: transparent; border: 1px solid var(--border); border-radius: 16px;
-  padding: 1.5rem 1.7rem;
-  text-decoration: none; color: var(--ink);
-  overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s, border-color 0.3s;
-}
-.eng__row::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-  background: var(--acc);
-  transform: scaleY(0); transform-origin: 50% 100%;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.eng__row:hover { transform: translateY(-3px); box-shadow: 0 22px 48px -18px rgba(31, 26, 18, 0.2); border-color: #d9d0be; }
-.eng__row:hover::before { transform: scaleY(1); }
-/* the mark repeats on each row as a watermark, not a second icon — the row
-   already leads with its number, and a second same-size glyph would compete.
-   The row is position:relative + overflow:hidden, so it crops cleanly. */
-.eng__mark--row {
-  position: absolute;
-  right: -22px;
-  top: 50%;
-  width: 132px; height: 132px;
-  transform: translateY(-50%);
-  margin: 0;
-  color: var(--acc);
-  opacity: 0.09;
-  pointer-events: none;
-}
-.eng__mark--row path { stroke-width: 1.6; }
-.eng__row:hover .eng__mark--row { opacity: 0.16; }
 
-.eng__rownum {
-  /* Retuned twice: #c9bda1 measured 1.8:1 on the old card, #7c7261 cleared
-     4.58 there — but with the card fill removed these numerals now sit on the
-     taupe ground, where #7c7261 falls to 2.82. --muted clears 4.7 on the ground. */
-  flex: none; font-size: 1rem; color: var(--muted);
-  font-variant-numeric: tabular-nums;
+/* split header: statement left, qualifier + index right */
+.eng__shead {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2rem 3.5rem; align-items: end;
 }
-.eng__rowmain { min-width: 0; flex: 1; }
-.eng__rowhead { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; }
-.eng__rowname { font-family: var(--font-display); font-weight: 400; font-size: 1.7rem; letter-spacing: -0.01em; }
-.eng__rowverb { font-style: italic; font-family: var(--font-display); font-size: 1.05rem; color: var(--acc-t, var(--acc)); }
-.eng__rowstatus {
-  margin-left: auto; padding: 0.22rem 0.6rem;
-  border: 1px solid var(--border); border-radius: 99px; background: transparent;
-  font-size: 0.54rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-text);
-  white-space: nowrap;
+.eng__sheadside { display: flex; flex-direction: column; gap: 1.4rem; }
+.eng__sheadlede {
+  margin: 0; max-width: 30rem;
+  font-size: 0.9rem; line-height: 1.7; color: #4a463e;
 }
-.eng__rowline { display: block; margin-top: 0.55rem; max-width: 46rem; font-size: 0.88rem; line-height: 1.62; color: #4a463e; }
-.eng__rowmetric {
-  display: inline-flex; align-items: center; gap: 0.45rem;
-  margin-top: 0.75rem; font-size: 0.6rem; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--soft);
-}
-.eng__rowmetric i { width: 6px; height: 6px; border-radius: 50%; background: var(--acc); }
-.eng__rowarrow { flex: none; color: #c9bda1; transition: transform 0.3s, color 0.3s; }
-.eng__row:hover .eng__rowarrow { transform: translateX(4px); color: var(--ink); }
+.eng__sheadmeta { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.eng__sheadmeta li { display: flex; align-items: center; gap: 0.55rem; }
+.eng__sheadmeta i { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--acc); }
+.eng__sheadmeta b { font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+.eng__sheadmeta span { font-size: 0.6rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--soft); }
+.eng__sheadmeta span::before { content: '— '; }
 
-/* — metrics layer section — */
 /* ── ONE GROUND ──
    Every band on this page is now transparent so the taupe runs unbroken
    from nav to footer. These sections were previously a dark slab (metrics,
@@ -683,14 +678,14 @@ body.eng-body::after {
   .eng__phaseline em { width: 100%; height: 100%; }
   .eng__phasewk i { top: 0.05rem; left: -1.78rem; }
   .eng__schematic { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .eng__rowstatus { margin-left: 0; }
+  /* header stacks before the tiles do — the serif line needs its width back
+     sooner than the grid does */
+  .eng__shead { grid-template-columns: 1fr; gap: 1.6rem; align-items: start; }
 }
 @media (max-width: 560px) {
   .mod__hero { padding: 8rem 1.2rem 3.6rem; }
   .mod__watermark { display: none; }
   .mod__problem, .mod__pipe, .mod__deliver, .eng__systems, .eng__month, .eng__included, .eng__faq { padding-left: 1.2rem; padding-right: 1.2rem; }
-  .eng__row { flex-direction: column; align-items: flex-start; gap: 0.8rem; padding: 1.3rem 1.25rem; }
-  .eng__rowarrow { display: none; }
   .mod__foot { flex-direction: column; align-items: flex-start; }
 }
 
@@ -698,9 +693,9 @@ body.eng-body::after {
 @media (prefers-reduced-motion: reduce) {
   .mod__status b { animation: none; }
   .mod__heroline em, .eng__sline em { display: none; }
-  .mod__delivergrid li, .eng__row, .eng__row::before, .mod__stripline a,
-  .mod__ctabtn, .eng__finalbtn, .mod__next svg, .eng__rowarrow, .eng__q summary { transition: none; }
-  .mod__delivergrid li:hover, .eng__row:hover, .mod__ctabtn:hover, .eng__finalbtn:hover { transform: none; }
+  .mod__delivergrid li, .mod__stripline a,
+  .mod__ctabtn, .eng__finalbtn, .mod__next svg, .eng__q summary { transition: none; }
+  .mod__delivergrid li:hover, .mod__ctabtn:hover, .eng__finalbtn:hover { transform: none; }
 }
 
 /* ── mobile touch targets ──

@@ -1,0 +1,7 @@
+# ORL Media
+# Crawling is welcome — being found and cited is the entire thesis.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://orlmedia.com/sitemap-index.xml

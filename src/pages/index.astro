@@ -3,6 +3,7 @@ import Seo from '../components/Seo.astro';
 import { graph, organization, website } from '../lib/schema';
 
 import '../styles/global.css';
+import '../styles/revenue-leak.css';
 import { getCollection } from 'astro:content';
 
 // ── The ORL Journal: featured posts for the Insights teaser ───
@@ -79,71 +80,53 @@ const slides = [
 const TILE_ASPECT = 3530 / 891;
 
 
-/* Section 2B — the four failure modes, one per system.
-   Accents are the light-ground variants (AA on ivory and on the tinted
-   active column), because this section is ivory throughout. */
-const GAPS = [
+/* Section 2B — Revenue Leak Map.
+   The four stages of the buyer journey where revenue leaks. Rail nodes are
+   data-driven from here; each panel body is authored by hand below because the
+   visualisations differ per stage. Accents are the AA-on-ivory variants.
+
+   GROUNDING: the per-stage $ leak figures are an ILLUSTRATIVE split of a
+   nominal $1M opportunity (marked as such in the UI). The metric-strip numbers
+   inside each panel are the market figures already published elsewhere on this
+   site / the engine pages — no new or fabricated research is introduced, and
+   no "ORL Research — analysis of N answers" citation is claimed. */
+const STAGES = [
   {
-    n: '01', svc: 'Visibility', acc: '#2244bd', href: '/engine/visibility',
-    short: 'Ranked, not recommended.',
-    metric: 'AI answer presence', metricVal: 'Low',
-    lede: 'You show up in search. You do not show up in the conversation — and the shortlist is drawn there now.',
-    stat: '5.4', statUnit: 'vendors',
-    statNote: 'named in a typical AI answer. Miss that list and the evaluation happens without you in the room.',
-    signs: [
-      'You rank on Google but never surface in ChatGPT, Perplexity or Copilot answers.',
-      'Buyers arrive already shortlisted, comparing you against names you did not expect.',
-      'Nobody at the company can say what a model currently claims about you.',
-    ],
-    fix: 'The Visibility system maps 100+ buying questions, engineers you into the answer, and re-scores against competitors every month.',
+    key: 'visibility', n: '01', label: 'VISIBILITY', head: 'Get discovered',
+    acc: '#2244bd', soft: '#eef1fb', href: '/engine/visibility',
+    leak: '$540K', leakNote: 'invisible in AI answers',
+    kicker: '01 / VISIBILITY', ph: 'Ranked, not recommended.',
+    psub: 'Buyers discover the shortlist before they ever reach your website.',
+    cta: 'Explore Visibility',
   },
   {
-    n: '02', svc: 'Signals', acc: '#724911', href: '/engine/signals',
-    short: 'You meet them too late.',
-    metric: 'Intent coverage', metricVal: 'None',
-    lede: 'Roughly 5% of your market is in a buying window right now. Nothing in your stack tells you which 5%.',
-    stat: '95', statUnit: '%',
-    statNote: 'of the market you are emailing this quarter is not in a buying window at all.',
-    signs: [
-      'Outbound goes to a static list built once, refreshed rarely, ranked by nothing.',
-      'You learn a target raised, hired a VP or switched stacks from their launch post.',
-      'Reps cannot answer "why this account, why this week" without hand-waving.',
-    ],
-    fix: 'The Signals system reads funding, hiring, stack and leadership movement, then scores the accounts worth a message right now.',
+    key: 'signals', n: '02', label: 'SIGNALS', head: 'Find demand',
+    acc: '#8a5a1e', soft: '#f5efe2', href: '/engine/signals',
+    leak: '$430K', leakNote: 'not currently in-market',
+    kicker: '02 / SIGNALS', ph: 'You meet them too late.',
+    psub: 'Most of your market isn’t buying today — and nothing tells you which few are.',
+    cta: 'Explore Signals',
   },
   {
-    n: '03', svc: 'Proof', acc: '#235c38', href: '/engine/proof',
-    short: 'The deal dies in silence.',
-    metric: 'Stall visibility', metricVal: 'Low',
-    lede: 'Security review, procurement, the committee member who never joined a call. None of it reaches your pipeline review.',
-    stat: '40', statUnit: '–60%',
-    statNote: 'of qualified pipeline ends in no-decision rather than a loss to a named competitor.',
-    signs: [
-      'Deals go quiet after a strong demo and nobody can name the actual blocker.',
-      'Closed-lost reasons are mostly "budget" or "timing" — and neither is true.',
-      'Security questionnaires and references get assembled from scratch every time.',
-    ],
-    fix: 'The Proof system maps where deals stall, builds the third-party evidence that unsticks them, and fires it into live deals at the stall moment.',
+    key: 'proof', n: '03', label: 'PROOF', head: 'Win the deal',
+    acc: '#235c38', soft: '#e9f1ea', href: '/engine/proof',
+    leak: '$250K', leakNote: 'deals stall in security & validation',
+    kicker: '03 / PROOF', ph: 'The deal dies in silence.',
+    psub: 'Pipeline doesn’t die at the top of the funnel. It stalls in security, procurement, and committee.',
+    cta: 'Explore Proof',
   },
   {
-    n: '04', svc: 'Pricing', acc: '#1a5a60', href: '/engine/pricing',
-    short: 'Growth stops at signature.',
-    metric: 'Expansion triggers', metricVal: 'None',
-    lede: 'Expansion costs about half what acquisition does, and receives a fraction of the attention.',
-    stat: '2', statUnit: '×',
-    statNote: 'cheaper to expand an existing account than to win a new one, yet packaging stays guesswork.',
-    signs: [
-      'Pricing was set once, by intuition, and never tested against real conversion.',
-      'Nobody sees usage data until a renewal is already at risk.',
-      'Expansion happens when a customer asks — never because a signal said they were ready.',
-    ],
-    fix: 'The Pricing system instruments usage, tests packaging against real conversion, and fires expansion plays the week an account is ready.',
+    key: 'pricing', n: '04', label: 'PRICING', head: 'Monetize & expand',
+    acc: '#1a5a60', soft: '#e6f0f0', href: '/engine/pricing',
+    leak: '$150K', leakNote: 'expansion revenue left on the table',
+    kicker: '04 / PRICING', ph: 'Growth stops at signature.',
+    psub: 'Winning the deal is half the revenue. The other half never gets instrumented.',
+    cta: 'Explore Pricing',
   },
 ];
 
 const ld = graph([organization(), website()]);
 import GlassNav from '../components/GlassNav.astro';
-import ShaderBackdrop from '../components/ShaderBackdrop.astro';
 ---
 
 <html lang="en">
@@ -162,7 +145,13 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- Inter 900 is requested for the pinned wordmark. Without it the browser
+       synthesises a fake black from 600, which smears at 240px+. -->
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- Switzer 900 (the pinned wordmark) is self-hosted — see @font-face in
+       global.css. It is NOT requested here: api.fontshare.com currently answers
+       with "Access to the Fontshare API has been temporarily restricted", so
+       any face behind it silently never arrives. -->
   <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
 </head>
 <body>
@@ -278,7 +267,8 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
     <nav class="menu" aria-label="Primary">
       <div class="menu__col">
         <a href="/engine" class="menu__link">Services</a>
-        <a href="#" class="menu__link">About us</a>
+        <a href="/audit" class="menu__link">Audit</a>
+        <a href="/about" class="menu__link">About us</a>
         <a href="#" class="menu__link">Case Studies</a>
       </div>
       <div class="menu__col">
@@ -324,7 +314,8 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
   </a>
   <div class="sitenav__links">
     <a href="/engine" class="sitenav__link">Services</a>
-    <a href="#" class="sitenav__link">About us</a>
+    <a href="/audit" class="sitenav__link">Audit</a>
+    <a href="/about" class="sitenav__link">About us</a>
     <a href="#" class="sitenav__link">Case Studies</a>
     <a href="/blog" class="sitenav__link">Blog</a>
     <a href="#" class="sitenav__link">Pricing</a>
@@ -333,7 +324,19 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
 </nav>
 
 <!-- ══════════ SECTION — GROWTH INFRASTRUCTURE (3D floating dashboard) ══════════ -->
+<!-- ══════════ PINNED SCENE + WORDMARK PASS ══════════
+     The card scene holds still while ORL MEDIA travels up through it, and the
+     page only moves on once the wordmark has cleared the top. .s3dpin is the
+     scroll track — its extra height IS the pin duration — and .s3d itself is
+     what sticks, so #infra stays on the section and the hero handoff that
+     targets it is untouched. -->
+<div class="s3dpin">
 <section class="s3d" id="infra" aria-label="Growth infrastructure">
+  <!-- Decorative: the page says ORL Media in the nav and the <title>, so the
+       wordmark stays out of the accessibility tree. -->
+  <div class="s3dmark" aria-hidden="true" data-s3dmark>
+    <span class="s3dmark__text">ORL MEDIA</span>
+  </div>
   <div class="s3d__canvas">
 
     <!-- the suspended card scene (full-bleed floating wall) -->
@@ -613,6 +616,7 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
     </ul>
   </div>
 </section>
+</div><!-- /.s3dpin -->
 
 <!-- ══════════ SECTION 2 — the problem (3D carousel) ══════════ -->
 <section class="section2" id="section2" aria-label="The problem">
@@ -828,82 +832,327 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
 
      Tabs, not accordion: there is a single panel region and four controls
      selecting into it, which is what the tab pattern describes. -->
-<section class="chk" aria-labelledby="chk-title">
-  <ShaderBackdrop />
-  <div class="chk__head">
-    <h2 class="chk__title" id="chk-title" data-chk-in>Where B2B SaaS<br /><em>loses the revenue.</em></h2>
-    <div class="chk__meta" data-chk-in>
-      <p class="chk__range mono">( 01 &mdash; 04 )</p>
-      <p class="chk__hint mono">Select a column</p>
+<section class="rl" id="section2b" aria-labelledby="rl-title">
+  <div class="rl__wrap">
+
+    <div class="rl__head">
+      <h2 class="rl__title" id="rl-title" data-rl-in>Where B2B SaaS<br />and AI startups <em>lose the revenue.</em></h2>
+      <p class="rl__lede" data-rl-in>Revenue doesn&rsquo;t disappear. It leaks&mdash;quietly, at every stage of the buyer journey.</p>
     </div>
-  </div>
 
-  <div class="chk__cols" role="tablist" aria-label="Four places revenue leaks">
-    {GAPS.map((g, i) => (
-      <button
-        class="chk__col"
-        style={`--chk-acc:${g.acc}`}
-        role="tab"
-        id={`chk-tab-${i}`}
-        aria-controls={`chk-panel-${i}`}
-        aria-selected={i === 0 ? 'true' : 'false'}
-        tabindex={i === 0 ? '0' : '-1'}
-        data-chk-tab
-      >
-        <span class="chk__num mono">{g.n}</span>
-        <span class="chk__svc mono">{g.svc}</span>
-        <span class="chk__h">{g.short}</span>
-        <span class="chk__body">{g.lede}</span>
-        <span class="chk__rule" aria-hidden="true"></span>
-        <span class="chk__metric mono">
-          <em>{g.metric}</em>
-          <b>{g.metricVal}</b>
-        </span>
-      </button>
-    ))}
-  </div>
+    <!-- ── the horizontal revenue journey ── -->
+    <div class="rl__journey">
+      <p class="rl__oppo mono" data-rl-in><b>$1M revenue opportunity</b><i>illustrative</i></p>
+      <div class="rl__rail" role="tablist" aria-label="Four stages where revenue leaks">
+        <span class="rl__line" aria-hidden="true"></span>
+        {STAGES.map((s, i) => {
+          const disc = ({
+            visibility: '<circle cx="11" cy="11" r="6.4" stroke="currentColor" stroke-width="1.6"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+            signals: '<circle cx="12" cy="12" r="2.3" fill="currentColor"/><path d="M7.6 16.4a6 6 0 0 1 0-8.8M16.4 7.6a6 6 0 0 1 0 8.8M5 19a9.5 9.5 0 0 1 0-14M19 5a9.5 9.5 0 0 1 0 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+            proof: '<path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z" stroke="currentColor" stroke-width="1.5"/><path d="M9 12l2 2 4-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+            pricing: '<path d="M4 15l5-5 3 3 8-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+          })[s.key];
+          return (
+            <button
+              class="rl__stage"
+              role="tab"
+              id={`rl-tab-${i}`}
+              aria-controls={`rl-panel-${i}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? '0' : '-1'}
+              data-rl-tab
+              data-rl-in
+              style={`--acc:${s.acc}; --acc-soft:${s.soft}`}
+            >
+              <span class="rl__badge mono">{s.n}</span>
+              <span class="rl__disc" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" set:html={disc} /></span>
+              <span class="rl__slabel mono">{s.label}</span>
+              <span class="rl__shead">{s.head}</span>
+              <span class="rl__leak">
+                <span class="rl__leakval">{s.leak}</span>
+                <span class="rl__leaknote">{s.leakNote}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
 
-  <div class="chk__panels">
-    {GAPS.map((g, i) => (
-      <div
-        class="chk__panel"
-        style={`--chk-acc:${g.acc}`}
-        role="tabpanel"
-        id={`chk-panel-${i}`}
-        aria-labelledby={`chk-tab-${i}`}
-        hidden={i !== 0}
-        data-chk-panel
-      >
-        <div class="chk__panelin">
-          <div class="chk__pgrid">
-            <div class="chk__pstat">
-              <p class="chk__pnum"><b>{g.stat}</b><em>{g.statUnit}</em></p>
-              <p class="chk__pnote">{g.statNote}</p>
+    <!-- ── the large dynamic panel ── -->
+    <div class="rl__panels">
+
+      <!-- 01 · VISIBILITY -->
+      <div class="rl__panel" role="tabpanel" id="rl-panel-0" aria-labelledby="rl-tab-0" data-rl-panel style={`--acc:${STAGES[0].acc}; --acc-soft:${STAGES[0].soft}`}>
+        <div class="rl__pin">
+          <div class="rl__phead">
+            <div>
+              <p class="rl__pkicker mono">{STAGES[0].kicker}</p>
+              <h3 class="rl__ph">{STAGES[0].ph}</h3>
+              <p class="rl__psub">{STAGES[0].psub}</p>
+            </div>
+            <a class="rl__cta" href={STAGES[0].href}>{STAGES[0].cta}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+
+          <div class="rl__plats" role="group" aria-label="AI platforms monitored — logos are trademarks of their owners; no endorsement implied">
+            <span class="mono">Monitored</span>
+            <span class="rl__plat" title="OpenAI ChatGPT"><img src="/logos/ai/openai.svg" alt="OpenAI ChatGPT" width="15" height="15" loading="lazy" decoding="async" /></span>
+            <span class="rl__plat" title="Google Gemini"><img src="/logos/ai/gemini.svg" alt="Google Gemini" width="15" height="15" loading="lazy" decoding="async" /></span>
+            <span class="rl__plat" title="Perplexity"><img src="/logos/ai/perplexity.svg" alt="Perplexity" width="15" height="15" loading="lazy" decoding="async" /></span>
+            <span class="rl__plat" title="Microsoft Copilot"><img src="/logos/ai/copilot.svg" alt="Microsoft Copilot" width="15" height="15" loading="lazy" decoding="async" /></span>
+            <span class="rl__plat" title="Claude by Anthropic"><img src="/logos/ai/claude.svg" alt="Claude by Anthropic" width="15" height="15" loading="lazy" decoding="async" /></span>
+          </div>
+
+          <div class="rl__flow">
+            <div class="rl__col">
+              <span class="rl__step mono">Buyer asks AI</span>
+              <div class="rl__card rlv__q">
+                <p class="rlv__qbody"><span data-rl-type>What are the best security compliance platforms for B2B SaaS companies?</span><span class="rlv__caret" data-rl-caret></span></p>
+                <div class="rlv__qbar">
+                  <span class="rlv__ava" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.7"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+                  <span class="rlv__send mono">Sent<span class="rlv__sendbtn" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M4 12l16-7-7 16-2.5-6.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span></span>
+                </div>
+              </div>
             </div>
 
-            <div class="chk__psigns">
-              <p class="chk__plabel mono">You will recognise this if</p>
-              <ul>
-                {g.signs.map((sg) => (
-                  <li><i aria-hidden="true"></i><span>{sg}</span></li>
-                ))}
+            <div class="rl__col">
+              <span class="rl__step mono">AI answer &middot; 5.4 vendors</span>
+              <div class="rl__card">
+                <div class="rlv__ansbar"><b>AI Overview</b><svg class="rlv__spark" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.6 5.2L19 10l-5.4 1.7L12 17l-1.6-5.3L5 10l5.4-1.8z"/></svg></div>
+                <div class="rlv__rank" data-rl-step><span class="rlv__rk">1</span><span class="rlv__co" aria-hidden="true">A</span><span class="rlv__cn">Competitor A</span></div>
+                <div class="rlv__rank" data-rl-step><span class="rlv__rk">2</span><span class="rlv__co" aria-hidden="true">B</span><span class="rlv__cn">Competitor B</span></div>
+                <div class="rlv__rank" data-rl-step><span class="rlv__rk">3</span><span class="rlv__co" aria-hidden="true">C</span><span class="rlv__cn">Competitor C</span></div>
+                <div class="rlv__rank rlv__rank--me" data-rl-step><span class="rlv__rk">&ndash;</span><span class="rlv__co" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" stroke-width="1.7"/></svg></span><span class="rlv__cn">Your Brand</span><span class="rlv__nf">Not found</span></div>
+              </div>
+            </div>
+
+            <div class="rl__col">
+              <span class="rl__step mono">What you&rsquo;re seeing</span>
+              <ul class="rlv__see">
+                <li data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M8.4 12l2.3 2.3L15.6 9.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Competitors are repeatedly recommended.</span></li>
+                <li data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M8.4 12l2.3 2.3L15.6 9.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Your content exists, but isn&rsquo;t cited.</span></li>
+                <li data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M8.4 12l2.3 2.3L15.6 9.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Buyers arrive with a pre-built shortlist.</span></li>
               </ul>
             </div>
 
-            <div class="chk__pfix">
-              <p class="chk__plabel mono">What closes it</p>
-              <p class="chk__pbody">{g.fix}</p>
-              <a class="chk__plink" href={g.href}>
-                Explore {g.svc}
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </a>
+            <div class="rl__col">
+              <span class="rl__step mono">Without / with visibility</span>
+              <div class="rl__card rlv__cmp" data-rl-step>
+                <span class="rlv__cmplab mono">Without visibility</span>
+                <div class="rlv__chips">
+                  <span class="rlv__chip rlv__chip--ai">AI Answer</span><span class="rlv__arrowc">&rarr;</span>
+                  <span class="rlv__chip">Comp A</span><span class="rlv__arrowc">&rarr;</span>
+                  <span class="rlv__chip">Comp B</span><span class="rlv__arrowc">&rarr;</span>
+                  <span class="rlv__chip">Comp C</span>
+                </div>
+              </div>
+              <div class="rl__card rlv__cmp" data-rl-step>
+                <span class="rlv__cmplab mono">With visibility</span>
+                <div class="rlv__chips">
+                  <span class="rlv__chip rlv__chip--ai">AI Answer</span><span class="rlv__arrowc">&rarr;</span>
+                  <span class="rlv__chip rlv__chip--me">Your Brand &uarr;</span><span class="rlv__arrowc">&rarr;</span>
+                  <span class="rlv__chip">Comp A</span><span class="rlv__arrowc">&rarr;</span>
+                  <span class="rlv__chip">Comp B</span>
+                </div>
+              </div>
             </div>
           </div>
+
+          <div class="rl__strip">
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.7"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><span><span class="rl__tileval">Low</span><span class="rl__tilelab">AI answer presence today</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M8 7h12M8 12h12M8 17h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="4" cy="7" r="1.3" fill="currentColor"/><circle cx="4" cy="12" r="1.3" fill="currentColor"/><circle cx="4" cy="17" r="1.3" fill="currentColor"/></svg></span><span><span class="rl__tileval" data-rl-count="5.4" data-rl-dec="1">5.4</span><span class="rl__tilelab">avg vendors named in a typical AI answer</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.4" stroke="currentColor" stroke-width="1.6"/></svg></span><span><span class="rl__tileval">Pre&#8209;built</span><span class="rl__tilelab">shortlist formed before your site</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3a6 6 0 0 0-6 6c0 4 6 9 6 9s6-5 6-9a6 6 0 0 0-6-6z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="9" r="2" stroke="currentColor" stroke-width="1.6"/></svg></span><span><span class="rl__tileval" data-rl-count="100" data-rl-suffix="+">100+</span><span class="rl__tilelab">buying questions mapped &amp; scored</span></span></div>
+          </div>
+          <p class="rl__note">Illustrative demonstration &middot; the $1M split shows where opportunity leaks, not a client guarantee.</p>
         </div>
       </div>
-    ))}
+
+      <!-- 02 · SIGNALS -->
+      <div class="rl__panel" role="tabpanel" id="rl-panel-1" aria-labelledby="rl-tab-1" hidden data-rl-panel style={`--acc:${STAGES[1].acc}; --acc-soft:${STAGES[1].soft}`}>
+        <div class="rl__pin">
+          <div class="rl__phead">
+            <div>
+              <p class="rl__pkicker mono">{STAGES[1].kicker}</p>
+              <h3 class="rl__ph">{STAGES[1].ph}</h3>
+              <p class="rl__psub">{STAGES[1].psub}</p>
+            </div>
+            <a class="rl__cta" href={STAGES[1].href}>{STAGES[1].cta}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+
+          <div class="rl__flow">
+            <div class="rl__col">
+              <span class="rl__step mono">Total market</span>
+              <div class="rl__card">
+                <div class="rls__grid">
+                  <span class="rls__dot"></span><span class="rls__dot"></span><span class="rls__dot rls__dot--hot" data-rl-step></span><span class="rls__dot"></span><span class="rls__dot"></span><span class="rls__dot"></span>
+                  <span class="rls__dot"></span><span class="rls__dot"></span><span class="rls__dot"></span><span class="rls__dot"></span><span class="rls__dot rls__dot--hot" data-rl-step></span><span class="rls__dot"></span>
+                  <span class="rls__dot"></span><span class="rls__dot rls__dot--hot" data-rl-step></span><span class="rls__dot"></span><span class="rls__dot"></span><span class="rls__dot"></span><span class="rls__dot"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rl__col">
+              <span class="rl__step mono">Signals detected</span>
+              <div class="rl__card">
+                <div class="rls__sig" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="4" y="7" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 7V5h6v2" stroke="currentColor" stroke-width="1.6"/></svg><b>Hiring surge</b><span>+12 roles</span></div>
+                <div class="rls__sig" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4-8 4-8-4 8-4zM4 12l8 4 8-4M4 16l8 4 8-4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><b>Tech stack change</b><span>new tools</span></div>
+                <div class="rls__sig" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v8M9.5 10c0-1 1-1.6 2.5-1.6s2.5.6 2.5 1.5-1 1.3-2.5 1.5-2.5.6-2.5 1.6 1 1.6 2.5 1.6 2.5-.6 2.5-1.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><b>Funding event</b><span>Series B</span></div>
+                <div class="rls__sig" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="currentColor" stroke-width="1.6"/></svg><b>Competitor churn</b><span>3 left</span></div>
+              </div>
+            </div>
+
+            <div class="rl__col">
+              <span class="rl__step mono">High&#8209;intent accounts</span>
+              <div class="rl__card">
+                <div class="rls__acct rls__acct--hot" data-rl-step><span class="rlv__co" aria-hidden="true">N</span><b>Northwind</b><span class="rls__badge">High intent</span></div>
+                <div class="rls__acct rls__acct--hot" data-rl-step><span class="rlv__co" aria-hidden="true">A</span><b>Arclight</b><span class="rls__badge">High intent</span></div>
+                <div class="rls__acct" data-rl-step><span class="rlv__co" aria-hidden="true">V</span><b>Vantage</b></div>
+              </div>
+            </div>
+
+            <div class="rl__col">
+              <span class="rl__step mono">Prioritized outreach</span>
+              <div class="rl__card rlpr__up" data-rl-step>
+                <span class="rlpr__uplab mono">Approved-send queue</span>
+                <span class="rlpr__upval">2 accounts</span>
+                <span class="rlpr__upnote">&ldquo;Why this account, why now&rdquo; drafted from the evidence — a human approves every send.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rl__strip">
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20v-5M9 20V9M14 20v-8M19 20V5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><span><span class="rl__tileval" data-rl-count="95" data-rl-suffix="%">95%</span><span class="rl__tilelab">of your market isn&rsquo;t buying this quarter</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></svg></span><span><span class="rl__tileval">~5%</span><span class="rl__tilelab">in a buying window right now</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12h16M4 7h16M4 17h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/></svg></span><span><span class="rl__tileval">None</span><span class="rl__tilelab">intent coverage in your stack today</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span><span class="rl__tileval">2&ndash;3 mo</span><span class="rl__tilelab">a hire precedes the evaluation</span></span></div>
+          </div>
+          <p class="rl__note">Illustrative demonstration &middot; the $1M split shows where opportunity leaks, not a client guarantee.</p>
+        </div>
+      </div>
+
+      <!-- 03 · PROOF -->
+      <div class="rl__panel" role="tabpanel" id="rl-panel-2" aria-labelledby="rl-tab-2" hidden data-rl-panel style={`--acc:${STAGES[2].acc}; --acc-soft:${STAGES[2].soft}`}>
+        <div class="rl__pin">
+          <div class="rl__phead">
+            <div>
+              <p class="rl__pkicker mono">{STAGES[2].kicker}</p>
+              <h3 class="rl__ph">{STAGES[2].ph}</h3>
+              <p class="rl__psub">{STAGES[2].psub}</p>
+            </div>
+            <a class="rl__cta" href={STAGES[2].href}>{STAGES[2].cta}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+
+          <div class="rl__flow">
+            <div class="rl__col">
+              <span class="rl__step mono">Deal stalled</span>
+              <div class="rl__card rlp__pipe">
+                <span class="rlp__stage rlp__stage--done" data-rl-step><i></i>Discovery<span class="mono">done</span></span>
+                <span class="rlp__stage rlp__stage--done" data-rl-step><i></i>Evaluation<span class="mono">done</span></span>
+                <span class="rlp__stage rlp__stage--stall" data-rl-step><i></i>Security<span class="mono">stalled</span></span>
+                <span class="rlp__stage" data-rl-step><i></i>Procurement</span>
+                <span class="rlp__stage" data-rl-step><i></i>Committee</span>
+              </div>
+            </div>
+
+            <div class="rl__col">
+              <span class="rl__step mono">Evidence delivered</span>
+              <div class="rl__card">
+                <div class="rlp__ev" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z" stroke="currentColor" stroke-width="1.5"/></svg><b>Security documentation</b></div>
+                <div class="rlp__ev" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><b>Customer case study</b></div>
+                <div class="rlp__ev" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.3 6.3H21l-5.3 4 2 6.4L12 16l-5.7 3.7 2-6.4L3 9.3h6.7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><b>Verified reviews</b></div>
+                <div class="rlp__ev" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 16l5-6 4 3 7-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><b>ROI evidence</b></div>
+              </div>
+            </div>
+
+            <div class="rl__col">
+              <span class="rl__step mono">Objection cleared</span>
+              <div class="rl__card">
+                <div class="rlp__ev" data-rl-step><svg class="rlp__ok" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M8.4 12l2.3 2.3L15.6 9.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Security review cleared</b></div>
+                <div class="rlp__ev" data-rl-step><svg class="rlp__ok" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M8.4 12l2.3 2.3L15.6 9.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Committee questions answered</b></div>
+              </div>
+            </div>
+
+            <div class="rl__col">
+              <span class="rl__step mono">Deal advanced</span>
+              <div class="rl__card rlpr__up" data-rl-step>
+                <span class="rlpr__uplab mono">Stall cleared</span>
+                <span class="rlpr__upval">Deal advanced</span>
+                <span class="rlpr__upnote">Evidence fired into the live deal at the stall moment — not filed in a folder.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rl__strip">
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18l4-8 3 5 3-9 6 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="rl__tileval">40&ndash;60%</span><span class="rl__tilelab">of qualified pipeline ends in no decision</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 8.5a3 3 0 0 1 0 5.5M18 19c0-2-.8-3.6-2-4.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span><span class="rl__tileval" data-rl-count="13">13</span><span class="rl__tilelab">stakeholders in the median buying committee</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.7"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><span><span class="rl__tileval">Low</span><span class="rl__tilelab">stall visibility in your CRM today</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z" stroke="currentColor" stroke-width="1.5"/></svg></span><span><span class="rl__tileval">Dead last</span><span class="rl__tilelab">where vendor collateral ranks in buyer trust</span></span></div>
+          </div>
+          <p class="rl__note">Illustrative demonstration &middot; the $1M split shows where opportunity leaks, not a client guarantee.</p>
+        </div>
+      </div>
+
+      <!-- 04 · PRICING -->
+      <div class="rl__panel" role="tabpanel" id="rl-panel-3" aria-labelledby="rl-tab-3" hidden data-rl-panel style={`--acc:${STAGES[3].acc}; --acc-soft:${STAGES[3].soft}`}>
+        <div class="rl__pin">
+          <div class="rl__phead">
+            <div>
+              <p class="rl__pkicker mono">{STAGES[3].kicker}</p>
+              <h3 class="rl__ph">{STAGES[3].ph}</h3>
+              <p class="rl__psub">{STAGES[3].psub}</p>
+            </div>
+            <a class="rl__cta" href={STAGES[3].href}>{STAGES[3].cta}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+
+          <div class="rl__flow">
+            <div class="rl__col">
+              <span class="rl__step mono">Customer won</span>
+              <div class="rl__card">
+                <div class="rlp__ev" data-rl-step><svg class="rlp__ok" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M8.4 12l2.3 2.3L15.6 9.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Contract signed</b></div>
+                <div class="rlp__ev" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><b>Onboarding complete</b></div>
+              </div>
+            </div>
+
+            <div class="rl__col">
+              <span class="rl__step mono">Usage growth</span>
+              <div class="rl__card">
+                <svg class="rlpr__spark" viewBox="0 0 120 54" preserveAspectRatio="none" aria-hidden="true">
+                  <path data-rl-spark d="M2 48 L20 44 L38 40 L56 33 L74 27 L92 17 L118 6" fill="none" stroke="var(--acc)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <div class="rls__sig" data-rl-step style="border-top:1px solid var(--hair)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 16l5-6 4 3 7-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Active usage climbing</b><span>+ weekly</span></div>
+              </div>
+            </div>
+
+            <div class="rl__col">
+              <span class="rl__step mono">Expansion signal</span>
+              <div class="rl__card">
+                <div class="rlpr__trig" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 16l5-6 4 3 7-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Usage spike detected</b><span>fired</span></div>
+                <div class="rlpr__trig" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="9" r="2.6" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="9" r="2.2" stroke="currentColor" stroke-width="1.5"/><path d="M4 19c0-2.8 2.2-4.6 5-4.6s5 1.8 5 4.6M15 18c0-1.4.6-2.6 1.6-3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><b>Seat expansion opportunity</b><span>fired</span></div>
+                <div class="rlpr__trig" data-rl-step><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.3 6.3H21l-5.3 4 2 6.4L12 16l-5.7 3.7 2-6.4L3 9.3h6.7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><b>Premium feature adoption</b><span>fired</span></div>
+              </div>
+            </div>
+
+            <div class="rl__col">
+              <span class="rl__step mono">Upgrade opportunity</span>
+              <div class="rl__card rlpr__up" data-rl-step>
+                <span class="rlpr__uplab mono">Expansion opportunity</span>
+                <span class="rlpr__upval">Ready to expand</span>
+                <span class="rlpr__upnote">The play fires the week the account is ready — expansion at roughly half the CAC of new business.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rl__strip">
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 16l5-6 4 3 7-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><span class="rl__tileval">2&times;</span><span class="rl__tilelab">cheaper to expand than to acquire</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v8M9.5 10c0-1 1-1.6 2.5-1.6s2.5.6 2.5 1.5-1 1.3-2.5 1.5-2.5.6-2.5 1.6 1 1.6 2.5 1.6 2.5-.6 2.5-1.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span><span><span class="rl__tileval">~&frac12;</span><span class="rl__tilelab">expansion CAC vs new-customer CAC</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v8l4 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6" opacity="0.5"/></svg></span><span><span class="rl__tileval">None</span><span class="rl__tilelab">expansion triggers firing today</span></span></div>
+            <div class="rl__tile" data-rl-step><span class="rl__tileic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16v10H4z" stroke="currentColor" stroke-width="1.6"/><path d="M4 11h16" stroke="currentColor" stroke-width="1.6"/></svg></span><span><span class="rl__tileval" data-rl-count="75" data-rl-suffix="%">75%</span><span class="rl__tilelab">of SaaS changed pricing in the past year</span></span></div>
+          </div>
+          <p class="rl__note">Illustrative demonstration &middot; the $1M split shows where opportunity leaks, not a client guarantee.</p>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 
@@ -1589,11 +1838,25 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
   </article>
   </div><!-- /.orl3__flow -->
 
+</section>
+
+<!-- ══════════ STACK — Metrics held, Why rises over it ══════════
+     The dark Metrics layer and the ivory Why section used to meet at a
+     plain scroll seam, where the colour flip announced itself. They are
+     now a stacked pair: Metrics sticks and Why slides up over it like a
+     curtain, so the change of ground is a deliberate move rather than a
+     boundary you notice. The wrapper is what bounds the stick — without
+     it Metrics would stay pinned behind every section below. -->
+<div class="stack">
+
   <!-- ══════════ THE METRICS LAYER — full-bleed dark substrate ══════════
        Deliberately NOT a fifth app window. The four modules are ivory
        application panels; the layer is the dark ground they stand on —
        no browser chrome, no cursor demo. Four conduits drain into one
-       strip of board metrics and a typed intelligence readout. -->
+       strip of board metrics and a typed intelligence readout.
+       Lives outside .orl3 so it can stick: as .orl3's last child its
+       sticky range was zero, and .orl3's overflow:clip would have cropped
+       it. The rail still tracks it — that query is document-wide now. -->
   <section class="mlayer" data-chapter="metrics" aria-label="The Metrics layer">
     <!-- Same ground treatment as the four chapters above: identical .orl3__weather
          / .orl3__blob classes, not a copy. Three blooms rather than six —
@@ -1693,8 +1956,6 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
     </div>
   </section>
 
-</section>
-
 <!-- ══════════ WHY ORL MEDIA — the experiment ══════════
      Not a claims table. A simulation: what happens to pipeline the
      month you stop paying. Traditional agencies and ORL diverge at
@@ -1792,6 +2053,51 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
   </div>
 </section>
 
+</div><!-- /.stack -->
+
+<script>
+  /* ── stack reveal gate ──
+     Turns on the Metrics-holds-while-Why-rises effect, but only when the
+     Metrics layer actually fits one screen. `position: sticky; top: 0` grabs
+     the panel the moment its top hits the ceiling, so a panel taller than the
+     viewport would have its footer row cropped off and never seen.
+
+     Measured rather than a media query: the layer's height moves with width
+     (it reflows to a 3-column strip under 1024px) and the viewport moves with
+     OS display scaling — a 1080p screen at 125% reports ~750 CSS px. Any
+     hardcoded threshold is wrong for somebody. This asks the two questions
+     directly and re-asks on resize and zoom. */
+  const stackRoot = document.documentElement;
+  const stackLayer = document.querySelector<HTMLElement>('.mlayer');
+
+  if (stackLayer) {
+    const syncStack = () => {
+      /* Measure in .stack-measure: reveal padding applied, but no sticky and
+         no min-height:100vh — those would make the measurement circular. */
+      stackRoot.classList.remove('stack-reveal');
+      stackRoot.classList.add('stack-measure');
+      const natural = stackLayer.offsetHeight;
+      stackRoot.classList.remove('stack-measure');
+
+      const fits = natural <= window.innerHeight;
+      stackRoot.classList.toggle('stack-reveal', fits);
+      if (import.meta.env.DEV) {
+        (window as any).__stack = { natural, viewport: window.innerHeight, fits };
+      }
+    };
+
+    syncStack();
+    // fonts land after first paint and change the layer's height
+    document.fonts?.ready.then(syncStack);
+
+    let t = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(t);
+      t = window.setTimeout(syncStack, 150);
+    });
+  }
+</script>
+
 <!-- ══════════ THE LADDER — how to start ══════════
      The funnel's missing bottom: after Why ORL builds belief, this
      presents the entry path. Three rungs ascending left to right —
@@ -1825,7 +2131,7 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
           <li>Competitor benchmark &mdash; who gets cited instead</li>
           <li>Prioritized 90-day fix roadmap + readout call</li>
         </ul>
-        <a class="lad__cta-pill" href="/book">Start with the Audit
+        <a class="lad__cta-pill" href="/audit">Start with the Audit
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </article>
@@ -1869,7 +2175,7 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
     <!-- final ask — one CTA, per the site's own conversion sermon -->
     <div class="lad__final" data-lad-in>
       <p class="lad__finalline">Start with the audit. <em>See what buyers see.</em></p>
-      <a class="lad__cta-pill lad__cta-pill--big" href="/book">Start with the AI Visibility Audit
+      <a class="lad__cta-pill lad__cta-pill--big" href="/audit">Start with the AI Visibility Audit
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <p class="lad__finalmeta mono">Fixed scope &middot; 10 business days &middot; no retainer required</p>
@@ -1881,11 +2187,9 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
 <!-- ══════════ SECTION 4 — THE ORL JOURNAL (blog teaser) ══════════ -->
 <section class="ins" id="insights" aria-label="The ORL Journal">
   <div class="ins__inner">
-    <header class="ins__head">
-      <div>
-        <p class="ins__eyebrow mono" data-ins-in>The ORL Journal</p>
-        <h2 class="ins__h2" data-ins-in>Notes on growth<br />infrastructure.</h2>
-      </div>
+    <header class="ins__head ins__head--center">
+      <p class="ins__eyebrow mono" data-ins-in>The ORL Journal</p>
+      <h2 class="ins__h2" data-ins-in>Notes on growth<br />infrastructure.</h2>
       <a class="ins__all" href="/blog" data-ins-in>View all articles
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
@@ -1900,6 +2204,19 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
         </a>
       ))}
     </div>
+  </div>
+</section>
+
+<!-- ══════════ SECTION 5 — CLOSING CTA · WORK WITH US ══════════ -->
+<section class="wcta" id="work-with-us" aria-label="Work with ORL Media">
+  <div class="wcta__inner">
+    <p class="wcta__eyebrow mono" data-wcta-in>Work with us</p>
+    <h2 class="wcta__h2" data-wcta-in>Ready to dominate?</h2>
+    <p class="wcta__sub" data-wcta-in>The buyers in your category are already asking AI who to trust. Let&rsquo;s make the answer you &mdash; and build the engine that keeps it that way.</p>
+    <a class="wcta__pill" href="/book" data-wcta-in>Book a call
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <p class="wcta__meta mono" data-wcta-in>Built for seed&ndash;Series B SaaS &middot; $1M&ndash;$20M ARR</p>
   </div>
 </section>
 
@@ -2081,17 +2398,53 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
   let heroLocked = true;
   let relockGuard = 0;             // suppress re-lock until this timestamp
 
+  /* The document-level half of the lock. The Observer below only intercepts
+     wheel/touch/pointer; this is what stops every OTHER way a page can be
+     scrolled (scrollbar drag, track click, autoscroll, find-in-page, browser
+     scroll restoration). Without it the page could slide past hero 1 while
+     the slider was still on slide 0, and the re-arm listener — which bails
+     when heroLocked is true — would never resync it. */
+  /* Measure the scrollbar before the first lock, while the document is still
+     in its normal scrolling state — see --sbw in global.css. */
+  document.documentElement.style.setProperty(
+    '--sbw', (window.innerWidth - document.documentElement.clientWidth) + 'px',
+  );
+
+  function setDocScroll(locked: boolean) {
+    document.documentElement.classList.toggle('hero-locked', locked);
+  }
+  /* NB: the lock is armed further down, only once the Observer that can
+     release it exists. Locking here would mean any error in between left the
+     page permanently unscrollable with no way out. */
+
   function releaseHero() {
     if (!heroLocked) return;
     heroLocked = false;
     relockGuard = performance.now() + 1300;   // don't re-lock during the glide down
     obs.disable();
+    setDocScroll(false);           // give the document its scroll back first
     if (lenis) {
       lenis.start();
+      /* Toggling document overflow changes the scroll geometry Lenis caches,
+         so recompute it before asking Lenis to scroll into that geometry. */
+      lenis.resize();
       lenis.scrollTo(afterHero!, { duration: 0.85 });
     } else {
       window.scrollTo({ top: afterHero!.offsetTop, behavior: 'smooth' });
     }
+  }
+
+  /* Release WITHOUT the glide. releaseHero() assumes the visitor is finishing
+     the hero and animates them down to #infra; this is for the case where they
+     are already somewhere else entirely and simply need the lock taken off. */
+  function forceRelease() {
+    if (!heroLocked) return;
+    heroLocked = false;
+    relockGuard = performance.now() + 800;
+    obs.disable();
+    setDocScroll(false);
+    lenis?.start();
+    lenis?.resize();          // overflow just changed; Lenis caches geometry
   }
 
   function relockHero() {
@@ -2100,6 +2453,7 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
     animating = false;             // clear any stale transition state
     coolUntil = performance.now() + COOLDOWN;
     lenis?.stop();                 // hand the wheel back to the hero
+    setDocScroll(true);
     obs.enable();
   }
 
@@ -2121,19 +2475,63 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
     },
   });
 
+  // the Observer that releases the lock now exists, so it is safe to lock
+  setDocScroll(true);
+
   // if the browser restored a mid-page scroll position (reload / back-nav),
   // the visitor is NOT at the hero — never hijack their wheel in that case
-  if (window.scrollY > 2) {
-    heroLocked = false;
-    obs.disable();
-    lenis?.start();               // smooth scrolling active straight away
+  function syncToRestoredScroll() {
+    if (window.scrollY > 2 && heroLocked) {
+      heroLocked = false;
+      obs.disable();
+      setDocScroll(false);
+      lenis?.start();             // smooth scrolling active straight away
+    }
   }
+  syncToRestoredScroll();
+
+  /* Chrome restores scroll position asynchronously — often AFTER this script
+     runs — so the synchronous check above can read 0 on a reload that is
+     actually mid-page. Taking scroll restoration into our own hands removes
+     the race entirely: we decide where the page starts. 'load' is a
+     belt-and-braces resync for engines that restore on their own schedule. */
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.addEventListener('load', syncToRestoredScroll);
+
+  /* Desync guard. The `hero-locked` class and the heroLocked flag must never
+     disagree: the flag decides behaviour, the class decides whether the whole
+     document has overflow:hidden. If anything ever leaves the class applied
+     while the hero is not actually locked, every sticky section on the page
+     dies silently and there is no error to find. Reconcile instead of
+     trusting — this costs one check and closes the entire failure class. */
+  function reconcileLock() {
+    const stuck = !heroLocked
+      && document.documentElement.classList.contains('hero-locked');
+    if (stuck) setDocScroll(false);
+  }
+  window.addEventListener('load', reconcileLock);
+  setTimeout(reconcileLock, 1500);
 
   // re-arm the hero once the visitor scrolls back to the very top, so the
   // slides can be scrolled through in reverse (fixes the "stuck on the last
   // hero image" trap). The guard blocks re-locking during a release glide.
   window.addEventListener('scroll', () => {
-    if (heroLocked) return;
+    if (heroLocked) {
+      /* A LARGE jump is not drift. It is a visitor who genuinely left the hero
+         by a route the Observer never saw — scrollbar drag, keyboard, an
+         in-page anchor, or scroll restoration that landed after our sync.
+         Snapping them back to 0 fights them, and leaving the lock on is worse
+         than that: `html.hero-locked` puts overflow:hidden on <html> AND
+         <body>, and a non-visible overflow on an ancestor silently kills
+         position:sticky for every pinned section below. That is what breaks
+         the 3D scene's pin and takes the rising ORL MEDIA wordmark with it —
+         the wordmark still travels, but the scene slides out from under it.
+         So: release rather than snap back. */
+      if (window.scrollY > window.innerHeight * 0.75) { forceRelease(); return; }
+      /* Small drift with the hero genuinely on screen — correct it, as before. */
+      if (window.scrollY > 0) window.scrollTo(0, 0);
+      return;
+    }
     if (window.scrollY <= 1 && performance.now() > relockGuard) relockHero();
   }, { passive: true });
 
@@ -2160,6 +2558,7 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
   if (import.meta.env.DEV) {
     (window as any).__hero = {
       release: releaseHero,
+      lenis,
       state: () => ({ heroLocked, current, scrollY: Math.round(window.scrollY) }),
     };
   }
@@ -2182,6 +2581,153 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
 <!-- ══════════ GROWTH INFRASTRUCTURE — 3D floating dashboard ══════════ -->
 <script>
   import { gsap } from 'gsap';
+
+  /* ── wordmark pass over the pinned scene ──
+     Maps scroll position within the pin track onto the wordmark's travel:
+     progress 0 parks it one screen below the fold, progress 1 has its last
+     pixel clearing the top. The section unsticks at exactly progress 1, so the
+     page starts moving on the frame the wordmark finishes leaving.
+
+     Driven off the scroll event rather than rAF: one style write per event,
+     and reading straight from scroll position means it can't drift out of sync
+     with the pin the way a tweened value can. CSS holds the resting state, so
+     if this never runs the wordmark simply stays parked below the fold. */
+  const pinTrack = document.querySelector<HTMLElement>('.s3dpin');
+  const wordmark = document.querySelector<HTMLElement>('[data-s3dmark]');
+  const markText = wordmark?.querySelector<HTMLElement>('.s3dmark__text');
+  const scenePin = document.getElementById('infra');
+  const sceneCanvas = scenePin?.querySelector<HTMLElement>('.s3d__canvas');
+  const pinRoot = document.documentElement;
+  /* Declared locally, not borrowed: each <script> in this file is its own
+     module, and REDUCED lives in the hero's. Reaching for it here threw a
+     ReferenceError that took this whole module down — card parallax included. */
+  const markReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* NOTE: reduced-motion is deliberately NOT part of this guard.
+     Pinning is a LAYOUT decision — position:sticky plus a fit scale — not an
+     animation. Gating the whole block on it meant anyone with "reduce motion"
+     enabled (Windows: Accessibility → Visual effects → Animation effects, and
+     battery saver flips it too) lost the pin, the scene fit AND the rising
+     wordmark, and the section just scrolled past like a plain block with no
+     error anywhere. Only the scroll-LINKED travel below is real motion, and
+     only that is skipped. */
+  if (pinTrack && wordmark && markText && scenePin && sceneCanvas) {
+    let travel = 0;
+    let range = 0;
+
+    /* Was 0.72. That was tuned as "below this the scene is too small to be
+       worth it", but the cost of failing the check is not a smaller scene —
+       it is losing the pin, the sticky and the wordmark outright, with the
+       section silently degrading to a plain scrolling block. A slightly
+       shrunken scene is far better than no scene, so the floor is low enough
+       that only genuinely tiny viewports fall through. */
+    const MIN_SCALE = 0.55;
+    const BREATHING = 32;     // px of air top and bottom
+
+    /* Make the scene fit rather than asking whether it does. Measured, not
+       assumed: the scene's height moves with width and the viewport moves with
+       OS display scaling — a 1080p screen at 125% reports ~750 CSS px, so no
+       hardcoded breakpoint is right for both. offsetHeight is layout height and
+       ignores transforms, so it can be read while already scaled. */
+    const gate = () => {
+      pinRoot.classList.add('s3dpin-on');
+      scenePin.style.setProperty('--s3d-fit', '1');
+      const sceneH = sceneCanvas.offsetHeight;
+      /* The section keeps its nav-clearance padding now, so the canvas only
+         has the viewport MINUS that padding to live in. Reading it rather than
+         hardcoding 4.5rem keeps this correct if the clearance is ever retuned. */
+      const padTop = parseFloat(getComputedStyle(scenePin).paddingTop) || 0;
+      const scale = Math.min(1, (window.innerHeight - padTop - BREATHING) / sceneH);
+      const on = scale >= MIN_SCALE;
+      pinRoot.classList.toggle('s3dpin-on', on);
+      scenePin.style.setProperty('--s3d-fit', String(on ? scale : 1));
+      return { sceneH, scale, on };
+    };
+
+    /* Size the wordmark to span the viewport. Measured at a reference size and
+       scaled by the ratio, because px-of-width per px-of-font-size is a
+       property of the typeface — hardcoding it would break the moment the
+       family, the tracking, or the string changed. */
+    const MARK_SPAN = 0.94;
+    const REF = 100;
+
+    const fitWordmark = () => {
+      wordmark.style.setProperty('--mark-size', `${REF}px`);
+      const refWidth = markText.getBoundingClientRect().width;
+      if (!refWidth) return;
+      const size = (window.innerWidth * MARK_SPAN) / (refWidth / REF);
+      wordmark.style.setProperty('--mark-size', `${Math.round(size)}px`);
+    };
+
+    const measure = () => {
+      fitWordmark();     // before the travel maths — it sets the mark's height
+      range = pinTrack.offsetHeight - window.innerHeight;
+      /* Fully below the fold to fully above the top, plus a 56px overshoot so
+         the last pixel retires before the section unsticks — landing both on
+         the same frame leaves a sliver on screen that reads as a snag. */
+      travel = window.innerHeight + wordmark.offsetHeight + 56;
+    };
+
+    const update = () => {
+      if (range <= 0) return;
+      if (markReduced) {
+        /* No scroll-linked travel for anyone who asked for less motion — but
+           the wordmark still belongs on screen, so it rests in the upper third
+           of the pinned scene instead of sweeping through it. */
+        wordmark.style.setProperty('--mark-y', `${Math.round(window.innerHeight * 0.3)}px`);
+        return;
+      }
+      const p = Math.min(1, Math.max(0, -pinTrack.getBoundingClientRect().top / range));
+      wordmark.style.setProperty('--mark-y', `${window.innerHeight - p * travel}px`);
+    };
+
+    const sync = () => { gate(); measure(); update(); };
+
+    sync();
+    document.fonts?.ready.then(sync);   // the wordmark's height moves with the font
+    /* the travel is the only part that needs per-scroll work */
+    if (!markReduced) window.addEventListener('scroll', update, { passive: true });
+
+    let rt = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = window.setTimeout(sync, 150);
+    });
+
+    /* Why is the pin off? Previously there was no way to tell — it just did
+       nothing. Now the reason is always available. */
+    if (import.meta.env.DEV) {
+      (window as any).__pinWhy = () => {
+        const g = gate();
+        return {
+          pinned: pinRoot.classList.contains('s3dpin-on'),
+          reducedMotion: markReduced,
+          sceneHeight: g.sceneH,
+          viewportHeight: window.innerHeight,
+          fitScale: +g.scale.toFixed(3),
+          minScale: MIN_SCALE,
+          passesFitCheck: g.on,
+          minViewportHeightNeeded: Math.ceil(MIN_SCALE * g.sceneH + BREATHING
+            + (parseFloat(getComputedStyle(scenePin).paddingTop) || 0)),
+        };
+      };
+    }
+
+    if (import.meta.env.DEV) {
+      (window as any).__s3dmarkUpdate = update;
+      (window as any).__s3dmark = () => ({
+        pinned: pinRoot.classList.contains('s3dpin-on'),
+        sceneH: sceneCanvas.offsetHeight,
+        sceneFit: scenePin.style.getPropertyValue('--s3d-fit'),
+        viewportH: window.innerHeight,
+        range,
+        travel,
+        progress: Math.min(1, Math.max(0, -pinTrack.getBoundingClientRect().top / range)),
+        markTop: Math.round(markText.getBoundingClientRect().top),
+        sceneTop: Math.round(scenePin.getBoundingClientRect().top),
+      });
+    }
+  }
 
   const s3d = document.getElementById('infra');
   if (s3d) {
@@ -2732,6 +3278,23 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
       gsap.to(cards, { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out', stagger: 0.1, delay: 0.15 });
     }, { threshold: 0.2 });
     io.observe(ins);
+  }
+</script>
+
+<!-- ══════════ SECTION 5 — Work-with-us CTA entrance ══════════ -->
+<script>
+  import { gsap } from 'gsap';
+
+  const wcta = document.getElementById('work-with-us');
+  if (wcta && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const bits = [...wcta.querySelectorAll<HTMLElement>('[data-wcta-in]')];
+    gsap.set(bits, { opacity: 0, y: 22 });
+    const io = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      io.disconnect();
+      gsap.to(bits, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.08 });
+    }, { threshold: 0.3 });
+    io.observe(wcta);
   }
 </script>
 
@@ -3945,8 +4508,23 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
       const rect = vcanvas.getBoundingClientRect();
       vcanvas.width = Math.floor(rect.width * dpr);
       vcanvas.height = Math.floor(rect.height * dpr);
-      const fit = rect.width / (TEXT.length * 0.66);
-      const fs = Math.max(28, Math.min(fit, 120));
+      // Measure, don't assume. The previous constant — 0.66em average advance
+      // per glyph — overestimated General Sans 600 by 7.7% (measured: 0.6126),
+      // so the text never reached the width it was being sized for.
+      // measureText is exact and survives a change of face.
+      ctx.font = `600 100px 'General Sans','Inter',sans-serif`;
+      const emW = ctx.measureText(TEXT).width / 100;   // text width per 1px of font-size
+
+      // +30%, bounded by what the canvas can actually hold. fillText is centred
+      // and does not wrap, so anything past the canvas edge is silently clipped
+      // — the width cap is the real guarantee, not the multiplier.
+      // Above ~1530px the ×1.3 cap binds and the full +30% lands; below that the
+      // width cap binds first and the text grows by whatever room exists.
+      const GROW = 1.3;
+      const maxFs = (rect.width * 0.94) / emW;
+      // deliberately no lower bound: a floor could only ever force a clip, and
+      // maxFs already scales with the viewport.
+      const fs = Math.min(120 * GROW, maxFs);
       ctx.clearRect(0, 0, vcanvas.width, vcanvas.height);
       ctx.fillStyle = '#111111';
       ctx.textAlign = 'center';
@@ -4039,8 +4617,12 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
   if (o3) {
     const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
     /* [data-chapter], not .orl3__chapter — the Metrics layer is a full-bleed
-       section with its own styling, but the rail still tracks it */
-    const chapters = [...o3.querySelectorAll<HTMLElement>('[data-chapter]')];
+       section with its own styling, but the rail still tracks it.
+       Queried from the document, not from o3: the Metrics layer moved out of
+       #section3 so it could stick under the Why panel. Document order is
+       unchanged (visibility → signals → proof → pricing → metrics), which is
+       all the rail depends on. */
+    const chapters = [...document.querySelectorAll<HTMLElement>('[data-chapter]')];
 
     /* ── ambient particles (vanilla port of the shadcn Particles component) ── */
     const pHost = o3.querySelector<HTMLElement>('[data-orl3-particles]');
@@ -4879,32 +5461,106 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
 </style>
 
 
-<!-- Section 2B — tabs + entrance.
+<!-- Section 2B — Revenue Leak Map: stage interaction + per-panel viz.
      Own block on purpose: this section must stay readable and operable even if
      an unrelated script above throws, so it shares no scope with the hero/GSAP
      code. (An unrelated null in that block silently killed three features
-     earlier in this project.) -->
+     earlier in this project.)
+
+     Resting DOM is the FINISHED state; gsap applies the hidden state only when
+     it runs, so no-JS and reduced-motion show every stage fully populated. -->
 <script>
-  const chk = document.querySelector('.chk');
+  import { gsap } from 'gsap';
 
-  if (chk) {
-    const tabs = [...chk.querySelectorAll('[data-chk-tab]')];
-    const panels = [...chk.querySelectorAll('[data-chk-panel]')];
+  const rl = document.querySelector('.rl');
 
-    const select = (idx, focus) => {
+  if (rl) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tabs = [...rl.querySelectorAll('[data-rl-tab]')];
+    const panels = [...rl.querySelectorAll('[data-rl-panel]')];
+
+    /* ── count-up formatter ── */
+    const fmt = (el, v) => {
+      const dec = Number(el.dataset.rlDec || 0);
+      const s = dec ? v.toFixed(dec) : String(Math.round(v));
+      return s + (el.dataset.rlSuffix || '');
+    };
+    const finalizeCounts = (panel) =>
+      panel.querySelectorAll('[data-rl-count]').forEach((el) => { el.textContent = fmt(el, Number(el.dataset.rlCount || 0)); });
+
+    /* ── build + play one panel's visualization (replays on each activation) ── */
+    function playViz(panel) {
+      if (panel._rlTl) { panel._rlTl.kill(); panel._rlTl = null; }
+      if (panel._rlHeal) { clearTimeout(panel._rlHeal); panel._rlHeal = null; }
+      const steps = [...panel.querySelectorAll('[data-rl-step]')];
+      const sparks = [...panel.querySelectorAll('[data-rl-spark]')];
+      const counts = [...panel.querySelectorAll('[data-rl-count]')];
+      const typeEl = panel.querySelector('[data-rl-type]');
+      const caret = panel.querySelector('[data-rl-caret]');
+      const fullText = typeEl ? (typeEl.dataset.rlFull || typeEl.textContent || '') : '';
+      if (typeEl) typeEl.dataset.rlFull = fullText;
+
+      if (reduce) {
+        gsap.set(steps, { autoAlpha: 1, y: 0 });
+        sparks.forEach((p) => gsap.set(p, { strokeDashoffset: 0 }));
+        if (typeEl) typeEl.textContent = fullText;
+        if (caret) gsap.set(caret, { autoAlpha: 0 });
+        finalizeCounts(panel);
+        return;
+      }
+
+      /* hidden initial state — JS-applied, so a dead ticker leaves resting DOM */
+      gsap.set(steps, { autoAlpha: 0, y: 10 });
+      sparks.forEach((p) => { const len = p.getTotalLength(); gsap.set(p, { strokeDasharray: len, strokeDashoffset: len }); });
+      if (typeEl) typeEl.textContent = '';
+      if (caret) gsap.set(caret, { autoAlpha: 1 });
+
+      const tl = gsap.timeline();
+      let t = 0;
+
+      if (typeEl && fullText) {
+        const dur = Math.min(1.0, fullText.length * 0.014);
+        tl.to({ i: 0 }, { i: fullText.length, duration: dur, ease: 'none',
+          onUpdate() { typeEl.textContent = fullText.slice(0, Math.round(this.targets()[0].i)); } }, 0);
+        t = dur + 0.15;
+        if (caret) tl.to(caret, { autoAlpha: 0, duration: 0.2 }, t);
+      }
+
+      steps.forEach((s, i) => tl.to(s, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out' }, t + i * 0.09));
+      sparks.forEach((p, i) => tl.to(p, { strokeDashoffset: 0, duration: 0.85, ease: 'power2.out' }, t + 0.25 + i * 0.1));
+      counts.forEach((el) => {
+        const o = { v: 0 };
+        tl.to(o, { v: Number(el.dataset.rlCount || 0), duration: 1.0, ease: 'power2.out',
+          onUpdate: () => { el.textContent = fmt(el, o.v); } }, t + 0.2);
+      });
+
+      /* self-heal: whatever the ticker's fate, the panel is guaranteed finished */
+      const heal = () => {
+        gsap.set(steps, { autoAlpha: 1, y: 0 });
+        sparks.forEach((p) => gsap.set(p, { strokeDashoffset: 0 }));
+        if (typeEl) typeEl.textContent = fullText;
+        if (caret) gsap.set(caret, { autoAlpha: 0 });
+        finalizeCounts(panel);
+      };
+      tl.eventCallback('onComplete', heal);
+      panel._rlHeal = setTimeout(heal, 6000);
+      panel._rlTl = tl;
+    }
+
+    /* ── stage selection ── */
+    const select = (idx, focus, play) => {
       tabs.forEach((t, i) => {
         const on = i === idx;
         t.setAttribute('aria-selected', on ? 'true' : 'false');
-        // roving tabindex: only the selected tab is in the tab order, so Tab
-        // moves past the group rather than through all four
-        t.setAttribute('tabindex', on ? '0' : '-1');
+        t.setAttribute('tabindex', on ? '0' : '-1');   // roving tabindex
       });
       panels.forEach((pl, i) => { pl.hidden = i !== idx; });
       if (focus) tabs[idx].focus();
+      if (play) playViz(panels[idx]);
     };
 
     tabs.forEach((t, i) => {
-      t.addEventListener('click', () => select(i, false));
+      t.addEventListener('click', () => select(i, false, true));
       t.addEventListener('keydown', (e) => {
         const k = e.key;
         let next = -1;
@@ -4914,25 +5570,45 @@ import ShaderBackdrop from '../components/ShaderBackdrop.astro';
         else if (k === 'End') next = tabs.length - 1;
         if (next < 0) return;
         e.preventDefault();
-        select(next, true);
+        select(next, true, true);
       });
     });
 
-    /* ── entrance ── */
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      chk.classList.add('is-armed');
-      const items = [...chk.querySelectorAll('[data-chk-in]'), ...tabs];
-      const io2 = new IntersectionObserver((entries) => {
+    /* ── entrance + first-viz trigger ── */
+    if (reduce) {
+      panels.forEach(finalizeCounts);
+    } else {
+      rl.classList.add('is-armed');
+      const items = [...rl.querySelectorAll('[data-rl-in]')];
+      const io = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
           if (!e.isIntersecting) return;
-          io2.unobserve(e.target);
+          io.unobserve(e.target);
           const idx = items.indexOf(e.target);
           e.target.style.transitionDelay = (Math.max(0, idx) * 0.05) + 's';
           e.target.classList.add('is-in');
         });
-      }, { threshold: 0.1, rootMargin: '0px 0px -5%' });
-      items.forEach((el) => io2.observe(el));
+      }, { threshold: 0.12, rootMargin: '0px 0px -5%' });
+      items.forEach((el) => io.observe(el));
       setTimeout(() => items.forEach((el) => el.classList.add('is-in')), 4000);
+
+      /* play the default (Visibility) viz when the panel first enters view.
+         IntersectionObserver is primary; a scroll/rect check is the fallback for
+         environments where IO is flaky, and never force-finalizes an unseen
+         panel prematurely. */
+      let started = false;
+      const start = () => { if (started) return; started = true; playViz(panels[0]); };
+      const panelIO = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) { panelIO.disconnect(); start(); } });
+      }, { threshold: 0.2 });
+      panelIO.observe(panels[0]);
+      const onScroll = () => {
+        const r = panels[0].getBoundingClientRect();
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        if (r.top < vh * 0.9 && r.bottom > 0) { window.removeEventListener('scroll', onScroll); start(); }
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
     }
   }
 </script>

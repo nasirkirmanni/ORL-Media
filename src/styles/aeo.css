@@ -1,0 +1,620 @@
+/* ═══════════════════════════════════════════════════════════
+   VISIBILITY — everything AFTER the locked 3-video hero.
+
+   SCOPE: styles only .aeo*. Never touches .vh*, the shader, or
+   the hero script. The hero is a locked component.
+
+   GROUND: beige and white only. No black, no charcoal, no dark
+   slabs — the whole page is the site's warm light theme. Depth
+   comes from the beige/white alternation, hairlines and soft
+   shadows rather than from inverted sections.
+
+   TITLES: every section title is centred and large, so the
+   visitor can tell what a section is about at a glance while
+   scrolling. That is a deliberate rule here, not a default.
+
+   BLUE MEANS AI. Reserved for answer-engine activity: AI replies,
+   scores, mentions, tracked questions, active states. RED means
+   absence — the moments where the brand is missing. Neither is
+   ever decorative.
+   ═══════════════════════════════════════════════════════════ */
+
+.aeo {
+  /* grounds — beige + white only */
+  --paper: #faf8f4;          /* lightest, near-white warm */
+  --beige: #efe9dd;          /* the beige ground */
+  --beige-2: #e6dfd0;        /* deeper beige, for insets */
+  --card: #ffffff;           /* white cards */
+
+  /* ink */
+  --ink: #241b12;            /* 14.6:1 on paper */
+  --ink-2: #4a463c;          /* body */
+  --ink-3: #6b6559;          /* meta */
+
+  /* rules */
+  --rule: #ddd6c8;
+  --rule-2: #cabfa9;
+
+  /* meaning */
+  --ai: #2649d8;             /* AI activity */
+  --ai-wash: #eaeeff;
+  --ai-line: #c3cdf7;
+  --miss: #b03a2b;           /* absence */
+  --miss-wash: #fbeeec;
+  --win: #2f7d4c;            /* gain */
+  --gold-ink: #6b5220;       /* eyebrows */
+
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+/* ── section chrome ── */
+.aeo__sec { position: relative; padding: clamp(5rem, 10vh, 8rem) 1.5rem; }
+.aeo__sec--paper { background: var(--paper); }
+.aeo__sec--beige { background: var(--beige); }
+.aeo__in { max-width: 70rem; margin: 0 auto; }
+.aeo__in--narrow { max-width: 46rem; margin: 0 auto; }
+
+/* ── the centred head block ──
+   Every section opens the same way: small eyebrow, big centred title,
+   optional lede. Consistency is what makes the page scannable. */
+.aeo__head { text-align: center; max-width: 46rem; margin: 0 auto clamp(2.5rem, 5vh, 3.75rem); }
+.aeo__eyebrow {
+  margin: 0 0 1.1rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--gold-ink);
+}
+/* ── the hierarchy ──
+   The section NAME is the heading — "What is AEO?", "Your market", "The
+   diagnosis". Short, large, centred, so a visitor scrolling past can tell
+   what a section is without reading a sentence. The editorial line that used
+   to be the big type is now a subtitle underneath it, and the explanatory
+   paragraph sits smaller again beneath that. Three clear steps down. */
+.aeo__h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  /* deliberately large — this is the signpost */
+  font-size: clamp(2.6rem, 6vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.024em;
+  color: var(--ink);
+}
+.aeo__h2 em { font-style: italic; color: var(--ai); }
+
+/* the editorial statement — was the headline, now the subtitle */
+.aeo__sub {
+  margin: 1.1rem auto 0; max-width: 34ch;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.3rem, 2.7vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.012em;
+  color: var(--ink-2);
+}
+.aeo__sub em { font-style: italic; color: var(--ai); }
+.aeo__sub .miss { font-style: normal; color: var(--miss); }
+/* section 01's opener carries the page's first statement, so it sits a step
+   above the other subtitles — still well below the heading */
+.aeo__sub--lead { max-width: 24ch; font-size: clamp(1.5rem, 3.2vw, 2.35rem); color: var(--ink); }
+.aeo__sub--lead span { display: block; color: var(--ai); }
+
+.aeo__lede {
+  margin: 1.3rem auto 0; max-width: 38rem;
+  font-size: 1.0625rem; line-height: 1.7; color: var(--ink-2);
+}
+.aeo__h3 {
+  margin: 0; font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.25rem, 2.2vw, 1.55rem); line-height: 1.15; color: var(--ink);
+}
+
+/* ── buttons ── */
+.aeo__btn {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  padding: 0 1.9rem; min-height: 54px;
+  background: var(--ink); color: var(--paper);
+  border-radius: 99px; font-size: 0.98rem; font-weight: 500; text-decoration: none;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+}
+.aeo__btn:hover { transform: translateY(-2px); box-shadow: 0 18px 34px -16px rgba(36, 27, 18, 0.5); }
+.aeo__btn:focus-visible { outline: 2px solid var(--ai); outline-offset: 3px; }
+.aeo__btnnote {
+  margin: 1rem 0 0; text-align: center;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3);
+}
+.aeo__ctacenter { text-align: center; margin-top: 2.5rem; }
+
+/* ── the shared card ──
+   Every box on the page is one of these, so the entrance animation and
+   hover behaviour are identical everywhere. */
+.aeo__card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  padding: 1.6rem 1.5rem;
+  box-shadow: 0 2px 3px rgba(36, 27, 18, 0.03);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.aeo__card:hover {
+  transform: translateY(-5px);
+  border-color: var(--rule-2);
+  box-shadow: 0 22px 40px -22px rgba(36, 27, 18, 0.28);
+}
+.aeo__cardnum {
+  display: block; margin-bottom: 0.75rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem; letter-spacing: 0.14em; color: var(--ai);
+}
+.aeo__card p { margin: 0.6rem 0 0; font-size: 0.9rem; line-height: 1.65; color: var(--ink-2); }
+
+/* ── clickable card (a <button> styled as a card) ──
+   Resets the button chrome, keeps the card's own look, and adds a corner
+   plus + a "Read more" cue so it clearly affords opening. */
+.aeo__cardbtn {
+  position: relative;
+  display: block; width: 100%; text-align: left;
+  font: inherit; color: inherit; cursor: pointer;
+  padding-right: 3rem;    /* room for the plus, so the heading never runs under it */
+}
+.aeo__cardbtn:focus-visible { outline: 2px solid var(--ai); outline-offset: 3px; }
+.aeo__cardplus {
+  position: absolute; top: 1.3rem; right: 1.3rem;
+  display: grid; place-items: center; width: 28px; height: 28px;
+  border-radius: 50%; background: var(--beige); border: 1px solid var(--rule);
+  color: var(--ink-3);
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+.aeo__cardbtn:hover .aeo__cardplus,
+.aeo__cardbtn:focus-visible .aeo__cardplus {
+  background: var(--ai); border-color: var(--ai); color: #fff; transform: rotate(90deg);
+}
+.aeo__cardmore {
+  display: inline-block; margin-top: 1rem;
+  font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ai);
+  opacity: 0; transform: translateY(4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.aeo__cardbtn:hover .aeo__cardmore,
+.aeo__cardbtn:focus-visible .aeo__cardmore { opacity: 1; transform: translateY(0); }
+
+/* ── the deep-dive dialog ── */
+.aeo__modal {
+  width: min(38rem, calc(100vw - 2.5rem));
+  max-height: min(85vh, 44rem);
+  margin: auto;                     /* native centring */
+  padding: 0; border: none; border-radius: 20px;
+  background: transparent; color: var(--ink);
+  overflow: visible;
+}
+.aeo__modal::backdrop {
+  /* the blur the request asked for — filters the page painted behind it */
+  background: rgba(26, 18, 12, 0.4);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.aeo__modalcard {
+  position: relative;
+  max-height: min(85vh, 44rem); overflow-y: auto;
+  padding: clamp(1.75rem, 4vw, 2.5rem);
+  background: var(--paper);
+  border: 1px solid var(--rule); border-radius: 20px;
+  box-shadow: 0 40px 90px -30px rgba(26, 18, 12, 0.5);
+}
+.aeo__modalclose {
+  position: absolute; top: 0.9rem; right: 0.9rem;
+  display: grid; place-items: center; width: 44px; height: 44px;
+  border-radius: 50%; border: 1px solid var(--rule); background: var(--card);
+  color: var(--ink-2); cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.aeo__modalclose:hover { background: var(--beige); color: var(--ink); }
+.aeo__modalclose:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+.aeo__modaleyebrow { margin: 0 0 0.9rem; font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ai); }
+.aeo__modaltitle {
+  margin: 0; padding-right: 2.5rem;
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.6rem, 3.4vw, 2.1rem); line-height: 1.1; letter-spacing: -0.015em; color: var(--ink);
+}
+.aeo__modallead { margin: 1.1rem 0 0; font-size: 1rem; line-height: 1.65; color: var(--ink-2); }
+.aeo__modalpoints { list-style: none; margin: 1.4rem 0 0; padding: 0; display: grid; gap: 0.9rem; }
+.aeo__modalpoints li {
+  position: relative; padding-left: 1.5rem;
+  font-size: 0.9rem; line-height: 1.6; color: var(--ink-2);
+}
+.aeo__modalpoints li::before {
+  content: ''; position: absolute; left: 0; top: 0.6em;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--ai);
+}
+.aeo__modalcta {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  margin-top: 1.8rem; padding: 0 1.6rem; min-height: 48px;
+  background: var(--ink); color: var(--paper); border-radius: 99px;
+  font-size: 0.9rem; font-weight: 500; text-decoration: none;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+}
+.aeo__modalcta:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -14px rgba(26, 18, 12, 0.5); }
+.aeo__modalcta:focus-visible { outline: 2px solid var(--ai); outline-offset: 3px; }
+
+/* entrance — respects reduced-motion below */
+.aeo__modal, .aeo__modal::backdrop {
+  transition: opacity 0.28s ease, overlay 0.28s allow-discrete, display 0.28s allow-discrete;
+  opacity: 0;
+}
+.aeo__modal[open], .aeo__modal[open]::backdrop { opacity: 1; }
+@starting-style {
+  .aeo__modal[open], .aeo__modal[open]::backdrop { opacity: 0; }
+}
+.aeo__modalcard { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.aeo__modal[open] .aeo__modalcard { transform: translateY(0); }
+@starting-style { .aeo__modal[open] .aeo__modalcard { transform: translateY(14px); } }
+
+/* ═══════ 01 · the shift ═══════ */
+.aeo__shift { background: var(--paper); text-align: center; }
+
+/* ═══════ 02 · what is AEO — the search interaction ═══════ */
+.aeo__convo { max-width: 46rem; margin: 0 auto; display: grid; gap: 0.9rem; }
+.aeo__bubble {
+  padding: 1.05rem 1.25rem; border-radius: 14px;
+  font-size: 0.95rem; line-height: 1.55;
+}
+.aeo__bubble--user {
+  justify-self: end; max-width: 90%;
+  background: var(--card); border: 1px solid var(--rule); color: var(--ink);
+}
+.aeo__bubble--ai {
+  justify-self: start; max-width: 90%;
+  background: var(--ai-wash); border: 1px solid var(--ai-line); color: var(--ink);
+}
+.aeo__bubbletag {
+  display: block; margin-bottom: 0.45rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.54rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+.aeo__bubble--ai .aeo__bubbletag { color: var(--ai); }
+
+.aeo__picks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; margin: 1.3rem 0 0; }
+.aeo__pick { padding: 1.1rem 1.1rem 1.2rem; text-align: left; }
+.aeo__pickrank {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem; letter-spacing: 0.1em; color: var(--ai);
+}
+.aeo__pickname { margin: 0.5rem 0 0; font-family: var(--font-display); font-size: 1.15rem; color: var(--ink); }
+.aeo__pickmeta { margin: 0.3rem 0 0; font-size: 0.76rem; color: var(--ink-3); }
+
+/* the absence — the point of the section */
+.aeo__absent {
+  display: flex; align-items: center; justify-content: center; gap: 0.7rem;
+  max-width: 46rem; margin: 1.1rem auto 0; padding: 1rem 1.2rem;
+  background: var(--miss-wash);
+  border: 1px solid color-mix(in srgb, var(--miss) 30%, transparent);
+  border-radius: 14px;
+  font-size: 0.95rem; color: var(--ink);
+}
+.aeo__absent b { color: var(--miss); font-weight: 600; }
+.aeo__dot {
+  flex: none; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--miss);
+}
+
+.aeo__define {
+  max-width: 42rem; margin: clamp(2.5rem, 5vh, 3.5rem) auto 0;
+  padding: 1.7rem 1.7rem;
+  background: var(--card); border: 1px solid var(--rule); border-radius: 16px;
+  text-align: center;
+  font-size: 1rem; line-height: 1.7; color: var(--ink-2);
+}
+.aeo__define b { color: var(--ink); font-weight: 600; }
+
+/* ═══════ 03 · why it matters ═══════
+   Scoped maroon: overriding --ai on the section re-tints every component that
+   reads it (bars, chips, the AI column, the new-journey pills) to deep red,
+   without touching the blue used elsewhere on the page. */
+.aeo__why {
+  --ai: #7d1f2e;
+  --ai-wash: #f6ebec;
+  --ai-line: #e4c9cd;
+}
+/* the section title keeps "matters" in ink italic, not the accent colour */
+.aeo__h2--plainem em { font-style: italic; color: var(--ink); }
+/* the one maroon word in the lede */
+.aeo__mark { color: var(--ai); font-weight: 600; }
+
+/* ── the graph card: label block left, animated bars right ── */
+.aeo__graph {
+  max-width: 50rem; margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(1.5rem, 3vw, 2.75rem); align-items: center;
+  padding: clamp(1.6rem, 3vw, 2.2rem) clamp(1.5rem, 3vw, 2rem);
+  background: var(--card); border: 1px solid var(--rule); border-radius: 18px;
+}
+.aeo__grapheyebrow {
+  margin: 0 0 0.7rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.58rem; letter-spacing: 0.13em; text-transform: uppercase;
+  line-height: 1.5; color: var(--ai);
+}
+.aeo__graphlead { margin: 0; font-size: 0.88rem; line-height: 1.6; color: var(--ink-2); }
+.aeo__graphchip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  margin-top: 1rem; padding: 0.32rem 0.7rem;
+  background: var(--beige); border: 1px solid var(--rule); border-radius: 99px;
+  font-size: 0.6rem; letter-spacing: 0.02em; color: var(--ink-3);
+}
+.aeo__graphrows { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.85rem; }
+.aeo__graphrows li { display: grid; grid-template-columns: 3rem minmax(0, 1fr) 3rem; align-items: center; gap: 0.75rem; }
+.aeo__graphyear { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.72rem; color: var(--ink-3); }
+.aeo__graphtrack { height: 13px; border-radius: 99px; background: var(--beige-2); overflow: hidden; }
+.aeo__graphbar {
+  display: block; height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ai) 82%, #000 8%), var(--ai));
+  width: 0;                                   /* animated to --w on .is-drawn */
+  /* per-bar stagger: each starts 0.12s after the one above, so the chart
+     draws top-to-bottom rather than all at once */
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 0.12s);
+}
+.is-drawn .aeo__graphbar { width: var(--w); }
+.aeo__graphval {
+  text-align: right; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.78rem; font-weight: 500; color: var(--ai); font-variant-numeric: tabular-nums;
+}
+.aeo__graphsource {
+  max-width: 50rem; margin: 1rem auto 0; text-align: center;
+  font-size: 0.68rem; line-height: 1.5; color: var(--ink-3);
+}
+
+/* ── comparison table: traditional → AI, arrow badge each row ── */
+.aeo__compare {
+  max-width: 50rem; margin: clamp(2.5rem, 5vh, 3.5rem) auto 0;
+  background: var(--card); border: 1px solid var(--rule); border-radius: 18px; overflow: hidden;
+}
+.aeo__ctable { width: 100%; border-collapse: collapse; }
+.aeo__ctable caption {
+  padding: 1.15rem 1.5rem 1rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-ink);
+  border-bottom: 1px solid var(--rule);
+}
+.aeo__ctable th, .aeo__ctable td {
+  padding: 0.9rem 1.5rem; text-align: left;
+  border-bottom: 1px solid var(--rule); font-size: 0.9rem; line-height: 1.4;
+}
+.aeo__ctable thead th {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3);
+  font-weight: 500;
+}
+.aeo__ctable thead th:first-child,
+.aeo__ctable thead th:last-child { display: inline-flex; align-items: center; gap: 0.45rem; }
+.aeo__ctable thead th:last-child { color: var(--ai); }
+.aeo__ctable tbody tr:last-child td { border-bottom: none; }
+.aeo__ctable td:first-child { color: var(--ink-3); }
+.aeo__ctable td.aeo__ai { color: var(--ink); font-weight: 500; }
+/* the arrow lives in a narrow middle column */
+.aeo__ctable th:nth-child(2), .aeo__ctable td.aeo__arrowcell { width: 3rem; padding-left: 0; padding-right: 0; text-align: center; }
+.aeo__arrowbadge {
+  display: inline-grid; place-items: center; width: 26px; height: 26px;
+  border-radius: 50%; background: var(--ai-wash); color: var(--ai);
+  border: 1px solid var(--ai-line);
+}
+.aeo__diamond { color: var(--ai); }
+
+/* ── the two journeys — pills with icons ── */
+.aeo__journeys { display: grid; gap: 1rem; margin-top: clamp(2.5rem, 5vh, 3.5rem); }
+.aeo__journey { padding: 1.4rem 1.5rem; }
+.aeo__journeytag {
+  margin: 0 0 1rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+.aeo__journey--new .aeo__journeytag { color: var(--ai); }
+.aeo__steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.aeo__steps li {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 0.9rem 0.5rem 0.55rem; border-radius: 99px;
+  background: var(--beige); border: 1px solid var(--rule);
+  font-size: 0.78rem; color: var(--ink-2);
+}
+.aeo__pillicon {
+  display: inline-grid; place-items: center; flex: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--card); border: 1px solid var(--rule); color: var(--ink-3);
+}
+.aeo__arrow { color: var(--rule-2); font-size: 0.85rem; }
+.aeo__journey--new .aeo__steps li { background: var(--ai-wash); border-color: var(--ai-line); color: var(--ink); }
+.aeo__journey--new .aeo__pillicon { background: var(--card); border-color: var(--ai-line); color: var(--ai); }
+.aeo__journey--new .aeo__arrow { color: var(--ai); }
+
+/* ═══════ 04 · are you visible ═══════ */
+.aeo__asks { display: grid; gap: 0.8rem; max-width: 46rem; margin: 0 auto; }
+.aeo__ask { display: grid; gap: 0.7rem; padding: 1.25rem 1.35rem; }
+.aeo__askq {
+  margin: 0; font-size: 0.98rem; line-height: 1.5; color: var(--ink);
+  font-family: var(--font-display);
+}
+.aeo__askrow { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+.aeo__chip {
+  padding: 0.34rem 0.72rem; border-radius: 99px;
+  font-size: 0.74rem; line-height: 1;
+  background: var(--ai-wash); border: 1px solid var(--ai-line); color: var(--ai);
+}
+.aeo__chip--you {
+  background: var(--miss-wash); border-color: color-mix(in srgb, var(--miss) 32%, transparent);
+  color: var(--miss);
+  display: inline-flex; align-items: center; gap: 0.4rem;
+}
+.aeo__turn {
+  max-width: 40rem; margin: clamp(2.5rem, 5vh, 3.5rem) auto 0;
+  text-align: center;
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem); line-height: 1.2; color: var(--ink);
+}
+.aeo__turn em { font-style: italic; color: var(--miss); }
+
+/* ═══════ 05 · the four-part system + flow ═══════ */
+.aeo__four { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.9rem; }
+.aeo__flow {
+  list-style: none; margin: clamp(2.25rem, 4vh, 3rem) 0 0; padding: 1.3rem 1.4rem;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.6rem;
+  background: var(--card); border: 1px solid var(--rule); border-radius: 16px;
+}
+.aeo__flow li {
+  padding: 0.55rem 1rem; border-radius: 99px;
+  background: var(--beige); border: 1px solid var(--rule);
+  font-size: 0.8rem; color: var(--ink-2);
+}
+.aeo__flow li.is-orl { background: var(--ink); border-color: var(--ink); color: var(--paper); font-weight: 500; }
+
+
+
+/* ═══════ 07 · why not recommended ═══════ */
+.aeo__diag { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+
+/* ═══════ 08 · the service ═══════ */
+.aeo__pipe {
+  list-style: none; margin: 0 0 clamp(2.25rem, 4vh, 3rem); padding: 1.3rem 1.4rem;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.55rem;
+  background: var(--card); border: 1px solid var(--rule); border-radius: 16px;
+}
+.aeo__pipe li {
+  padding: 0.55rem 1rem; border-radius: 99px;
+  background: var(--beige); border: 1px solid var(--rule);
+  font-size: 0.78rem; color: var(--ink-2);
+}
+.aeo__deliver { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; }
+.aeo__deliver .aeo__h3 { font-size: 1.1rem; }
+
+/* ═══════ 09 · proof ═══════ */
+.aeo__proof { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: stretch; }
+.aeo__proofcard { padding: 1.8rem 1.7rem; }
+.aeo__proofcard--after { border-color: color-mix(in srgb, var(--win) 32%, transparent); background: #f2f9f4; }
+.aeo__prooftag {
+  margin: 0 0 1.25rem;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+.aeo__proofcard--after .aeo__prooftag { color: var(--win); }
+.aeo__prooflist { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+.aeo__prooflist li {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+  padding-bottom: 0.9rem; border-bottom: 1px solid var(--rule);
+  font-size: 0.86rem; color: var(--ink-3);
+}
+.aeo__prooflist li:last-child { border-bottom: none; padding-bottom: 0; }
+.aeo__prooflist b {
+  font-family: var(--font-display); font-size: 1.5rem; font-weight: 400;
+  color: var(--ink); font-variant-numeric: tabular-nums;
+}
+.aeo__proofcard--after .aeo__prooflist b { color: var(--win); }
+
+/* ═══════ 10 · final CTA ═══════ */
+/* follows the beige proof section, so it takes paper to keep the alternation */
+.aeo__final { background: var(--paper); text-align: center; }
+
+/* ═══════ strip + footer ═══════ */
+.aeo__strip { background: var(--paper); padding: 3.5rem 1.5rem 0; text-align: center; }
+.aeo__stripline {
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem; flex-wrap: wrap;
+  margin: 1.2rem 0 0; padding: 0; list-style: none;
+}
+.aeo__stripline li { display: flex; align-items: center; gap: 0.6rem; }
+.aeo__stripline li:not(:last-child)::after { content: '→'; color: var(--rule-2); font-size: 0.8rem; }
+.aeo__stripline a {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  min-height: 44px; padding: 0 0.95rem;
+  background: var(--card); border: 1px solid var(--rule); border-radius: 99px;
+  font-size: 0.78rem; font-weight: 500; color: var(--ink); text-decoration: none;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+.aeo__stripline a:hover { transform: translateY(-2px); border-color: var(--rule-2); }
+.aeo__stripline a:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+.aeo__stripline b { font-size: 0.6rem; font-weight: 500; color: var(--gold-ink); }
+.aeo__stripline .is-here a { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.aeo__stripline .is-here b { color: #cbb488; }
+
+.aeo__foot { background: var(--paper); padding: 2.5rem 1.5rem 3rem; }
+.aeo__footin {
+  display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;
+  max-width: 70rem; margin: 0 auto; padding-top: 2rem; border-top: 1px solid var(--rule);
+}
+.aeo__next { display: inline-flex; align-items: center; gap: 0.8rem; min-height: 44px; color: var(--ink); text-decoration: none; }
+.aeo__next span {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-ink);
+}
+.aeo__next strong { font-family: var(--font-display); font-weight: 400; font-size: 1.1rem; }
+.aeo__next svg { transition: transform 0.25s ease; }
+.aeo__next:hover svg { transform: translateX(4px); }
+.aeo__next:focus-visible { outline: 2px solid var(--ai); outline-offset: 3px; }
+.aeo__foot p {
+  margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.58rem; letter-spacing: 0.06em; color: var(--ink-3);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   THE FOURTH WIPE — the AEO content uncovered over the held
+   shader, the same equal-and-opposite pair the hero uses between
+   clips (mask yPercent 100→0, figure -100→0).
+
+   The SLOT holds the overlap and is NEVER transformed:
+   ScrollTrigger refreshes against its trigger's rect including
+   any transform already on it, so triggering off the mask
+   measured it with its own parked yPercent:100 and put start/end
+   a full element-height late. The hero avoids this the same way,
+   by triggering off zero-width spacers instead of the clips.
+
+   Gated on the hero's own html.vhpin-on, which is read, never
+   set. Ungated there is no overlap and no mask.
+   ═══════════════════════════════════════════════════════════ */
+html.vhpin-on .aeo__enterslot {
+  position: relative;
+  z-index: 20;              /* above .vh__triggers (z-index 10) */
+  /* a FULL viewport of overlap, so the curtain sweeps all the way to the top
+     of the screen exactly as clip 02 does over clip 01. Coupled to the hero's
+     110lvh tail in visibility.css — this must be -(tail - 10lvh). */
+  margin-top: -100lvh;
+  /* transparent on purpose — the pinned hero shows through the area the
+     mask has vacated. A background here would hide it. */
+}
+html.vhpin-on .aeo__enter { overflow: hidden; will-change: transform; }
+html.vhpin-on .aeo__enter > .aeo__shift { will-change: transform; }
+
+/* ─────────────── responsive ─────────────── */
+@media (max-width: 1000px) {
+  .aeo__four, .aeo__deliver { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .aeo__picks { grid-template-columns: 1fr; }
+  .aeo__proof { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  /* the graph card stacks: label block on top, bars beneath */
+  .aeo__graph { grid-template-columns: 1fr; gap: 1.4rem; }
+}
+@media (max-width: 700px) {
+  .aeo__sec { padding-left: 1.2rem; padding-right: 1.2rem; }
+  /* every card grid collapses to a single column */
+  .aeo__four, .aeo__diag, .aeo__deliver { grid-template-columns: 1fr; }
+  /* bar rows tighten their year/value tracks */
+  .aeo__graphrows li { grid-template-columns: 2.6rem minmax(0, 1fr) 2.6rem; }
+  .aeo__footin { flex-direction: column; align-items: flex-start; }
+  /* the comparison table scrolls rather than squashing its three columns */
+  .aeo__scroller { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .aeo__scroller .aeo__ctable { min-width: 32rem; }
+}
+
+/* ─────────────── reduced motion ─────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .aeo__card, .aeo__btn, .aeo__stripline a, .aeo__next svg, .aeo__graphbar,
+  .aeo__cardplus, .aeo__cardmore, .aeo__modal, .aeo__modal::backdrop, .aeo__modalcard { transition: none; }
+  .aeo__card:hover, .aeo__btn:hover, .aeo__stripline a:hover { transform: none; }
+  .aeo__cardbtn:hover .aeo__cardplus { transform: none; }
+  .aeo__next:hover svg { transform: none; }
+  /* the modal still opens, it just doesn't slide or blur-in */
+  .aeo__modal[open] .aeo__modalcard { transform: none; }
+  /* bars render at final width with no draw */
+  .aeo__graphbar { width: var(--w); }
+  /* no overlap, no mask — the section simply follows the hero */
+  html.vhpin-on .aeo__enterslot { margin-top: 0; }
+  html.vhpin-on .aeo__enter { overflow: visible; will-change: auto; }
+}

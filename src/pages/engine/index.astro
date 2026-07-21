@@ -1,6 +1,7 @@
 ---
 import '../../styles/global.css';
 import '../../styles/engine.css';
+import '../../styles/engine-cards.css';
 import Seo from '../../components/Seo.astro';
 import { graph, organization, website, faqPage, breadcrumbs } from '../../lib/schema';
 
@@ -40,6 +41,37 @@ const MODULES = [
    reference uses. Nine at 40° with a 50° sweep gives a 10° overlap, which is
    what makes it read as braided rather than as a dashed circle. */
 const RING = Array.from({ length: 9 }, (_, i) => i * 40);
+
+/* Per-module centre emblem, held inside the braided ring — the woven-ring +
+   symbol pairing from the reference logos, drawn as clean line glyphs in the
+   site's own stroke style rather than the raster illustrations (which don't
+   survive at 30–40px). Centred on 24,24 in the 48 viewBox; inherit the
+   module accent via currentColor. Filled dots set fill inline. */
+const EMBLEM: Record<string, string> = {
+  /* eye with two ripple arcs above it — the "vision/waves" reference */
+  visibility: '<path d="M14 27c4-5.4 16-5.4 20 0-4 5.4-16 5.4-20 0Z"/><circle cx="24" cy="27" r="2.9"/><path d="M17.5 19.6a9 9 0 0 1 13 0"/><path d="M20 15.8a5 5 0 0 1 8 0"/>',
+  /* concentric target rings + centre dot */
+  signals: '<circle cx="24" cy="24" r="2.4" fill="currentColor" stroke="none"/><circle cx="24" cy="24" r="6.5"/><circle cx="24" cy="24" r="10.4"/>',
+  /* two overlapping rounded squares → an interlaced woven-knot read */
+  proof: '<rect x="16.6" y="16.6" width="14.8" height="14.8" rx="4"/><rect x="16.6" y="16.6" width="14.8" height="14.8" rx="4" transform="rotate(45 24 24)"/>',
+  /* stacked coins */
+  pricing: '<ellipse cx="24" cy="19" rx="8" ry="3"/><path d="M16 19v6.8c0 1.6 3.6 3 8 3s8-1.4 8-3V19"/><path d="M16 22.4c0 1.6 3.6 3 8 3s8-1.4 8-3"/>',
+};
+
+/* Real brand-logo images (client-supplied), keyed to transparency and label-
+   trimmed into public/logos. Where a module has one, the image replaces the
+   drawn ring + emblem entirely — the logos already contain their own woven
+   ring. Visibility has no image yet (the supplied file was a page mockup, not
+   the eye logo), so it keeps the drawn emblem in brand blue below. */
+const LOGO_IMG: Record<string, string> = {
+  visibility: '/logos/visibility.png',
+  signals: '/logos/signals.png',
+  proof: '/logos/proof.png',
+  pricing: '/logos/pricing.png',
+};
+/* every module now has a real logo image; the drawn EMBLEM/RING is kept only
+   as the fallback if an image key is ever missing */
+const LOGO_COLOR: Record<string, string> = {};
 
 const FAQ = [
   {
@@ -106,6 +138,8 @@ import GlassNav from '../../components/GlassNav.astro';
   </a>
   <div class="sitenav__links">
     <a href="/engine" class="sitenav__link" aria-current="page">Engine</a>
+    <a href="/audit" class="sitenav__link">Audit</a>
+    <a href="/about" class="sitenav__link">About</a>
     <a href="/blog" class="sitenav__link">Blog</a>
   </div>
   <a class="sitenav__pill" href="/book">Book a call</a>
@@ -128,12 +162,19 @@ import GlassNav from '../../components/GlassNav.astro';
            architecture of the offer, drawn rather than described. -->
       <div class="eng__schematic" data-e-in aria-hidden="true">
         {MODULES.map((mo) => (
-          <span class="eng__schip" style={`--acc:${mo.accent}; --acc-t:${mo.accT}`}>
-            <svg class="eng__mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-              {RING.map((a) => (
-                <path d="M24 10A14 14 0 0 1 34.7 15" transform={`rotate(${a} 24 24)`} />
-              ))}
-            </svg>
+          <span class="eng__schip" style={`--acc:${mo.accent}; --acc-t:${mo.accT}; --mark:${LOGO_COLOR[mo.slug] ?? mo.accT}`}>
+            {LOGO_IMG[mo.slug] ? (
+              <img class="eng__logo" src={LOGO_IMG[mo.slug]} width="256" height="256" decoding="async" alt="" aria-hidden="true" />
+            ) : (
+              <svg class="eng__mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <g class="eng__ring">
+                  {RING.map((a) => (
+                    <path d="M24 10A14 14 0 0 1 34.7 15" transform={`rotate(${a} 24 24)`} />
+                  ))}
+                </g>
+                <g class="eng__glyph" set:html={EMBLEM[mo.slug]} />
+              </svg>
+            )}
             <b class="eng__schnum mono">{mo.num}</b>
             <span class="eng__schname">{mo.name}</span>
             <span class="eng__schverb">{mo.verb}</span>
@@ -146,33 +187,272 @@ import GlassNav from '../../components/GlassNav.astro';
     </div>
   </header>
 
+
   <!-- ── the four systems ── -->
   <section class="eng__systems" aria-label="The four systems">
     <div class="eng__inner">
-      <p class="eng__seyebrow mono" data-e-in>The systems</p>
-      <h2 class="eng__h2" data-e-in>Four installations.<br />Each accountable to one number.</h2>
-      <div class="eng__rows">
-        {MODULES.map((mo) => (
-          <a class="eng__row" href={`/engine/${mo.slug}`} style={`--acc:${mo.accent}; --acc-t:${mo.accT}`} data-e-in>
-            <span class="eng__rownum mono">{mo.num}</span>
-            <span class="eng__rowmain">
-              <span class="eng__rowhead">
-                <strong class="eng__rowname">{mo.name}</strong>
-                <em class="eng__rowverb">{mo.verb}</em>
-                <i class="eng__rowstatus mono">{mo.status}</i>
-              </span>
-              <span class="eng__rowline">{mo.line}</span>
-              <span class="eng__rowmetric mono"><i aria-hidden="true"></i>Moves one number: {mo.metric}</span>
-            <svg class="eng__mark eng__mark--row" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-              {RING.map((a) => (
-                <path d="M24 10A14 14 0 0 1 34.7 15" transform={`rotate(${a} 24 24)`} />
-              ))}
-            </svg>
-            </span>
-            <svg class="eng__rowarrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
-        ))}
+      {/* Split header — statement left, the qualifier right. Keeps the serif
+          line short enough to break well while the supporting copy carries
+          the detail that used to crowd it. */}
+      <div class="eng__shead">
+        <div data-e-in>
+          <p class="eng__seyebrow mono">The systems</p>
+          <h2 class="eng__h2">Four installations.<br />Each accountable<br />to one number.</h2>
+        </div>
+        <div class="eng__sheadside" data-e-in>
+          <p class="eng__sheadlede">Every system is installed on your data and your instances, operated by one senior team, and reporting into a single metrics layer. Run one. Run all four.</p>
+          <ul class="eng__sheadmeta">
+            {MODULES.map((mo) => (
+              <li style={`--acc:${mo.accent}`}><i aria-hidden="true"></i><b class="mono">{mo.name}</b><span class="mono">{mo.metric}</span></li>
+            ))}
+          </ul>
+        </div>
       </div>
+
+      {/* Four full-width system cards. The whole card is the link; the CTA
+          pill inside is a span (one target, one tab stop). Each carries a
+          native, animated dashboard thumbnail on the right. */}
+      <div class="ec-grid">
+
+        {/* ── 01 · VISIBILITY ── */}
+        <a class="ec" href="/engine/visibility" style="--ca:#9a7b43" data-e-in data-ec="visibility" aria-label="Visibility — get discovered">
+          <span class="ec__radar" aria-hidden="true"><span class="ec__radarspin"></span><i></i></span>
+          <i class="ec__status is-live" style="--sd:#c04a30" aria-hidden="true"><b></b>Live</i>
+          <span class="ec__left">
+            <span class="ec__num mono">01</span>
+            <span class="ec__name">Visibility</span>
+            <em class="ec__verb">Get discovered.</em>
+            <span class="ec__line">Buyers ask AI before they search your name. This system puts you inside the answer — 100+ buying questions mapped, engineered, and re-scored monthly against your competitors.</span>
+            <span class="ec__foot">
+              <span class="ec__pill">Explore Visibility<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ec__metric">Share of Answer</span>
+            </span>
+          </span>
+          <span class="ec__right">
+            <span class="ec__dash">
+              <span class="ec__dashbody">
+                <span class="ecv__prompt">
+                  <p><span data-ec-type>What are the best growth partners for B2B SaaS companies?</span><span class="ecv__caret" data-ec-caret></span></p>
+                  <span class="ecv__send" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 12l16-7-7 16-2.5-6.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+                </span>
+                <span data-ec-reveal>
+                  <span class="ecv__ovhead">
+                    <svg class="ecv__spark4" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7z"/></svg>
+                    <b>AI Overview</b>
+                    <span class="ecv__sources">Sources<i class="ecv__srcdot"></i><i class="ecv__srcdot"></i><i class="ecv__srcdot"></i>+3</span>
+                  </span>
+                  <p class="ecv__body">Based on expertise, client results, and market presence, here are the top growth partners for B2B SaaS companies:</p>
+                  <ul class="ecv__ranks">
+                    <li class="ecv__rank ecv__rank--top" data-ec-row>
+                      <span class="ecv__rk">1</span>
+                      <span class="ecv__logo">ORL<br/>MEDIA</span>
+                      <span><span class="ecv__rname">ORL Media</span><br/><span class="ecv__rdesc">AI search visibility, demand generation &amp; growth systems.</span></span>
+                      <span class="ecv__rmetric"><span class="ecv__rpct">↑<span data-count="72" data-suffix="%">0%</span></span><br/><span class="ecv__rlabel">Visibility</span></span>
+                    </li>
+                    <li class="ecv__rank" data-ec-row>
+                      <span class="ecv__rk">2</span>
+                      <span class="ecv__rname" style="flex:1">Competitor A</span>
+                      <span class="ecv__rpct" style="color:var(--ink-3)">↑<span data-count="24" data-suffix="%">0%</span></span>
+                    </li>
+                    <li class="ecv__rank" data-ec-row>
+                      <span class="ecv__rk">3</span>
+                      <span class="ecv__rname" style="flex:1">Competitor B</span>
+                      <span class="ecv__rpct" style="color:var(--ink-3)">↑<span data-count="11" data-suffix="%">0%</span></span>
+                    </li>
+                  </ul>
+                  <span class="ecv__foot" data-ec-row>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" stroke="currentColor" stroke-width="1.5"/></svg>
+                    Answer based on <span data-count="36">0</span> sources
+                    <span class="ecv__viewall">View all<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+        {/* ── 02 · SIGNALS ── */}
+        <a class="ec" href="/engine/signals" style="--ca:#9a7b43" data-e-in data-ec="signals" aria-label="Signals — find demand">
+          <span class="ec__radar" aria-hidden="true"><span class="ec__radarspin"></span><i></i></span>
+          <i class="ec__status" style="--sd:#c9902f" aria-hidden="true"><b></b>Limited seats</i>
+          <span class="ec__left">
+            <span class="ec__num mono">02</span>
+            <span class="ec__name">Signals</span>
+            <em class="ec__verb">Find demand.</em>
+            <span class="ec__line">Roughly 5% of your market is in a buying window right now. This system reads signal convergence — hiring, stack changes, competitor churn — and tells you which 5%, with the evidence attached.</span>
+            <span class="ec__foot">
+              <span class="ec__pill">Explore Signals<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ec__metric">Qualified meetings</span>
+            </span>
+          </span>
+          <span class="ec__right">
+            <span class="ec__dash">
+              <span class="ec__dashbar">
+                <span class="ec__dashtitle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 20v-5M9 20V9M14 20v-8M19 20V5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Live Signal Feed</span>
+                <span class="ec__dashlive"><b></b>Live</span>
+              </span>
+              <span class="ec__dashbody" style="padding-top:0.4rem">
+                <span class="ecs__row" data-ec-row>
+                  <span class="ecs__ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="4" y="7" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 7V5h6v2" stroke="currentColor" stroke-width="1.6"/></svg></span>
+                  <span class="ecs__mid"><span class="ecs__t">Hiring Surge</span><br/><span class="ecs__s">12 new growth roles</span></span>
+                  <span class="ec__badge">High Intent</span>
+                  <svg class="ec__spark" viewBox="0 0 46 22" preserveAspectRatio="none" aria-hidden="true"><path data-spark d="M1 18 L10 15 L18 16 L27 9 L36 10 L45 3"/></svg>
+                </span>
+                <span class="ecs__row" data-ec-row>
+                  <span class="ecs__ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4-8 4-8-4 8-4zM4 12l8 4 8-4M4 16l8 4 8-4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+                  <span class="ecs__mid"><span class="ecs__t">Tech Stack Change</span><br/><span class="ecs__s">Added Segment + Intercom</span></span>
+                  <span class="ec__badge">High Intent</span>
+                  <svg class="ec__spark" viewBox="0 0 46 22" preserveAspectRatio="none" aria-hidden="true"><path data-spark d="M1 16 L10 17 L18 11 L27 12 L36 6 L45 4"/></svg>
+                </span>
+                <span class="ecs__row" data-ec-row>
+                  <span class="ecs__ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="currentColor" stroke-width="1.6"/></svg></span>
+                  <span class="ecs__mid"><span class="ecs__t">Competitor Churn</span><br/><span class="ecs__s">3 customers left</span></span>
+                  <span class="ec__badge ec__badge--rose">Medium Intent</span>
+                  <svg class="ec__spark" viewBox="0 0 46 22" preserveAspectRatio="none" aria-hidden="true"><path data-spark d="M1 8 L10 10 L18 9 L27 13 L36 12 L45 15"/></svg>
+                </span>
+                <span class="ecs__row" data-ec-row>
+                  <span class="ecs__ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v8M9.5 10.2c0-1.2 1.1-1.8 2.5-1.8s2.5.7 2.5 1.6-1 1.4-2.5 1.6-2.5.6-2.5 1.6 1.1 1.6 2.5 1.6 2.5-.6 2.5-1.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+                  <span class="ecs__mid"><span class="ecs__t">Funding Activity</span><br/><span class="ecs__s">Series B raised</span></span>
+                  <span class="ec__badge ec__badge--rose">Medium Intent</span>
+                  <svg class="ec__spark ec__spark--pos" viewBox="0 0 46 22" preserveAspectRatio="none" aria-hidden="true"><path data-spark d="M1 17 L10 13 L18 14 L27 8 L36 9 L45 2"/></svg>
+                </span>
+                <span class="ecs__foot" data-ec-row>
+                  <span class="ec__cap"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M8 12l3 3 5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Signals scanned today</span>
+                  <span class="ecs__count"><span data-count="128">0</span></span>
+                </span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+        {/* ── 03 · PROOF ── */}
+        <a class="ec" href="/engine/proof" style="--ca:#3e7d4f" data-e-in data-ec="proof" aria-label="Proof — win the deal">
+          <span class="ec__radar" aria-hidden="true"><span class="ec__radarspin"></span><i></i></span>
+          <i class="ec__status" style="--sd:#3e7d4f" aria-hidden="true"><b></b>3 seats</i>
+          <span class="ec__left">
+            <span class="ec__num mono">03</span>
+            <span class="ec__name">Proof</span>
+            <em class="ec__verb">Win the deal.</em>
+            <span class="ec__line">Deals die in security review, in committee, in silence. This system maps where yours stall, builds the third-party evidence that unsticks them, and fires it into live deals at the stall moment.</span>
+            <span class="ec__foot">
+              <span class="ec__pill">Explore Proof<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ec__metric">No-decision rate</span>
+            </span>
+          </span>
+          <span class="ec__right">
+            <span class="ec__dash">
+              <span class="ec__dashbar">
+                <span class="ec__dashtitle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" stroke="currentColor" stroke-width="1.6"/><path d="M9 12l2 2 4-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Proof Engine</span>
+                <span class="ec__dashlive"><b></b>Live</span>
+              </span>
+              <span class="ec__dashbody">
+                <span class="ec__tiles ecp__tiles3">
+                  <span class="ec__tile" data-ec-row><span class="ec__tilecap">Stalls Unstuck</span><span class="ec__tileval"><span data-count="27">0</span></span><span class="ec__up">↑<span data-count="38" data-suffix="%">0%</span></span><br/><span class="ec__tilesub">vs last 30 days</span></span>
+                  <span class="ec__tile" data-ec-row><span class="ec__tilecap">Evidence Delivered</span><span class="ec__tileval"><span data-count="64">0</span></span><span class="ec__up">↑<span data-count="42" data-suffix="%">0%</span></span><br/><span class="ec__tilesub">vs last 30 days</span></span>
+                  <span class="ec__tile" data-ec-row><span class="ec__tilecap">Deals Influenced</span><span class="ec__tileval"><span data-count="18">0</span></span><span class="ec__up">↑<span data-count="29" data-suffix="%">0%</span></span><br/><span class="ec__tilesub">vs last 30 days</span></span>
+                </span>
+                <span class="ec__section">
+                  <span class="ec__sectionhead"><span class="ec__cap">Recent Proof Impact</span></span>
+                  <span class="ecr" data-ec-row>
+                    <span class="ecr__ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" stroke="currentColor" stroke-width="1.5"/></svg></span>
+                    <span class="ecr__mid"><span class="ecr__t">SOC 2 Type II Report</span><br/><span class="ecr__s">Security review cleared</span></span>
+                    <span class="ec__badge ec__badge--pos" data-ec-badge>Deal Advanced</span>
+                    <span class="ecr__val"><span class="ecr__amt">$240K</span><br/><span class="ecr__seg">Enterprise</span></span>
+                  </span>
+                  <span class="ecr" data-ec-row>
+                    <span class="ecr__ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="2.6" stroke="currentColor" stroke-width="1.5"/><path d="M4 19c0-3 2.5-5 5-5s5 2 5 5M15 9h5M15 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                    <span class="ecr__mid"><span class="ecr__t">Customer ROI Case Study</span><br/><span class="ecr__s">Finance committee convinced</span></span>
+                    <span class="ec__badge ec__badge--pos" data-ec-badge>Deal Advanced</span>
+                    <span class="ecr__val"><span class="ecr__amt">$185K</span><br/><span class="ecr__seg">Mid-Market</span></span>
+                  </span>
+                  <span class="ecr" data-ec-row>
+                    <span class="ecr__ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 7h8M6 10h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M6 4h9l3 3v13H6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+                    <span class="ecr__mid"><span class="ecr__t">G2 Verified Reviews Pack</span><br/><span class="ecr__s">Vendor evaluation passed</span></span>
+                    <span class="ec__badge ec__badge--pos" data-ec-badge>Deal Closed</span>
+                    <span class="ecr__val"><span class="ecr__amt">$120K</span><br/><span class="ecr__seg">SMB</span></span>
+                  </span>
+                </span>
+              </span>
+              <span class="ec__dashfoot">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7l6 6 4-4 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>&nbsp;No-decision rate down <span data-count="32" data-suffix="%">0%</span>
+                <span class="ec__ff">View all proof assets<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+        {/* ── 04 · PRICING ── */}
+        <a class="ec" href="/engine/pricing" style="--ca:#4f7a5f" data-e-in data-ec="pricing" aria-label="Pricing — monetize and expand">
+          <span class="ec__radar" aria-hidden="true"><span class="ec__radarspin"></span><i></i></span>
+          <i class="ec__status" style="--sd:#9a9386" aria-hidden="true"><b></b>In build</i>
+          <span class="ec__left">
+            <span class="ec__num mono">04</span>
+            <span class="ec__name">Pricing</span>
+            <em class="ec__verb">Monetize &amp; expand.</em>
+            <span class="ec__line">Expansion costs half of what acquisition does. This system instruments usage, tests packaging against real conversion, and fires expansion plays the week an account is ready.</span>
+            <span class="ec__foot">
+              <span class="ec__pill">Explore Pricing<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ec__metric">Net revenue / account</span>
+            </span>
+          </span>
+          <span class="ec__right">
+            <span class="ec__dash">
+              <span class="ec__dashbar">
+                <span class="ec__dashtitle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v8M9.5 10.2c0-1.2 1.1-1.8 2.5-1.8s2.5.7 2.5 1.6-1 1.4-2.5 1.6-2.5.6-2.5 1.6 1.1 1.6 2.5 1.6 2.5-.6 2.5-1.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Pricing Performance</span>
+                <span class="ec__dashsel">This Week<svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </span>
+              <span class="ec__dashbody">
+                <span class="ec__tiles ecp__tiles4">
+                  <span class="ec__tile" data-ec-row><span class="ec__tilecap">Net Revenue / Account</span><span class="ec__tileval">$<span data-count="8420" data-commas>0</span></span><span class="ec__up">↑<span data-count="18" data-suffix="%">0%</span></span></span>
+                  <span class="ec__tile" data-ec-row><span class="ec__tilecap">Expansion MRR</span><span class="ec__tileval">$<span data-count="230400" data-commas>0</span></span><span class="ec__up">↑<span data-count="24" data-suffix="%">0%</span></span></span>
+                  <span class="ec__tile" data-ec-row><span class="ec__tilecap">Conversion Uplift</span><span class="ec__tileval"><span data-count="32" data-suffix="%">0%</span></span><span class="ec__up">↑<span data-count="14" data-suffix="%">0%</span></span></span>
+                  <span class="ec__tile" data-ec-row><span class="ec__tilecap">At-Risk Revenue</span><span class="ec__tileval">$<span data-count="96120" data-commas>0</span></span><span class="ec__down">↓<span data-count="9" data-suffix="%">0%</span></span></span>
+                </span>
+                <span class="ec__section">
+                  <span class="ec__sectionhead"><span class="ec__cap">Packaging Test</span><span class="ec__sectionlink">View all tests<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+                  <span class="ecpk" data-ec-row>
+                    <span class="ecpk__tag">A</span>
+                    <span><span class="ecpk__name">Growth Pro</span><br/><span class="ecpk__plan">Current Plan</span></span>
+                    <span class="ecpk__col ecpk__conv"><span class="ecpk__big"><span data-count="21.3" data-decimals="1" data-suffix="%">0%</span></span><br/><span class="ecpk__sub">Conversion</span></span>
+                    <span class="ecpk__col"><span class="ecpk__big">$<span data-count="7920" data-commas>0</span></span><br/><span class="ecpk__sub">NRR / Account</span></span>
+                    <svg class="ec__spark ec__spark--pos ecpk__spark" viewBox="0 0 46 22" preserveAspectRatio="none" aria-hidden="true"><path data-spark d="M1 15 L10 14 L18 13 L27 11 L36 9 L45 8"/></svg>
+                  </span>
+                  <span class="ecpk" data-ec-row>
+                    <span class="ecpk__tag">B</span>
+                    <span><span class="ecpk__name">Growth Scale</span><br/><span class="ecpk__plan">Test Variant <span class="ec__badge ec__badge--pos" data-ec-badge>Winner</span></span></span>
+                    <span class="ecpk__col ecpk__conv"><span class="ecpk__big"><span data-count="28.9" data-decimals="1" data-suffix="%">0%</span></span><br/><span class="ecpk__sub">Conversion ↑7.6pp</span></span>
+                    <span class="ecpk__col"><span class="ecpk__big">$<span data-count="11340" data-commas>0</span></span><br/><span class="ecpk__sub">NRR / Account ↑43%</span></span>
+                    <svg class="ec__spark ec__spark--pos ecpk__spark" viewBox="0 0 46 22" preserveAspectRatio="none" aria-hidden="true"><path data-spark d="M1 17 L10 15 L18 12 L27 10 L36 5 L45 2"/></svg>
+                  </span>
+                </span>
+                <span class="ec__section">
+                  <span class="ec__sectionhead"><span class="ec__cap">Expansion Plays Triggered</span><span class="ec__sectionlink">View playbook<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+                  <span class="ecr" data-ec-row>
+                    <span class="ecr__ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 16l5-6 4 3 7-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    <span class="ecr__mid"><span class="ecr__t">Usage Spike Detected</span><br/><span class="ecr__s">3 accounts</span></span>
+                    <span class="ec__badge ec__badge--pos" data-ec-badge>Triggered</span>
+                    <span class="ecr__val"><span class="ecr__amt">$34K</span><br/><span class="ecr__seg">Potential</span></span>
+                  </span>
+                  <span class="ecr" data-ec-row>
+                    <span class="ecr__ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="2.6" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="9" r="2.2" stroke="currentColor" stroke-width="1.5"/><path d="M4 19c0-2.8 2.2-4.6 5-4.6s5 1.8 5 4.6M15 18c0-1.4.6-2.6 1.6-3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                    <span class="ecr__mid"><span class="ecr__t">Seat Expansion Opportunity</span><br/><span class="ecr__s">5 accounts</span></span>
+                    <span class="ec__badge ec__badge--pos" data-ec-badge>Triggered</span>
+                    <span class="ecr__val"><span class="ecr__amt">$28K</span><br/><span class="ecr__seg">Potential</span></span>
+                  </span>
+                  <span class="ecr" data-ec-row>
+                    <span class="ecr__ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.3 6.3H21l-5.3 4 2 6.4L12 16l-5.7 3.7 2-6.4L3 9.3h6.7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></span>
+                    <span class="ecr__mid"><span class="ecr__t">Premium Feature Adoption</span><br/><span class="ecr__s">2 accounts</span></span>
+                    <span class="ec__badge ec__badge--pos" data-ec-badge>Triggered</span>
+                    <span class="ecr__val"><span class="ecr__amt">$22K</span><br/><span class="ecr__seg">Potential</span></span>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+      </div>
+
     </div>
   </section>
 
@@ -276,7 +556,7 @@ import GlassNav from '../../components/GlassNav.astro';
   <section class="eng__final" aria-label="Start">
     <div class="eng__inner" data-e-in>
       <p class="eng__finalline">Start with the audit. <em>See what buyers see.</em></p>
-      <a class="eng__finalbtn" href="/book">Start with the AI Visibility Audit
+      <a class="eng__finalbtn" href="/audit">Start with the AI Visibility Audit
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <p class="eng__finalmeta mono">Fixed scope &middot; 10 business days &middot; no retainer required</p>
@@ -340,6 +620,162 @@ import GlassNav from '../../components/GlassNav.astro';
         if (gsap.getProperty(el, 'opacity') === 0) gsap.set(el, { autoAlpha: 1, y: 0 });
       });
     }, 5000);
+  }
+</script>
+
+<script>
+  /* ══════════ engine card dashboards ══════════
+     Each of the four cards carries a native, animated dashboard. On first
+     viewport entry a per-card timeline runs ONCE: (visibility) the prompt
+     types, then the AI overview reveals; rows rise in sequence, sparklines
+     draw left→right, badges fade after their row, and every [data-count]
+     number counts from 0 to its value.
+
+     No new dependency — gsap (already imported) drives it all. Resting CSS is
+     the finished card, so reduced-motion and a JS failure both show the final
+     state with real numbers. */
+  import { gsap } from 'gsap';
+
+  const ecReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-ec]')];
+
+  /* ── reusable CountUp: ints, decimals, %, $, commas ── */
+  function fmt(el: HTMLElement, v: number) {
+    const dec = Number(el.dataset.decimals || 0);
+    let s = dec ? v.toFixed(dec) : String(Math.round(v));
+    if ('commas' in el.dataset) s = Number(s).toLocaleString('en-US');
+    return (el.dataset.prefix || '') + s + (el.dataset.suffix || '');
+  }
+  function setFinal(el: HTMLElement) { el.textContent = fmt(el, Number(el.dataset.count || 0)); }
+  function countUp(el: HTMLElement, tl: gsap.core.Timeline, at: number) {
+    const o = { v: 0 };
+    tl.to(o, {
+      v: Number(el.dataset.count || 0), duration: 1.1, ease: 'power2.out',
+      onUpdate: () => { el.textContent = fmt(el, o.v); },
+    }, at);
+  }
+
+  if (cards.length && !ecReduce) {
+    cards.forEach((card) => {
+      const typeEl = card.querySelector<HTMLElement>('[data-ec-type]');
+      const caret = card.querySelector<HTMLElement>('[data-ec-caret]');
+      const reveal = card.querySelector<HTMLElement>('[data-ec-reveal]');
+      const rows = [...card.querySelectorAll<HTMLElement>('[data-ec-row]')];
+      const badges = [...card.querySelectorAll<HTMLElement>('[data-ec-badge]')];
+      const sparks = [...card.querySelectorAll<SVGPathElement>('[data-spark]')];
+      const counts = [...card.querySelectorAll<HTMLElement>('[data-count]')];
+
+      /* hidden state — applied by JS, so no-JS keeps the finished card */
+      gsap.set(rows, { autoAlpha: 0, y: 10 });
+      gsap.set(badges, { autoAlpha: 0 });
+      if (reveal) gsap.set(reveal, { autoAlpha: 0 });
+      let fullText = '';
+      if (typeEl) { fullText = typeEl.textContent || ''; typeEl.textContent = ''; }
+      sparks.forEach((p) => {
+        const len = p.getTotalLength();
+        gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+      });
+
+      /* force the finished state, unconditionally and idempotently — plain DOM
+         writes plus gsap.set (which applies synchronously, no ticker needed),
+         so it works even if the animation's rAF ticker never advanced */
+      function forceFinal() {
+        gsap.set(rows, { autoAlpha: 1, y: 0 });
+        gsap.set(badges, { autoAlpha: 1 });
+        if (reveal) gsap.set(reveal, { autoAlpha: 1 });
+        sparks.forEach((p) => gsap.set(p, { strokeDashoffset: 0 }));
+        if (typeEl) typeEl.textContent = fullText;
+        if (caret) gsap.set(caret, { autoAlpha: 0 });
+        counts.forEach(setFinal);
+      }
+
+      let played = false;
+      function play() {
+        if (played) return;
+        played = true;
+        /* self-heal: whatever the animation's fate, this card is guaranteed
+           finished 6s after it starts. Fires off the timer (not rAF), so a
+           stalled or interrupted timeline can never leave it half-built. */
+        setTimeout(forceFinal, 6000);
+        const tl = gsap.timeline({ delay: 0.15 });
+        let t = 0;
+
+        /* 1 — typewriter (visibility) */
+        if (typeEl && fullText) {
+          const chars = fullText.length;
+          const dur = Math.min(1.1, chars * 0.016);
+          tl.to({ i: 0 }, {
+            i: chars, duration: dur, ease: 'none',
+            onUpdate() { typeEl.textContent = fullText.slice(0, Math.round(this.targets()[0].i)); },
+          }, 0);
+          t = dur + 0.1;
+          if (caret) tl.to(caret, { autoAlpha: 0, duration: 0.2 }, t);
+          if (reveal) tl.to(reveal, { autoAlpha: 1, duration: 0.35 }, t);
+          t += 0.25;
+        } else if (reveal) {
+          tl.to(reveal, { autoAlpha: 1, duration: 0.35 }, 0);
+        }
+
+        /* 2 — rows rise in sequence, sparks draw with them */
+        rows.forEach((row, i) => {
+          const at = t + i * 0.09;
+          tl.to(row, { autoAlpha: 1, y: 0, duration: 0.42, ease: 'power2.out' }, at);
+          const spark = row.querySelector<SVGPathElement>('[data-spark]');
+          if (spark) tl.to(spark, { strokeDashoffset: 0, duration: 0.7, ease: 'power2.out' }, at + 0.1);
+          const badge = row.querySelector<HTMLElement>('[data-ec-badge]');
+          if (badge) tl.to(badge, { autoAlpha: 1, duration: 0.3 }, at + 0.28);
+        });
+
+        /* any sparks not inside a row (none currently) draw at the end */
+        sparks.filter((s) => !s.closest('[data-ec-row]')).forEach((s, i) =>
+          tl.to(s, { strokeDashoffset: 0, duration: 0.7, ease: 'power2.out' }, t + i * 0.1));
+
+        /* badges not tied to a row */
+        badges.filter((b) => !b.closest('[data-ec-row]')).forEach((b, i) =>
+          tl.to(b, { autoAlpha: 1, duration: 0.3 }, t + 0.4 + i * 0.1));
+
+        /* 3 — numbers count up, once the content is arriving */
+        counts.forEach((c) => countUp(c, tl, t + 0.15));
+      }
+
+      /* Trigger the moment the card enters the viewport. IntersectionObserver
+         is the primary path; a scroll/resize check is the fallback for
+         environments where IO is flaky or never composites. We deliberately do
+         NOT force the finished state on a timer — the systems section sits well
+         down the page, so a visitor who takes >9s to reach it must still see
+         the animation run rather than arrive to find every number already
+         static. A card below the fold simply waits at its resting (hidden)
+         state until it is actually scrolled into view. */
+      function tryPlay() {
+        if (played) return true;
+        const r = card.getBoundingClientRect();
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        if (r.top < vh * 0.94 && r.bottom > vh * 0.06) { play(); return true; }
+        return false;
+      }
+
+      const io = new IntersectionObserver(([e], o) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        play();
+      }, { threshold: 0.3, rootMargin: '0px 0px -6%' });
+      io.observe(card);
+
+      const onScrollEc = () => {
+        if (tryPlay()) {
+          window.removeEventListener('scroll', onScrollEc);
+          window.removeEventListener('resize', onScrollEc);
+        }
+      };
+      window.addEventListener('scroll', onScrollEc, { passive: true });
+      window.addEventListener('resize', onScrollEc, { passive: true });
+      tryPlay(); /* in case the card is already in view on load */
+    });
+  } else {
+    /* reduced motion: format the numbers to their final values (markup ships
+       them at 0) and leave everything else at its resting, visible state */
+    cards.forEach((card) =>
+      card.querySelectorAll<HTMLElement>('[data-count]').forEach(setFinal));
   }
 </script>
 </body>

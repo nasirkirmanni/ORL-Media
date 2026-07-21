@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ORL — OG Card Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ═══════════════════════════════════════════════════════════
+   OG CARD STUDIO — renders all seven social cards at exactly
+   1200×630 using the site's real tokens and fonts.
+
+   Cards are NOT css-scaled: they render at true pixel size so
+   the export is always exact. Use Ctrl/Cmd+minus to zoom the
+   browser for preview — browser zoom doesn't alter offsetWidth,
+   so captures stay 1200×630 regardless.
+
+   Not in src/pages or public/ — zero production footprint.
+   ═══════════════════════════════════════════════════════════ */
+
+:root{
+  --ink:#1f1d19; --ivory:#f6f2ea; --card:#fdfbf6; --border:#e6ddcc;
+  --muted:#6f675a; --gold:#c9a86a; --gold-text:#82632f;
+  --dark-a:#1b1815; --dark-b:#121009; --dark-ink:#f3efe6; --dark-muted:#b5ac9c;
+  --vx:#2e5cff; --sx:#c98b32; --px:#3e8e5a; --pr:#2b7f86;
+  --vx-d:#8fa4ff; --sx-d:#d9a45c; --px-d:#6fbb90; --pr-d:#64b4bb;
+  --serif:'Instrument Serif',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --sans:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;padding:40px;background:#2a2724;color:#e8e1d4;
+  font-family:var(--sans);
+}
+h1{font-family:var(--serif);font-weight:400;font-size:32px;margin:0 0 6px}
+.hint{font-family:var(--mono);font-size:12px;line-height:1.7;color:#a89f8f;max-width:1200px;margin:0 0 8px}
+.hint b{color:#e8e1d4}
+.bar{display:flex;gap:10px;align-items:center;margin:18px 0 34px;flex-wrap:wrap}
+button{
+  font-family:var(--mono);font-size:12px;letter-spacing:.04em;
+  padding:9px 16px;border-radius:99px;border:1px solid #4a453e;
+  background:#38342e;color:#e8e1d4;cursor:pointer;transition:background .2s;
+}
+button:hover{background:#454039}
+button.primary{background:#c9a86a;color:#1b1815;border-color:#c9a86a;font-weight:500}
+button.primary:hover{background:#d8ba80}
+.status{font-family:var(--mono);font-size:12px;color:#8fbf9f}
+
+.slot{margin:0 0 46px}
+.slot__head{
+  display:flex;align-items:center;gap:14px;margin:0 0 12px;
+  font-family:var(--mono);font-size:12px;color:#a89f8f;
+}
+.slot__head b{color:#e8e1d4;font-weight:500}
+.slot__head span{color:#6e675d}
+
+/* ── the card itself: exact export dimensions ── */
+.card{
+  position:relative;width:1200px;height:630px;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+/* film grain — kills the flat-fill look at feed size */
+.card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.055;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+}
+.card--dark{
+  background:radial-gradient(120% 130% at 50% 0%, var(--dark-a), var(--dark-b) 72%);
+  color:var(--dark-ink);
+}
+.card--ivory{background:#f6f2ea;color:#1f1d19}
+
+/* ── 1 · default ── */
+.d{align-items:center;justify-content:center;text-align:center;padding:56px 80px}
+.d__label{
+  font-family:var(--mono);font-size:26px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold);margin:0;
+}
+.d__head{
+  font-family:var(--serif);font-weight:400;font-size:72px;line-height:1.08;
+  letter-spacing:-.015em;margin:34px 0 0;color:#fff;
+}
+/* every line is an explicit no-wrap block — see note above */
+.d__head span,.d__head em{display:block;white-space:nowrap}
+.d__head em{font-style:italic;color:var(--gold)}
+.d__strip{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:52px}
+.d__rule{position:relative;width:420px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.d__dots{position:absolute;inset:0;display:flex;justify-content:space-evenly;align-items:center}
+.d__dots i{width:9px;height:9px;border-radius:50%;display:block}
+.d__cap{font-family:var(--mono);font-size:15px;letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
+
+/* ── 2 · flagship article ── */
+.f{flex-direction:row;align-items:center;gap:56px;padding:70px 80px}
+.f__left{width:544px;flex:none}
+.f__kicker{
+  font-family:var(--mono);font-size:20px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold-text);margin:0;
+}
+.f__head{
+  font-family:var(--serif);font-weight:400;font-size:62px;line-height:1.08;
+  letter-spacing:-.015em;margin:26px 0 0;color:var(--ink);
+}
+.f__meta{
+  display:flex;align-items:center;gap:10px;margin:30px 0 0;
+  font-family:var(--mono);font-size:16px;color:var(--muted);
+}
+.f__meta i{width:7px;height:7px;border-radius:50%;background:var(--px);display:block}
+.f__fig{flex:none;width:440px}
+.f__fig svg{display:block;width:100%;height:auto}
+
+/* ── 3 · engine ── */
+.e{align-items:center;justify-content:center;text-align:center;padding:60px 80px}
+.e__label{font-family:var(--mono);font-size:22px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0}
+.e__head{
+  font-family:var(--serif);font-weight:400;font-size:66px;line-height:1.1;
+  letter-spacing:-.015em;margin:26px 0 0;color:#fff;
+}
+.e__head span,.e__head em{display:block;white-space:nowrap}
+.e__head em{font-style:italic;color:var(--gold)}
+.e__sch{display:grid;grid-template-columns:repeat(4,150px);gap:18px;margin-top:48px}
+.e__chip{display:flex;flex-direction:column;align-items:center}
+.e__chip b{font-family:var(--mono);font-size:17px;font-weight:500;margin-bottom:5px}
+.e__chip span{font-family:var(--mono);font-size:16px;color:var(--dark-muted);letter-spacing:.05em}
+.e__chip i{width:1.5px;height:24px;margin-top:11px;background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,.05))}
+.e__bar{
+  width:636px;margin-top:14px;padding:11px 0;text-align:center;
+  border:1px solid rgba(201,168,106,.4);border-radius:9px;background:rgba(201,168,106,.07);
+  font-family:var(--mono);font-size:15px;letter-spacing:.24em;color:var(--gold);
+}
+
+/* ── 4-7 · modules ── */
+.m{justify-content:center;padding:70px 80px}
+/* Text column stops short of the watermark. Sized against the WIDEST
+   numeral ("02"/"04" start ~x895, narrower "01" starts ~x954), so the
+   clearance holds on every module rather than only the first. */
+.m__label,.m__name,.m__verb,.m__metric{max-width:760px;white-space:nowrap}
+.m__wm{
+  position:absolute;right:56px;top:50%;transform:translateY(-50%);
+  font-family:var(--serif);font-size:330px;line-height:.8;
+  opacity:.15;pointer-events:none;
+}
+.m__label{
+  position:relative;font-family:var(--mono);font-size:20px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold);margin:0;
+}
+.m__name{
+  position:relative;font-family:var(--serif);font-weight:400;font-size:104px;
+  line-height:1;letter-spacing:-.02em;margin:22px 0 0;color:#fff;
+}
+.m__verb{position:relative;font-family:var(--serif);font-style:italic;font-size:44px;margin:14px 0 0}
+.m__metric{
+  position:relative;display:flex;align-items:center;gap:11px;margin:40px 0 0;
+  font-family:var(--mono);font-size:17px;letter-spacing:.05em;color:var(--dark-muted);
+}
+.m__metric i{width:8px;height:8px;border-radius:50%;display:block}
+</style>
+</head>
+<body>
+
+<h1>ORL — OG Card Studio</h1>
+<p class="hint">
+  Seven cards at exactly <b>1200×630</b>. Rendered at true pixel size, so exports are always exact —
+  use <b>Ctrl/Cmd + &minus;</b> to zoom out for preview; browser zoom does not affect the capture.<br />
+  <b>Export:</b> click Download on any card. If web fonts render wrong in the PNG, use the fallback:
+  DevTools &rarr; Elements &rarr; right-click the <b>.card</b> node &rarr; <b>Capture node screenshot</b>.<br />
+  Save into <b>public/og/</b> with the filename shown on each card.
+</p>
+<div class="bar">
+  <button onclick="dlAll()">Download all 7</button>
+  <span style="color:#6e675d;font-family:var(--mono);font-size:12px">format:</span>
+  <button id="fmt-jpeg" class="primary" onclick="setFmt('jpeg')">JPEG &middot; ~150KB</button>
+  <button id="fmt-png" onclick="setFmt('png')">PNG &middot; ~1.2MB</button>
+  <span class="status" id="status"></span>
+</div>
+
+<!-- ══ 1 · default ══ -->
+<div class="slot">
+  <p class="slot__head"><b>default.png</b><span>homepage &middot; /book &middot; /blog &middot; fallback</span>
+    <button onclick="dl('default')">Download</button></p>
+  <div class="card card--dark d" id="c-default">
+    <p class="d__label">ORL Media</p>
+    <h2 class="d__head"><span>We don’t run your marketing.</span><em>We install the machine.</em></h2>
+    <div class="d__strip">
+      <div class="d__rule">
+        <div class="d__dots">
+          <i style="background:var(--vx-d)"></i><i style="background:var(--sx-d)"></i>
+          <i style="background:var(--px-d)"></i><i style="background:var(--pr-d)"></i>
+        </div>
+      </div>
+      <p class="d__cap">Metrics Layer</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 2 · flagship article ══ -->
+<div class="slot">
+  <p class="slot__head"><b>buying-windows.png</b><span>the flagship article</span>
+    <button onclick="dl('buying-windows')">Download</button></p>
+  <div class="card card--ivory f" id="c-buying-windows">
+    <div class="f__left">
+      <p class="f__kicker">The ORL Journal &middot; Pipeline</p>
+      <h2 class="f__head">Buying windows: the missing layer in modern GTM.</h2>
+      <p class="f__meta"><i></i>31 min read &middot; orlmedia.com</p>
+    </div>
+    <div class="f__fig">
+      <!-- the article's signature lifecycle figure, simplified for card scale -->
+      <svg viewBox="0 0 440 300" aria-hidden="true">
+        <rect x="0" y="86" width="250" height="66" fill="#279a58" opacity=".10"/>
+        <rect x="250" y="86" width="190" height="66" fill="#b0532f" opacity=".10"/>
+        <line x1="14" y1="119" x2="426" y2="119" stroke="#e6ddcc" stroke-width="2"/>
+        <circle cx="46"  cy="119" r="8" fill="#279a58"/>
+        <circle cx="130" cy="119" r="8" fill="#279a58"/>
+        <circle cx="214" cy="119" r="8" fill="#279a58"/>
+        <circle cx="298" cy="119" r="8" fill="#b0532f"/>
+        <circle cx="382" cy="119" r="8" fill="#b0532f"/>
+        <g font-family="JetBrains Mono, monospace" font-size="13" fill="#4a463e" text-anchor="middle">
+          <text x="46"  y="166">Trigger</text>
+          <text x="130" y="166">Recognise</text>
+          <text x="214" y="166">Informal</text>
+          <text x="298" y="166">Evaluate</text>
+          <text x="382" y="166">Decide</text>
+        </g>
+        <g font-family="JetBrains Mono, monospace" font-size="13">
+          <text x="14" y="70" fill="#279a58">SIGNAL-VISIBLE</text>
+          <text x="426" y="70" fill="#b0532f" text-anchor="end">EVERYONE SEES IT</text>
+        </g>
+        <text x="14" y="214" font-family="JetBrains Mono, monospace" font-size="13" fill="#6f675a">
+          You win or lose here &mdash; before the form fill.
+        </text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3 · engine ══ -->
+<div class="slot">
+  <p class="slot__head"><b>engine.png</b><span>/engine flagship offer page</span>
+    <button onclick="dl('engine')">Download</button></p>
+  <div class="card card--dark e" id="c-engine">
+    <p class="e__label">The ORL Growth Engine</p>
+    <h2 class="e__head"><span>Four systems.</span><em>One layer of truth.</em></h2>
+    <div class="e__sch">
+      <span class="e__chip"><b style="color:var(--vx-d)">01</b><span>Visibility</span><i></i></span>
+      <span class="e__chip"><b style="color:var(--sx-d)">02</b><span>Signals</span><i></i></span>
+      <span class="e__chip"><b style="color:var(--px-d)">03</b><span>Proof</span><i></i></span>
+      <span class="e__chip"><b style="color:var(--pr-d)">04</b><span>Pricing</span><i></i></span>
+    </div>
+    <div class="e__bar">Metrics Layer</div>
+  </div>
+</div>
+
+<!-- ══ 4-7 · modules ══ -->
+<div class="slot">
+  <p class="slot__head"><b>visibility.png</b><span>/engine/visibility</span>
+    <button onclick="dl('visibility')">Download</button></p>
+  <div class="card card--dark m" id="c-visibility">
+    <span class="m__wm" style="color:var(--vx-d)">01</span>
+    <p class="m__label">System 01</p>
+    <h2 class="m__name">Visibility</h2>
+    <p class="m__verb" style="color:var(--vx-d)">Get discovered.</p>
+    <p class="m__metric"><i style="background:var(--vx-d)"></i>Moves one number: Share of Answer</p>
+  </div>
+</div>
+
+<div class="slot">
+  <p class="slot__head"><b>signals.png</b><span>/engine/signals</span>
+    <button onclick="dl('signals')">Download</button></p>
+  <div class="card card--dark m" id="c-signals">
+    <span class="m__wm" style="color:var(--sx-d)">02</span>
+    <p class="m__label">System 02</p>
+    <h2 class="m__name">Signals</h2>
+    <p class="m__verb" style="color:var(--sx-d)">Find demand.</p>
+    <p class="m__metric"><i style="background:var(--sx-d)"></i>Moves one number: Qualified meetings</p>
+  </div>
+</div>
+
+<div class="slot">
+  <p class="slot__head"><b>proof.png</b><span>/engine/proof</span>
+    <button onclick="dl('proof')">Download</button></p>
+  <div class="card card--dark m" id="c-proof">
+    <span class="m__wm" style="color:var(--px-d)">03</span>
+    <p class="m__label">System 03</p>
+    <h2 class="m__name">Proof</h2>
+    <p class="m__verb" style="color:var(--px-d)">Win the deal.</p>
+    <p class="m__metric"><i style="background:var(--px-d)"></i>Moves one number: No-decision rate</p>
+  </div>
+</div>
+
+<div class="slot">
+  <p class="slot__head"><b>pricing.png</b><span>/engine/pricing</span>
+    <button onclick="dl('pricing')">Download</button></p>
+  <div class="card card--dark m" id="c-pricing">
+    <span class="m__wm" style="color:var(--pr-d)">04</span>
+    <p class="m__label">System 04</p>
+    <h2 class="m__name">Pricing</h2>
+    <p class="m__verb" style="color:var(--pr-d)">Monetize &amp; expand.</p>
+    <p class="m__metric"><i style="background:var(--pr-d)"></i>Moves one number: Net revenue / account</p>
+  </div>
+</div>
+
+<script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<script>
+const NAMES = ['default','buying-windows','engine','visibility','signals','proof','pricing'];
+const status = (m) => document.getElementById('status').textContent = m;
+/* JPEG by default: the film grain makes PNG ~1.2MB per card, while JPEG at
+   q0.92 lands near 150KB with no visible difference at feed size. Platforms
+   scrape these synchronously, so weight matters. Flip with the toggle. */
+let FMT = 'jpeg';
+const setFmt = (f) => {
+  FMT = f;
+  document.getElementById('fmt-jpeg').classList.toggle('primary', f === 'jpeg');
+  document.getElementById('fmt-png').classList.toggle('primary', f === 'png');
+  status('format: ' + f.toUpperCase());
+};
+
+async function shot(name){
+  const node = document.getElementById('c-' + name);
+  // explicit size + pixelRatio 1 => exactly 1200×630, never DPR-doubled
+  const opts = { width: 1200, height: 630, pixelRatio: 1, cacheBust: true, style: { margin: '0' } };
+  // JPEG has no alpha — this colour fills anywhere the node doesn't paint.
+  // It MUST match the card or a light card exports on a dark ground.
+  const bg = node.classList.contains('card--ivory') ? '#f6f2ea' : '#121009';
+  return FMT === 'png'
+    ? htmlToImage.toPng(node, opts)
+    : htmlToImage.toJpeg(node, { ...opts, quality: 0.92, backgroundColor: bg });
+}
+async function dl(name){
+  try{
+    status('rendering ' + name + '…');
+    // render twice — first pass warms the font cache, second captures it
+    await shot(name);
+    const url = await shot(name);
+    const kb = Math.round(atob(url.split(',')[1]).length / 1024);
+    const a = document.createElement('a');
+    a.download = name + '.' + (FMT === 'png' ? 'png' : 'jpg');
+    a.href = url; a.click();
+    status(a.download + ' downloaded (' + kb + ' KB)');
+  }catch(e){
+    status('export failed — use the DevTools fallback (see note above)');
+    console.error(e);
+  }
+}
+async function dlAll(){
+  for(const n of NAMES){ await dl(n); await new Promise(r => setTimeout(r, 500)); }
+  status('all 7 downloaded → move them into public/og/');
+}
+document.fonts.ready.then(() => status('fonts loaded — ready to export (JPEG)'));
+</script>
+</body>
+</html>

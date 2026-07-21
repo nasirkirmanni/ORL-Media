@@ -11,17 +11,129 @@
 
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-ui: 'Inter', system-ui, sans-serif;
+  /* Giant-display face — the oversized single words (currently only
+     /engine/visibility's hero). Switzer Black is a Helvetica-Neue-lineage
+     neo-grotesk, self-hosted below, free under the ITF licence.
+     ⚠ The 4.65em multiplier that visibility.css's clamp() is derived from is
+     a property of THIS typeface. Swapping in a licensed face (Neue Haas
+     Grotesk Display, Helvetica Neue 95) is a one-line change here — but the
+     multiplier must be re-measured or the hero word will overflow. */
+  --font-display-xl: 'Switzer', 'Switzer Fallback', 'Arial Black', sans-serif;
 }
 
 html, body {
   min-height: 100%;
   margin: 0;
-  overflow-x: hidden;        /* hero hijacks scroll while active; native scroll carries the sections below */
   background: var(--ink);
   color: var(--white);
   font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Reserve the scrollbar gutter permanently. The hero lock below toggles
+   overflow:hidden, which would otherwise remove the scrollbar and shift the
+   whole page ~15px sideways on every arm/release. */
+/* Switzer Black — the pinned wordmark's face. Self-hosted rather than pulled
+   from Fontshare: their API currently returns "Access to the Fontshare API has
+   been temporarily restricted" instead of CSS, so the face silently never
+   registers and the wordmark falls through the stack. Serving the woff2
+   ourselves also drops a third-party origin from the critical path.
+   Licence: ITF Free Font Licence — free for commercial use, redistribution
+   with the site is permitted. */
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer-900.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  /* swap, not block: the wordmark is decorative and sits below the fold, so a
+     fallback flash costs nothing and invisible text would cost a paint. */
+  font-display: swap;
+}
+
+/* Metric-matched fallback for Switzer Black.
+   Measured with fontTools against OTF/Switzer-Black.otf: the string
+   "VISIBILITY" sums to 5.092em of advances in Switzer Black but 6.002em in
+   Arial Black — 17.9% wider. At the hero's size that renders 351px of ink in
+   a 320px viewport, i.e. it overflows before the webfont lands.
+   size-adjust 84.8% (5.092/6.002) makes the fallback render at identical
+   width, so the swap-in is a shape change with zero reflow and zero overflow.
+   This is why font-display stays `swap` above: the flash is now free. */
+@font-face {
+  font-family: 'Switzer Fallback';
+  src: local('Arial Black'), local('Helvetica Neue Black'), local('Arial Bold');
+  size-adjust: 84.8%;
+  font-weight: 900;
+  font-style: normal;
+}
+
+/* Pierson — supplied as .ttf and installed here. Subset to Latin + common
+   punctuation, which took the regular cut from 109KB to 61KB; it could not be
+   converted to woff2 because brotli is not available in this environment, so
+   these stay .ttf and are correspondingly heavier than switzer's woff2.
+   All three cuts are declared, but a browser only downloads the weight it
+   actually uses — the wordmark uses 400, so thin and light cost nothing
+   unless something else asks for them. */
+@font-face {
+  font-family: 'Pierson';
+  src: url('/fonts/pierson-thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pierson';
+  src: url('/fonts/pierson-light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pierson';
+  src: url('/fonts/pierson-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+html { scrollbar-gutter: stable; }
+
+/* Full-bleed sections (100vw + negative margins) can spill sideways, so the
+   horizontal axis is clipped — but ONLY on <html>. This used to sit on
+   `html, body` together, and `overflow-x` on <body> makes body the scroll
+   container, which silently breaks `position: sticky` for everything inside
+   it: the Metrics layer measured as travelling in lockstep with the panel
+   meant to slide over it. On <html> alone the clip still holds and sticky
+   resolves against the viewport as intended. */
+html { overflow-x: hidden; }
+
+/* Contain descendant margins so they can't collapse out through <body>.
+   The site nav is position:sticky — in flow — and carries a 17.6px top
+   margin; with nothing containing it that margin collapsed through body,
+   started body's box 17.6px down the page, and let <html>'s near-black
+   background show as a dark band above the content. `overflow-x:hidden` on
+   body used to contain it as a side effect of the block formatting context it
+   created, but that BFC was also a scroll container, which is what silently
+   broke position:sticky. flow-root gives the containment without the
+   scroll container, so sticky and the margins both behave. */
+body { display: flow-root; }
+
+/* ── hero scroll lock ──
+   While the hero owns the wheel, the DOCUMENT must not scroll — not just the
+   wheel. The lock used to be input-only (a GSAP Observer calling
+   preventDefault on wheel/touch/pointer), which left every other scroll
+   channel wide open: dragging the scrollbar, clicking the scrollbar track,
+   middle-click autoscroll, find-in-page, and the browser's own scroll
+   restoration on reload. Any of those slid the page past hero 1 while the
+   slider still thought it was on slide 0 — the choppy, half-broken state.
+   This class is applied from JS, never in the markup, so a JS failure fails
+   open (page scrolls normally) rather than trapping the visitor. */
+html.hero-locked, html.hero-locked body { overflow: hidden; }
+/* scrollbar-gutter:stable reserves the gutter for auto/scroll containers but
+   NOT for overflow:hidden ones, so locking would otherwise widen the content
+   box by the scrollbar width and snap it back on release — measured at 15px
+   in Chrome. --sbw is written once from JS before the first lock; it lands at
+   0px on overlay-scrollbar platforms, where no compensation is wanted. */
+html.hero-locked { padding-right: var(--sbw, 0px); }
 
 ::selection { background: var(--accent); color: #fff; }
 
@@ -561,7 +673,11 @@ html, body {
   font-weight: 600;
   letter-spacing: -0.02em;
   text-transform: uppercase;
-  font-size: clamp(2rem, 7vw, 5.5rem);
+  /* +30%, matching the canvas. This <h2> is the no-JS / reduced-motion
+     fallback; unlike the canvas it wraps, so it has no clipping risk and can
+     take the full multiplier at every width.
+     Was: clamp(2rem, 7vw, 5.5rem) */
+  font-size: clamp(2.6rem, 9.1vw, 7.15rem);
   color: #111111;
   text-align: center;
   padding: 0 1rem;
@@ -2706,6 +2822,7 @@ html, body {
   --ml-px: #6fbb90;
   --ml-pr: #64b4bb;
   position: relative;
+  z-index: 1;
   width: 100vw;
   /* flush against the chapter flow. The old 5rem top margin was breathing
      room from when the chapters were ivory and this layer was the dark
@@ -2718,6 +2835,56 @@ html, body {
   padding: 4.5rem 1.5rem 4rem;
   overflow: hidden;
 }
+/* The stack pair. Bounding the sticky range here is load-bearing: without a
+   wrapper, .mlayer's containing block would be <body> and it would stay
+   pinned behind the Ladder and Journal for the rest of the page. */
+.stack { position: relative; }
+
+/* ── the stack reveal ──
+   Metrics holds at the top of the viewport while .why (z-index 2) slides up
+   over it, so the dark→ivory change never reads as a scroll seam.
+
+   top, not bottom: `bottom:0` sticky holds an element as you scroll UP toward
+   it — measured, it let both panels travel in lockstep with zero overlap.
+   `top:0` is what holds a panel while the next one rises over it.
+
+   Gated because top:0 sticks the instant the panel's top hits the ceiling: if
+   the panel were taller than the viewport, its footer row would be cropped
+   away and never seen.
+
+   The gate is a MEASURED class, not a media query. A media query has to
+   hardcode a viewport size, and the layer's own height moves with width (it
+   reflows to a 3-column strip below 1024px, 738px → 928px) while the viewport
+   moves with OS display scaling — a 1080p screen at 125% reports ~750 CSS px,
+   which any sensible hardcoded threshold locks out. So JS compares the layer's
+   real height against the real viewport and sets .stack-reveal when it fits.
+   No JS → no class → plain scroll with the seam ramp, which is a fine page. */
+html.stack-reveal .mlayer {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+}
+/* Tighter vertical padding in reveal mode: the layer only has to clear one
+   screen here, and reclaiming 48px decides the marginal cases (a scaled 1080p
+   display, or any window with a bookmarks bar eating the difference).
+   .stack-measure applies the same padding WITHOUT the sticky/min-height, so
+   the gate measures the height the layer will really have — measuring with
+   loose padding would make this reclaim decorative. */
+html.stack-reveal .mlayer,
+html.stack-measure .mlayer { padding-top: 3rem; padding-bottom: 2.5rem; }
+/* NB: the ramp is switched off further down the sheet, immediately after the
+   rule that defines it — the definition is ~2400 lines below this block and
+   would otherwise win on source order. */
+
+/* .mlayer used to inherit its monospace labels from `.orl3 .mono`. It lives
+   outside .orl3 now, and every .mono rule in this sheet is section-scoped —
+   there is no bare .mono — so the layer carries its own copy. */
+.mlayer .mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 /* gold hairlines seam the layer into the ivory above and below it */
 .mlayer::before, .mlayer::after {
   content: ''; position: absolute; left: 0; right: 0; height: 1px;
@@ -2916,7 +3083,9 @@ html, body {
    ═══════════════════════════════════════════════════════════ */
 .why {
   position: relative;
-  z-index: 1;
+  /* above the held Metrics layer — this is what makes .why read as a panel
+     sliding over it rather than the next thing in the scroll */
+  z-index: 2;
   background: #f6f2ea;
   color: #1f1d19;
   padding: 6rem 1.5rem 6.5rem;
@@ -3352,6 +3521,70 @@ html, body {
   overflow: hidden;
   padding-top: 4.5rem;       /* clearance under the floating island nav */
 }
+/* ══════════ PINNED SCENE + WORDMARK PASS ══════════
+   The scene holds at the top of the viewport while ORL MEDIA rises through it;
+   the page resumes once the wordmark clears. Gated on a measured fit rather
+   than a breakpoint — `top:0` sticky grabs the section the instant its top hits
+   the ceiling, so a scene taller than the viewport would sit with its lower
+   cards cropped for the whole pin. The scene measures 1013px, so it does NOT
+   fit a common 850px viewport; the canvas is scaled by whatever factor closes
+   the gap. Ungated, this is the ordinary scrolling section it was before. */
+html.s3dpin-on .s3dpin { height: 200vh; }
+/* Display, padding and flow are deliberately left alone. An earlier version
+   centred the canvas with flex, which turned it into a flex item — it stopped
+   honouring its own `width: min(1780px, 95vw)`, collapsed 1445px → 964px, and
+   dragged the whole card scatter left. Only sticky + a fixed height here; the
+   fitting is done by a transform, which is paint-time and moves nothing. */
+html.s3dpin-on .s3d {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+/* Scaled, not the section itself: the card parallax normalises the pointer
+   against .s3d's own rect, so shrinking .s3d would distort that mapping.
+   Transforming the canvas inside it leaves the rect maths untouched.
+   Origin is top centre so the scene shrinks toward the nav clearance it
+   already has, rather than drifting up out of it. */
+html.s3dpin-on .s3d__canvas {
+  transform: scale(var(--s3d-fit, 1));
+  transform-origin: top center;
+}
+
+.s3dmark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* anchored to the TOP of the stuck section — its top edge and the viewport's
+     are the same line, which keeps the travel independent of section height */
+  top: 0;
+  /* above the cards: the wordmark passes in FRONT of the scene */
+  z-index: 6;
+  transform: translate3d(0, var(--mark-y, 100vh), 0);
+  will-change: transform;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+}
+html:not(.s3dpin-on) .s3dmark { display: none; }
+
+.s3dmark__text {
+  display: block;
+  /* Pierson, self-hosted (see @font-face at the top of this file).
+     Weight 400, NOT 900: the supplied family tops out at Regular — there is no
+     bold or black cut. Asking for 900 would make the browser synthesise a fake
+     bold by smearing the outlines, which is visible and ugly at 280px. Switzer
+     stays as the fallback so the wordmark still lands if Pierson fails. */
+  font-family: 'Pierson', Switzer, Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  /* Sized by JS to span the viewport. A vw clamp can't: width per px of
+     font-size is a property of the typeface, so the multiplier is measured. */
+  font-size: var(--mark-size, 13vw);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: #26211a;
+  white-space: nowrap;
+}
+
 .s3d::before {
   /* soft studio light pooling toward the upper composition, like the reference */
   content: '';
@@ -4318,6 +4551,106 @@ body.blg-body .mono {
 .ins__all:hover svg { transform: translateX(4px); }
 .ins__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.4rem; margin-top: 2.8rem; }
 
+/* — centered, enlarged Journal header — */
+.ins__head.ins__head--center {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.9rem;
+}
+.ins__head--center .ins__eyebrow {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.9rem, 6vw, 4.8rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: #1f1d19;
+}
+.ins__head--center .ins__h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: #6f675a;
+  margin-top: 0.7rem;
+}
+.ins__head--center .ins__all { margin-top: 1rem; }
+
+/* ── closing CTA · work with us ─────────────────────────────── */
+.wcta {
+  position: relative;
+  z-index: 1;
+  background: #17150f;
+  color: #f6f2ea;
+  padding: 7rem 1.5rem 7.5rem;
+  border-top: 1px solid #2a261d;
+  text-align: center;
+  overflow: hidden;
+}
+.wcta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 90% at 50% 0%, rgba(201, 168, 106, 0.14), transparent 70%);
+  pointer-events: none;
+}
+.wcta__inner { position: relative; max-width: 46rem; margin: 0 auto; }
+.wcta .mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.wcta__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  color: #c9a86a;
+}
+.wcta__h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.8rem, 6.5vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  margin: 1rem 0 0;
+}
+.wcta__sub {
+  max-width: 34rem;
+  margin: 1.4rem auto 0;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: #b8b0a2;
+}
+.wcta__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 2.2rem;
+  padding: 1rem 2rem;
+  background: #f6f2ea;
+  color: #17150f;
+  border-radius: 99px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s;
+}
+.wcta__pill:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -12px rgba(201, 168, 106, 0.5); }
+.wcta__pill svg { transition: transform 0.2s ease; }
+.wcta__pill:hover svg { transform: translateX(4px); }
+.wcta__meta {
+  margin: 1.8rem 0 0;
+  font-size: 0.72rem;
+  color: #7d7566;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wcta__pill, .wcta__pill svg { transition: none; }
+  .wcta__pill:hover { transform: none; }
+}
+
 /* — article card (shared by teaser + /blog) — */
 .inscard {
   display: flex;
@@ -4913,242 +5246,6 @@ body.blg-body .mono {
   .bk__spin { animation-duration: 1.4s; }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   SECTION 2B — "where it breaks"
-   Editorial column grid on ivory. Four measures divided by
-   hairlines, one selected at a time, breakdown beneath.
-
-   Volume comes from SCALE AND RULE WEIGHT, not from darkness:
-   display heading, oversized numerals, 2px structural rules
-   against 1px dividers, and a tinted active column.
-   ═══════════════════════════════════════════════════════════ */
-.chk {
-  --c-bg: #f4f0e7;            /* a shade off section 2's #f6f2ea so the block
-                                 reads as its own measure without a hard edge */
-  --c-ink: #1f1d19;
-  --c-muted: #5c5548;
-  --c-rule: #cfc6b3;          /* structural rules — deliberately heavier than
-                                 the old #e6ddcc hairline, which disappeared */
-  --c-hair: #ded5c4;
-  --c-tint: #ebe5d8;          /* selected column */
-  position: relative;
-  z-index: 1;
-  isolation: isolate;          /* contains the backdrop's stacking context */
-  background: var(--c-bg);
-  color: var(--c-ink);
-  padding: clamp(3.5rem, 6.2vw, 5.4rem) clamp(1rem, 3.2vw, 2.6rem) clamp(3.75rem, 6.2vw, 5.6rem);
-}
-/* ── shader backdrop ──
-   Animated mesh gradient behind section 2B, mounted from the vanilla
-   @paper-design/shaders core (no React, no three.js — see
-   components/ShaderBackdrop.astro).
-
-   CONTRAST CONTRACT: every colour fed to the shader is clamped to a light
-   band whose darkest value is #ded7c4. The section's muted copy is #5c5548
-   and needs a ground at or above ~L*0.59 to hold 4.5:1; #ded7c4 clears it.
-   The veil below adds a second guarantee — it flattens the shader toward the
-   base ivory so no single frame can dip the ground under the type. Darkening
-   either the palette or the veil silently breaks the body copy.
-
-   The flat --c-bg stays painted underneath: if WebGL is unavailable, the
-   context is lost, or JS never runs, the section is unchanged. */
-.shbg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-  opacity: 0;
-  transition: opacity 0.9s ease;
-}
-.shbg.is-live { opacity: 1; }
-.shbg canvas { display: block; width: 100%; height: 100%; }
-/* The veil unifies the canvas with the flat fallback and softens banding.
-   It is NOT what protects contrast — measured against the darkest shader
-   colour (#ded7c4), the worst text on the section clears 5.13:1 with no veil
-   at all, so this started at 55% and was cut to 25% once that was known.
-   55% washed the shader out for a safety margin the palette already had. */
-.shbg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(244, 240, 231, 0.25);
-}
-/* everything in the section rides above the canvas */
-.chk__head, .chk__cols, .chk__panels { position: relative; z-index: 1; }
-
-.chk .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; text-transform: uppercase; }
-
-/* ── header: title left, range right, heavy rule under ── */
-.chk__head {
-  max-width: 88rem; margin: 0 auto;
-  display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 2rem; flex-wrap: wrap;
-  padding-bottom: clamp(1.15rem, 2vw, 1.7rem);
-  border-bottom: 2px solid var(--c-rule);
-}
-.chk__title {
-  margin: 0;
-  font-family: var(--font-display); font-weight: 400;
-  font-size: clamp(1.95rem, 4.4vw, 3.6rem);
-  line-height: 1.04; letter-spacing: -0.022em;
-  color: var(--c-ink);
-}
-.chk__title em { font-style: italic; color: var(--c-muted); }
-.chk__meta { display: flex; align-items: baseline; gap: 1.4rem; padding-bottom: 0.4rem; }
-.chk__range, .chk__hint { margin: 0; font-size: 0.6rem; letter-spacing: 0.2em; color: var(--c-muted); }
-.chk__hint { opacity: 0.75; }
-
-/* ── the four columns ── */
-.chk__cols {
-  max-width: 88rem; margin: 0 auto;
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-.chk__col {
-  position: relative;
-  display: flex; flex-direction: column;
-  /* generous inner padding is what makes a divided grid read as columns of a
-     page rather than as four boxes pushed together */
-  padding: clamp(1.35rem, 2.1vw, 2rem) clamp(0.95rem, 1.5vw, 1.5rem) clamp(1.2rem, 1.8vw, 1.6rem);
-  border: 0;
-  border-right: 1px solid var(--c-hair);
-  background: transparent;
-  font: inherit; color: inherit; text-align: left;
-  cursor: pointer;
-  transition: background-color 0.25s ease;
-}
-.chk__col:last-child { border-right: 0; }
-.chk__col:hover { background: rgba(31, 29, 25, 0.035); }
-.chk__col:focus-visible { outline: 2px solid var(--chk-acc); outline-offset: -4px; }
-/* selected: tint + a heavy accent cap, so selection never rests on colour alone */
-.chk__col[aria-selected='true'] { background: var(--c-tint); }
-.chk__col::before {
-  content: '';
-  position: absolute; left: 0; right: 0; top: 0; height: 3px;
-  background: var(--chk-acc);
-  transform: scaleX(0); transform-origin: 0 50%;
-  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.chk__col[aria-selected='true']::before { transform: scaleX(1); }
-
-.chk__num {
-  font-size: 0.6rem; letter-spacing: 0.16em;
-  color: var(--c-muted);
-  font-variant-numeric: tabular-nums;
-}
-.chk__svc {
-  margin-top: clamp(1.05rem, 2.2vw, 1.85rem);
-  font-size: 0.58rem; font-weight: 500; letter-spacing: 0.18em;
-  color: var(--chk-acc);
-}
-.chk__h {
-  margin-top: 0.75rem;
-  font-family: var(--font-display); font-weight: 400;
-  font-size: clamp(1.18rem, 1.7vw, 1.55rem);
-  line-height: 1.14; letter-spacing: -0.012em;
-  color: var(--c-ink);
-}
-.chk__body {
-  margin-top: 0.7rem;
-  font-size: 0.875rem; line-height: 1.6; color: var(--c-muted);
-}
-.chk__rule { margin: auto 0 0; padding-top: 1.25rem; border-bottom: 1px solid var(--c-hair); }
-.chk__metric {
-  display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem;
-  margin-top: 0.7rem;
-  font-size: 0.54rem; letter-spacing: 0.12em;
-}
-.chk__metric em { font-style: normal; color: var(--c-muted); }
-.chk__metric b { font-weight: 500; color: var(--chk-acc); }
-
-/* ── the panel ── */
-.chk__panels { max-width: 88rem; margin: 0 auto; border-top: 2px solid var(--c-rule); }
-.chk__panel[hidden] { display: none; }
-.chk__panelin {
-  padding: clamp(1.6rem, 2.8vw, 2.4rem) clamp(0.95rem, 1.5vw, 1.5rem) 0;
-  border-left: 3px solid var(--chk-acc);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .chk__panel:not([hidden]) .chk__panelin {
-    animation: chkin 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-}
-@keyframes chkin { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-
-.chk__pgrid {
-  display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.25fr) minmax(0, 1fr);
-  gap: clamp(1.4rem, 2.8vw, 2.8rem);
-}
-.chk__pnum {
-  display: flex; align-items: baseline; gap: 0.1rem; margin: 0;
-  font-family: var(--font-display); font-weight: 400;
-  line-height: 0.88; color: var(--chk-acc);
-}
-.chk__pnum b { font-weight: 400; font-size: clamp(2.5rem, 5.1vw, 3.9rem); font-variant-numeric: lining-nums; }
-.chk__pnum em { font-style: normal; font-size: clamp(0.95rem, 1.6vw, 1.25rem); }
-.chk__pnote { margin: 0.75rem 0 0; font-size: 0.85rem; line-height: 1.58; color: var(--c-muted); }
-.chk__plabel { margin: 0 0 0.8rem; font-size: 0.54rem; letter-spacing: 0.16em; color: var(--c-muted); }
-.chk__psigns ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.55rem; }
-.chk__psigns li {
-  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.75rem; align-items: start;
-  font-size: 0.875rem; line-height: 1.56; color: var(--c-ink);
-}
-.chk__psigns li i {
-  width: 5px; height: 5px; margin-top: 0.5rem; border-radius: 50%;
-  background: var(--chk-acc); flex: none;
-}
-.chk__pbody { margin: 0; font-size: 0.875rem; line-height: 1.58; color: var(--c-muted); }
-.chk__plink {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  min-height: 44px;                     /* stated floor, not padding arithmetic */
-  margin-top: 1rem; padding: 0.6rem 1.05rem;
-  border-radius: 999px;
-  background: var(--chk-acc); color: #fbf9f4;
-  font-size: 0.8rem; font-weight: 600; text-decoration: none;
-  transition: transform 0.2s ease, filter 0.2s ease;
-}
-.chk__plink:hover { transform: translateY(-2px); filter: brightness(1.08); }
-.chk__plink:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 3px; }
-
-/* ── entrance — resting state visible so a dead observer leaves it readable ── */
-.chk [data-chk-in], .chk .chk__col { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: no-preference) {
-  .chk.is-armed [data-chk-in], .chk.is-armed .chk__col { opacity: 0; transform: translateY(16px); }
-  .chk.is-armed [data-chk-in].is-in, .chk.is-armed .chk__col.is-in {
-    opacity: 1; transform: none;
-    transition: opacity 0.5s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .chk__col, .chk__col::before, .chk__plink { transition: none; }
-}
-
-/* ── responsive ── */
-@media (max-width: 1080px) {
-  .chk__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  /* on two columns the right-hand divider of the first item in each row is the
-     only one wanted; the row below needs a top rule instead */
-  .chk__col:nth-child(2n) { border-right: 0; }
-  .chk__col:nth-child(n + 3) { border-top: 1px solid var(--c-hair); }
-  .chk__pgrid { grid-template-columns: 1fr 1fr; }
-  .chk__pstat { grid-column: 1 / -1; }
-}
-@media (max-width: 680px) {
-  .chk__cols { grid-template-columns: 1fr; }
-  .chk__col { border-right: 0; border-top: 1px solid var(--c-hair); }
-  .chk__col:first-child { border-top: 0; }
-  .chk__svc { margin-top: 1rem; }
-  .chk__pgrid { grid-template-columns: 1fr; }
-  .chk__panelin { border-left-width: 2px; padding-left: 1rem; }
-  .chk__head { align-items: flex-start; }
-}
-
-@media (max-width: 680px) {
-  /* the desktop scale-down does not apply here — narrow columns already
-     shorten the measure, and 14px paragraphs on a phone read as cramped */
-  .chk__body, .chk__psigns li, .chk__pbody, .chk__pnote { font-size: 0.95rem; }
-}
 
 /* ── Metrics → "Why" seam ──
    The dark Metrics layer met the cream section below it on a hard edge. This
@@ -5162,6 +5259,9 @@ body.blg-body .mono {
    so it never lightens the ground under the tiles — and ends exactly at
    .why's 96px padding, where its copy begins. Nothing sits on a mid-tone. */
 .why { position: relative; }
+/* Dark→ivory ramp that blurs the seam. This is the FALLBACK path — on
+   viewports tall enough for the stack reveal (see @media min-height:940px
+   above) the reveal covers the seam instead and this is switched off. */
 .why::before {
   content: '';
   position: absolute;
@@ -5189,6 +5289,13 @@ body.blg-body .mono {
     #f6f2ea 100%
   );
 }
+/* Where the stack reveal is active, the ramp is redundant and actively wrong:
+   .why slides up over the held Metrics layer, and a leading edge fading from
+   near-black would drag a 146px smudge up the screen instead of reading as a
+   clean panel edge. Must sit AFTER the rule above to win on source order,
+   and must match the reveal's gate exactly. */
+html.stack-reveal .why::before { content: none; }
+
 /* .why's own content rides above the ramp */
 .why > * { position: relative; z-index: 1; }
 

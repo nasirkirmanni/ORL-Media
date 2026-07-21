@@ -1,0 +1,415 @@
+---
+import '../styles/global.css';
+import '../styles/engine.css';
+import '../styles/audit.css';
+import Seo from '../components/Seo.astro';
+import GlassNav from '../components/GlassNav.astro';
+import { graph, organization, website, service, faqPage, breadcrumbs } from '../lib/schema';
+
+/* ─────────────────────────────────────────────────────────────
+   AI VISIBILITY AUDIT — the entry offer / door-opener.
+
+   The funnel's first step: every primary CTA on the site says
+   "Start with the AI Visibility Audit". This is where they land.
+
+   Rides on the .mod__ engine shell so it reads as one system with
+   the module pages. Accent is Visibility blue — the Audit is the
+   door into Visibility, and the colour says so. No price anywhere:
+   fixed scope + a 10-day turnaround is the credibility signal that
+   replaces the number (blueprint Part 3, Rule 3).
+   ───────────────────────────────────────────────────────────── */
+
+const path = '/audit/';
+
+/* The four AI engines the audit scores. */
+const ENGINES = ['ChatGPT', 'Perplexity', 'Gemini', 'Google AI Overviews'];
+
+/* What the audit covers — four cards. */
+const COVERS = [
+  {
+    n: '01',
+    h: '100+ buying questions',
+    p: 'The real questions asked in your category — problem, comparison, alternative, and pricing intent. Not keywords. The questions a buyer actually types into an assistant before they ever hear your name.',
+  },
+  {
+    n: '02',
+    h: 'Four AI engines, scored',
+    p: 'Every question run through the assistants your buyers use. We record whether you appear, where, and how you are described — engine by engine, question by question.',
+    engines: true,
+  },
+  {
+    n: '03',
+    h: 'Competitor benchmark',
+    p: 'Your Share of Answer against your three closest competitors. Who the engines recommend when you are absent, and the specific questions where they win and you do not.',
+  },
+  {
+    n: '04',
+    h: 'Sentiment & citations',
+    p: 'How the engines characterise you when they do cite you, and which third-party sources they lean on to do it — the citation surface that decides whether recommending you is the safe answer.',
+  },
+];
+
+/* Sample scorecard — illustrative, per the site's honesty rule. */
+const SAMPLE_ENGINES = [
+  { name: 'ChatGPT', val: 44, you: true },
+  { name: 'Perplexity', val: 31, you: true },
+  { name: 'Gemini', val: 46, you: true },
+  { name: 'Google AIO', val: 29, you: true },
+];
+const SAMPLE_COMPETITORS = [
+  { name: 'You', val: 38, you: true },
+  { name: 'Competitor A', val: 61, you: false },
+  { name: 'Competitor B', val: 52, you: false },
+  { name: 'Competitor C', val: 40, you: false },
+];
+
+/* Deliverables — the four things you get back. */
+const DELIVER = [
+  'Scored visibility report — Share of Answer across all four engines',
+  'Competitor benchmark against your three closest rivals',
+  '90-day GEO action plan, prioritized by revenue impact',
+  '60-minute readout call with the operator who ran it',
+  'The full question map — every query, every engine, every result',
+  'Sentiment and citation analysis on how the engines describe you',
+];
+
+/* The 10-day process. */
+const STEPS = [
+  { day: 'Days 1–2', t: 'Map the questions', d: 'We build the 100+ question set for your category from real buyer intent, and lock your three benchmark competitors with you.' },
+  { day: 'Days 3–6', t: 'Score across engines', d: 'Every question runs through ChatGPT, Perplexity, Gemini, and Google AI Overviews. Presence, position, and phrasing recorded for each.' },
+  { day: 'Days 7–8', t: 'Benchmark & analyse', d: 'Your Share of Answer computed and set against competitors. Sentiment and citation patterns pulled out — where you are absent, and why.' },
+  { day: 'Days 9–10', t: 'Readout & action plan', d: 'A scored report, a prioritized 90-day plan, and a 60-minute call. You leave knowing exactly what to fix first — whether or not you fix it with us.' },
+];
+
+/* FAQ — mirrors the visible copy into FAQPage schema. */
+const FAQ = [
+  {
+    q: 'What if we score well?',
+    a: 'Then you’ll know — and we’ll tell you the truth. A clean result is a real result: it means your budget belongs somewhere other than AI visibility right now, and we’ll say so plainly rather than sell you a system you don’t need.',
+  },
+  {
+    q: 'Do we have to buy anything after?',
+    a: 'No. The audit is fixed-scope and one-time. It converts to the Visibility module or the full Engine only if the findings make that the obvious move. Plenty of audits end at the readout, and that is a fine place to end.',
+  },
+  {
+    q: 'How is this different from an SEO audit?',
+    a: 'An SEO audit measures where you rank on Google’s results page. This measures whether AI assistants recommend you at all — a different surface, different mechanics, and increasingly the one buyers reach first. There is no ad unit inside a ChatGPT answer; presence there is earned or absent.',
+  },
+  {
+    q: 'What do you need from us to start?',
+    a: 'Your domain, your category, and your three closest competitors. That is the whole intake. We build the question set; you approve the competitor list. Kickoff to readout is 10 business days.',
+  },
+  {
+    q: 'Who runs it?',
+    a: 'A senior operator — the same person who presents the readout. No junior hand-off, no offshore scoring farm. It is capped work, which is part of why the scope is fixed and the turnaround is honest.',
+  },
+];
+
+const ld = graph([
+  organization(),
+  website(),
+  service({
+    name: 'AI Visibility Audit',
+    description: 'A fixed-scope, 10-business-day audit of how a B2B SaaS or AI company appears across ChatGPT, Perplexity, Gemini, and Google AI Overviews for 100+ real buying questions — Share of Answer, competitor benchmark, sentiment, and a prioritized 90-day action plan.',
+    path,
+  }),
+  faqPage(FAQ.map((f) => ({ q: f.q, a: f.a }))),
+  breadcrumbs([
+    { name: 'Home', path: '/' },
+    { name: 'AI Visibility Audit', path },
+  ]),
+]);
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <Seo
+    title="AI Visibility Audit — See exactly what buyers see | ORL Media"
+    description="A fixed-scope, 10-day audit of how you appear across ChatGPT, Perplexity, Gemini, and Google AI Overviews for 100+ real buying questions. Share of Answer, competitor benchmark, and a prioritized 90-day plan."
+    ogTitle="AI Visibility Audit — See what buyers see"
+    ogDescription="Fixed scope. 10 business days. Exactly how you appear across four AI engines — and what to fix first."
+  >
+    <script type="application/ld+json" is:inline set:html={ld} />
+  </Seo>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
+</head>
+<body class="blg-body eng-body aud-body">
+
+<nav class="sitenav sitenav--page is-visible" aria-label="Site">
+  <a class="sitenav__brand" href="/">
+    <span class="sitenav__mark" aria-hidden="true"></span>
+    ORL Media
+  </a>
+  <div class="sitenav__links">
+    <a href="/engine" class="sitenav__link">Engine</a>
+    <a href="/audit" class="sitenav__link" aria-current="true">Audit</a>
+    <a href="/about" class="sitenav__link">About</a>
+    <a href="/blog" class="sitenav__link">Blog</a>
+  </div>
+  <a class="sitenav__pill" href="/book">Book a call</a>
+</nav>
+<GlassNav />
+
+<main class="mod aud" id="main" style="--acc:#2e5cff; --acc-d:#8fa4ff; --acc-t:#2e5cff;">
+
+  <!-- ── hero ── -->
+  <header class="mod__hero">
+    <span class="mod__watermark" aria-hidden="true">AI</span>
+    <div class="mod__heroinner">
+      <p class="mod__crumb mono" data-e-in>
+        <a href="/engine">The Growth Engine</a>
+        <span aria-hidden="true">/</span>
+        The entry point
+        <i class="mod__status mod__status--live"><b aria-hidden="true"></b>Fixed scope &middot; 10 days</i>
+      </p>
+      <h1 class="mod__title" data-e-in>AI Visibility Audit<em>.</em></h1>
+      <p class="mod__pos" data-e-in>See what buyers see.</p>
+      <p class="mod__sub" data-e-in>Before you buy a system, get the diagnosis. We score how you appear across ChatGPT, Perplexity, Gemini, and Google AI Overviews for 100+ real buying questions in your category &mdash; then hand you the map of exactly what to fix first.</p>
+
+      <ul class="aud__facts" data-e-in>
+        <li><strong>4</strong><span>AI engines scored</span></li>
+        <li><strong>100+</strong><span>buying questions</span></li>
+        <li><strong>10</strong><span>business days</span></li>
+      </ul>
+    </div>
+    <i class="mod__heroline" aria-hidden="true"><em data-e-pulse></em></i>
+  </header>
+
+  <!-- ── the problem ── -->
+  <section class="mod__problem" aria-label="Why the audit exists">
+    <div class="mod__inner mod__problemgrid">
+      <div class="mod__probleft" data-e-in>
+        <p class="mod__eyebrow mono">Why this exists</p>
+        <h2 class="mod__h2">The search result is no longer the destination.</h2>
+        <p class="mod__bigstat"><strong data-e-in>71%</strong></p>
+        <p class="mod__bigstatline mono">of B2B buyers use AI chatbots during software evaluation. Most never see your homepage first.</p>
+      </div>
+      <div class="mod__probright">
+        <p class="mod__body" data-e-in>When an AI Overview appears, organic click-through roughly halves &mdash; and most searches now end with no click at all. There is no ad unit inside a ChatGPT answer. Presence there is earned or it is absent, and you cannot fix what you have never measured. The buyers researching your category are already getting an answer. The only question is whether you are in it, and how you are described when you are.</p>
+        <ul class="mod__support">
+          <li data-e-in><strong class="mono">8% vs 15%</strong><span>organic click-through with vs without an AI Overview</span></li>
+          <li data-e-in><strong class="mono">~60%</strong><span>of Google searches now end without a single click</span></li>
+          <li data-e-in><strong class="mono">53% vs 7%</strong><span>buyers weigh use-case match over brand recognition in AI answers</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── what the audit covers ── -->
+  <section class="aud__covers" aria-label="What the audit covers">
+    <div class="mod__inner">
+      <div class="aud__sechead">
+        <p class="mod__eyebrow mono" data-e-in>What the audit covers</p>
+        <h2 class="mod__h2" data-e-in>Four engines. One category. Every question.</h2>
+      </div>
+      <div class="aud__coversgrid">
+        {COVERS.map((c) => (
+          <article class="aud__cover" data-e-in>
+            <p class="aud__covernum"><i aria-hidden="true"></i>{c.n}</p>
+            <h3>{c.h}</h3>
+            <p>{c.p}</p>
+            {c.engines && (
+              <ul class="aud__engines">
+                {ENGINES.map((e) => <li>{e}</li>)}
+              </ul>
+            )}
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── sample scorecard ── -->
+  <section class="aud__report" aria-label="Sample report">
+    <div class="mod__inner">
+      <p class="mod__eyebrow mono" data-e-in>What you get back</p>
+      <h2 class="mod__h2" data-e-in>A scored report, not a slide deck.</h2>
+      <p class="aud__reportsub" data-e-in>One number that means something, benchmarked against the competitors you actually lose to &mdash; with the exact questions behind every point.</p>
+
+      <div class="aud__card" data-e-in>
+        <div class="aud__cardhead">
+          <b>AI Visibility Scorecard &mdash; Category: Developer Tools</b>
+          <span class="aud__tag">Sample</span>
+        </div>
+        <div class="aud__cardbody">
+          <div class="aud__soa">
+            <p class="aud__soalabel">Share of Answer</p>
+            <p class="aud__soanum"><strong>38<span style="font-size:0.4em">%</span></strong><em>&#9679; ranked #3 of 4</em></p>
+            <div class="aud__soatrack"><span class="aud__soafill"></span></div>
+            <p class="aud__soanote">Of 118 buying questions, you were cited or recommended in 38%. Your closest competitor: 61%.</p>
+          </div>
+          <ul class="aud__bars">
+            {SAMPLE_COMPETITORS.map((b) => (
+              <li class={`aud__bar${b.you ? ' aud__bar--you' : ''}`}>
+                <span class="aud__barname">{b.name}</span>
+                <span class="aud__bartrack"><span class="aud__barfill" style={`width:${b.val}%`}></span></span>
+                <span class="aud__barval">{b.val}%</span>
+              </li>
+            ))}
+            <li class="aud__barcap">Share of Answer &middot; you vs three closest competitors</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── the build sheet (deliverables) ── -->
+  <section class="mod__deliver" aria-label="What you receive">
+    <div class="mod__inner">
+      <div class="aud__sechead">
+        <p class="mod__eyebrow mono" data-e-in>On the tenth day</p>
+        <h2 class="mod__h2" data-e-in>The deliverables.</h2>
+      </div>
+      <ul class="mod__delivergrid">
+        {DELIVER.map((d) => (
+          <li data-e-in><i aria-hidden="true"></i>{d}</li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── how it works (10-day process) ── -->
+  <section class="mod__pipe" aria-label="How the audit runs">
+    <div class="mod__inner">
+      <div class="aud__sechead">
+        <p class="mod__eyebrow mono" data-e-in>How it runs</p>
+        <h2 class="mod__h2" data-e-in>Ten business days. Fixed scope.</h2>
+      </div>
+      <div class="mod__steps">
+        <i class="mod__pipeline" aria-hidden="true"><em data-e-draw></em></i>
+        {STEPS.map((s, i) => (
+          <article class="mod__step" data-e-in>
+            <span class="mod__stepnum mono"><i aria-hidden="true"></i>{String(i + 1).padStart(2, '0')}</span>
+            <span class="aud__day mono">{s.day}</span>
+            <h3 class="mod__stepname">{s.t}</h3>
+            <p class="mod__stepdesc">{s.d}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── scope band ── -->
+  <section class="aud__scope" aria-label="Scope">
+    <div class="mod__inner">
+      <p class="aud__scopeline">A defined deliverable on a fixed date &mdash; <em>not an open-ended retainer.</em></p>
+      <ul class="aud__scoperow">
+        <li><strong>10 days</strong><span>kickoff to readout</span></li>
+        <li><strong>Fixed</strong><span>scope, one-time</span></li>
+        <li><strong>Senior</strong><span>operator, no hand-off</span></li>
+        <li><strong>Zero</strong><span>obligation to continue</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section class="aud__faq" aria-label="Frequently asked questions">
+    <div class="mod__inner">
+      <div class="aud__faqhead">
+        <p class="mod__eyebrow mono" data-e-in>Honest answers</p>
+        <h2 class="mod__h2" data-e-in>Before you ask.</h2>
+      </div>
+      <div class="aud__faqlist" data-e-in>
+        {FAQ.map((f) => (
+          <details class="aud__q">
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── cta ── -->
+  <section class="mod__cta" aria-label="Start the audit">
+    <div class="mod__inner" data-e-in>
+      <h2 class="mod__ctah">Start with the audit. See what buyers see.</h2>
+      <p class="mod__ctas">Ten business days from now, you will know exactly how you appear across four AI engines &mdash; and precisely what to fix first. If you score well, we will tell you the truth.</p>
+      <a class="mod__ctabtn" href="/book">Start with the AI Visibility Audit
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <p class="mod__ctanote mono">Fixed scope &middot; 10 business days &middot; no retainer required</p>
+    </div>
+  </section>
+
+  <footer class="mod__foot">
+    <a class="mod__next" href="/engine/visibility">
+      <span class="mono">Where it leads</span>
+      <strong>01 &mdash; Visibility</strong>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <p class="mono">&copy; 2026 ORL Media &mdash; Growth infrastructure for B2B</p>
+  </footer>
+</main>
+
+<script>
+  import { gsap } from 'gsap';
+
+  /* Shared engine-page motion: reveals, counters, line draws, hero pulse.
+     Resting CSS is the finished page; a failed script degrades to static. */
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const main = document.querySelector<HTMLElement>('.mod, .eng');
+
+  if (main && !reduce) {
+    const ins = [...main.querySelectorAll<HTMLElement>('[data-e-in]')];
+    gsap.set(ins, { autoAlpha: 0, y: 16 });
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        gsap.to(e.target, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' });
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -8%' });
+    ins.forEach((el) => io.observe(el));
+
+    /* counters */
+    main.querySelectorAll<HTMLElement>('[data-e-count]').forEach((el) => {
+      const to = parseFloat(el.dataset.eCount || '0');
+      const from = parseFloat(el.dataset.eFrom || '0');
+      const suf = el.dataset.eSuffix || '';
+      new IntersectionObserver(([e], o) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        const p = { v: from };
+        gsap.to(p, {
+          v: to, duration: 1.4, ease: 'power2.out',
+          onUpdate: () => { el.textContent = `${Math.round(p.v)}${suf}`; },
+        });
+      }, { threshold: 0.5 }).observe(el);
+    });
+
+    /* pipeline draw */
+    main.querySelectorAll<HTMLElement>('[data-e-draw]').forEach((el) => {
+      gsap.set(el, { scaleY: 0, transformOrigin: '50% 0%' });
+      new IntersectionObserver(([e], o) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        gsap.to(el, { scaleY: 1, duration: 1.6, ease: 'power2.inOut' });
+      }, { threshold: 0.1 }).observe(el.parentElement!);
+    });
+
+    /* hero pulse travels the accent line, forever, cheaply */
+    const pulse = main.querySelector<HTMLElement>('[data-e-pulse]');
+    if (pulse) {
+      gsap.fromTo(pulse, { xPercent: -110 }, {
+        xPercent: 1100, duration: 4.6, ease: 'power1.inOut', repeat: -1, repeatDelay: 1.4,
+      });
+    }
+
+    /* failsafe: nothing on this page may stay invisible */
+    setTimeout(() => {
+      ins.forEach((el) => {
+        if (gsap.getProperty(el, 'opacity') === 0) gsap.set(el, { autoAlpha: 1, y: 0 });
+      });
+    }, 5000);
+  }
+</script>
+</body>
+</html>

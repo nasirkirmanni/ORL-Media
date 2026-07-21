@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.vercel/
+mov.mp4
+
+# Source masters kept locally only. .archive/source-video holds the original
+# camera/render files the hero clips were encoded from (87MB of 4K). Git stores
+# blobs forever, so committing these would bloat every future clone
+# permanently — the shipped, compressed versions live in public/video/.
+.archive/

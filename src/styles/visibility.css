@@ -1,0 +1,280 @@
+/* ═══════════════════════════════════════════════════════════
+   VISIBILITY — /engine/visibility
+   Only the video hero lives here; everything from the problem
+   block down reuses the .mod__* rules in engine.css.
+
+   THE HERO IS WORDLESS BY DESIGN. Clips 01 and 02 carry no type
+   at all — the footage says it. Only clip 03 (the city) carries
+   the statement, and that type lives INSIDE the figure so the
+   curtain reveals words and footage as one image.
+
+   THE TWO-STATE CONTRACT — read before editing:
+
+   Default (no `html.vhpin-on`) is an ORDINARY FLOWING SECTION.
+   No sticky, no absolute stacking, no transforms. The three clips
+   stack as 16:9 panels showing their posters. That is what
+   reduced-motion and a JS failure get, and it is a finished
+   layout rather than a degraded one.
+
+   `html.vhpin-on` is added by JS only when motion is allowed and
+   converts the section into the pinned wipe scene.
+
+   THE WIPE: .vh__asset (the mask, overflow:hidden) travels
+   yPercent 100 → 0 while .vh__fig inside it travels -100 → 0.
+   Equal and opposite, so the footage never moves on screen — the
+   mask sweeps off it. Mechanic taken from bennettandclive.com.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════
+   THE NAV — hidden over the hero, slid in once it releases
+
+   Two problems solved together:
+   1. `.sitenav--page` is `position: sticky` and first in body flow, so it
+      RESERVES ~92px above the hero, leaving a band of taupe above the
+      opening frame. Going fixed takes it out of flow; the video starts at 0.
+   2. It has no hidden state of its own — `is-visible` is inert on engine
+      pages — so it sat on top of the footage.
+
+   Gated on html.vhnav-on, set by an inline head script before first paint.
+   No JS → no class → the nav behaves as on every other page.
+   ═══════════════════════════════════════════════════════════ */
+html.vhnav-on .sitenav--page {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  margin: 0;
+  /* the -50% X is the centring; it must be repeated in the revealed state or
+     the nav jumps half its width sideways on reveal */
+  transform: translate(-50%, calc(-100% - 1.5rem));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease;
+}
+html.vhnav-on .sitenav--page.is-in,
+/* keyboard safety: never let focus land on an invisible target */
+html.vhnav-on .sitenav--page:focus-within {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.vh {
+  position: relative;
+  /* the cqi units on the statement resolve against this. Deliberately NOT on
+     .vh__sticky: container-type implies `contain: layout`, and the sticky
+     element's containing-block behaviour is not something to gamble on. */
+  container-type: inline-size;
+}
+.vh__wrapper { position: relative; }
+
+/* ── scroll budget ──
+   A zero-width column of spacers, one per clip. The section's height comes
+   from these, so retiming the whole sequence is this one number. */
+.vh__triggers { --vh-step: 68lvh; position: relative; width: 0; z-index: 10; }
+.vh__trigger { position: relative; width: 100%; height: var(--vh-step); }
+/* ungated, the spacers must not add phantom height to a flowing section */
+html:not(.vhpin-on) .vh__triggers { display: none; }
+
+/* ─────────────── resting (flow) state ─────────────── */
+.vh__inner,
+.vh__sticky { position: relative; }
+
+.vh__assets { display: grid; gap: 0.75rem; }
+.vh__asset { position: relative; overflow: hidden; border-radius: 14px; }
+.vh__fig {
+  position: relative;
+  margin: 0;
+  /* 16 / 9 — the masters are landscape. An aspect box here means the poster
+     reserves its space before the file arrives, so nothing reflows (CLS). */
+  aspect-ratio: 16 / 9;
+  /* the tint is the per-clip fallback ground: while a file is still
+     downloading the panel reads as a deliberate colour field, not a hole */
+  background: var(--tint, #1b1815);
+  overflow: hidden;
+}
+.vh__video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* the shader clip. The canvas is appended by JS; until then (and if WebGL is
+   unavailable) the figure's --tint shows, which is matched to the shader's
+   own black so the fallback reads as intent rather than a failure. */
+.vh__shader {
+  position: absolute; inset: 0;
+  overflow: hidden;
+}
+.vh__shader canvas { display: block; width: 100%; height: 100%; }
+
+/* ─────────────── the brand mark ───────────────
+   Top-left over every clip, above the assets so the wipes pass beneath it.
+
+   Black, as specified. That works because the first two masters are bright in
+   the corner — measured mean luma 209-212 (vis-01) and 137-149 (vis-02),
+   which puts black at roughly 6.5:1 or better.
+
+   The city plate is the exception: its corner measures luma 0-4, effectively
+   pure black, and a black mark there would be invisible rather than subtle.
+   JS adds .is-light for that clip only (driven by `mark` in the CLIPS data).
+   Delete the modifier and the mark stays black everywhere — it will simply
+   disappear on clip 03. */
+.vh__mark {
+  position: absolute;
+  top: 1.4rem;
+  left: 1.6rem;
+  z-index: 5;
+  margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-weight: 500;
+  font-size: clamp(1.1rem, 1.9cqi, 1.55rem);
+  letter-spacing: 0.015em;
+  line-height: 1;
+  color: var(--vh-mark, #000);
+  /* a whisper of light behind the black keeps it off the mid-grey frames of
+     vis-02 without reading as a glow */
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.28);
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+  pointer-events: none;
+}
+.vh__mark.is-light {
+  color: #f3efe6;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.55);
+}
+
+/* ─────────────── the statement (clip 03 only) ───────────────
+   Sits inside the figure, so the wipe reveals type and footage together and
+   the type counter-translates with the figure — dead still while the mask
+   sweeps off it. */
+.vh__statement {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1em;
+  padding: 1.5rem;
+  text-align: center;
+  /* the scrim lives here rather than as a page-wide layer: clips 01 and 02
+     carry no type and a constant scrim would only dull them */
+  background: linear-gradient(
+    to bottom,
+    rgba(8, 7, 6, 0.42) 0%,
+    rgba(8, 7, 6, 0.58) 55%,
+    rgba(8, 7, 6, 0.72) 100%
+  );
+  pointer-events: none;
+}
+.vh__statement span {
+  display: block;
+  max-width: 20ch;
+  /* Inter, matching the shader reference's own treatment (semibold, tight
+     tracking). Already loaded for the site UI, so this costs nothing new. */
+  font-family: var(--font-ui);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.03;
+  color: #fff;
+  font-size: clamp(2.1rem, 6.2cqi, 5.25rem);
+  text-wrap: balance;
+}
+
+/* Continuity: the hero must flow INTO the problem block as one thought.
+   .mod__problem's own 5.5rem top padding would reintroduce a seam. */
+.vis__problem { padding-top: 2.5rem; }
+
+.vis__sr {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PINNED STATE — motion only, gated by JS
+   ═══════════════════════════════════════════════════════════ */
+
+/* The tail of scroll after the last wipe.
+
+   Raised from 45lvh. This is the ONE hero value that had to change, and only
+   because the clip-03 → page transition is impossible without it: for the
+   incoming section to sweep all the way to the top of the screen the way clip
+   02 sweeps over clip 01, it needs a FULL viewport of overlap with the hero
+   still pinned behind it. At 45lvh the curtain ran out of room at 40% and
+   stalled mid-screen — which is exactly why that transition looked broken
+   while the clip-to-clip ones did not.
+
+   110lvh = 100lvh for the curtain + 10lvh of clean hold, so clip 03 and its
+   statement still get a beat before the sweep begins.
+
+   COUPLED: aeo.css's .aeo__enterslot margin-top must equal -(this - 10lvh).
+   Change one without the other and the wipe finishes early or late. */
+html.vhpin-on .vh__wrapper { padding-bottom: 110lvh; }
+
+html.vhpin-on .vh__inner {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+html.vhpin-on .vh__sticky {
+  position: sticky;
+  top: 0;
+  /* lvh, not svh: this is edge-to-edge video, and svh would leave a strip of
+     page showing under it whenever mobile chrome is hidden */
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+}
+
+html.vhpin-on .vh__assets {
+  display: block;
+  position: absolute; inset: 0;
+  background: #0c0b0a;
+}
+html.vhpin-on .vh__asset {
+  position: absolute; top: 0; left: 0;
+  width: 100%;
+  /* 101%, not 100%: the extra row hides the sub-pixel seam that otherwise
+     flickers along the mask edge mid-wipe */
+  height: 101%;
+  border-radius: 0;
+  will-change: transform;
+  /* forces its own composited layer and makes overflow clip correctly under
+     3D transforms in WebKit — the reference uses the same hack */
+  -webkit-mask-image: -webkit-radial-gradient(#fff, #000);
+}
+html.vhpin-on .vh__fig {
+  /* 100%, NOT 101%. The mask above is already 101% of the stage; nesting a
+     second 101% makes the figure ~8px taller than the mask, so the counter-
+     move overshoots and the footage drifts ~9px across the wipe instead of
+     holding still. (The reference compounds them the same way and carries
+     the same drift.) At 100% the two moves cancel exactly, and the figure
+     still covers the mask's visible area at every point in the sweep. */
+  height: 100%;
+  width: 100%;
+  aspect-ratio: auto;
+  will-change: transform;
+}
+
+/* ─────────────── responsive ─────────────── */
+@media (max-width: 900px) {
+  .vh__triggers { --vh-step: 60lvh; }
+  .vh__assets { gap: 0.6rem; }
+  .vh__statement { padding: 1.2rem; }
+  .vh__statement span { max-width: 16ch; font-size: clamp(1.6rem, 8.4cqi, 3rem); }
+}
+
+/* ─────────────── reduced motion ─────────────── */
+@media (prefers-reduced-motion: reduce) {
+  /* html.vhpin-on is never added, so there is no wipe to disable — only the
+     nav's slide needs to become a cut */
+  html.vhnav-on .sitenav--page { transition: opacity 0.2s ease; }
+  html.vhnav-on .sitenav--page,
+  html.vhnav-on .sitenav--page.is-in { transform: translate(-50%, 0); }
+  html.vhnav-on .sitenav--page { opacity: 0; }
+  html.vhnav-on .sitenav--page.is-in,
+  html.vhnav-on .sitenav--page:focus-within { opacity: 1; }
+}
