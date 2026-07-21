@@ -64,10 +64,10 @@ const EMBLEM: Record<string, string> = {
    ring. Visibility has no image yet (the supplied file was a page mockup, not
    the eye logo), so it keeps the drawn emblem in brand blue below. */
 const LOGO_IMG: Record<string, string> = {
-  visibility: '/logos/visibility.png',
-  signals: '/logos/signals.png',
-  proof: '/logos/proof.png',
-  pricing: '/logos/pricing.png',
+  visibility: '/logos/visibility.webp',
+  signals: '/logos/signals.webp',
+  proof: '/logos/proof.webp',
+  pricing: '/logos/pricing.webp',
 };
 /* every module now has a real logo image; the drawn EMBLEM/RING is kept only
    as the fallback if an image key is ever missing */
@@ -165,7 +165,7 @@ import GlassNav from '../../components/GlassNav.astro';
         {MODULES.map((mo) => (
           <span class="eng__schip" style={`--acc:${mo.accent}; --acc-t:${mo.accT}; --mark:${LOGO_COLOR[mo.slug] ?? mo.accT}`}>
             {LOGO_IMG[mo.slug] ? (
-              <img class="eng__logo" src={LOGO_IMG[mo.slug]} width="256" height="256" decoding="async" alt="" aria-hidden="true" />
+              <img class="eng__logo" src={LOGO_IMG[mo.slug]} width="160" height="160" decoding="async" alt="" aria-hidden="true" />
             ) : (
               <svg class="eng__mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
                 <g class="eng__ring">

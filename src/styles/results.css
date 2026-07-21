@@ -6,10 +6,15 @@
    Runs on the same light beige field as audit/about and borrows the
    engine tokens (.mod) + the shared reveal/counter motion.
 
+   Apple-look redesign: cards are floating material (soft layered
+   shadows, near-invisible hairlines, generous radius) rather than
+   hard-outlined boxes; the big result number is the focal point;
+   a subtle per-system accent wash replaces the hard 3px bar; the
+   featured study gains numbered steps. Markup + JS hooks unchanged.
+
    Honesty: until named client case studies land, the cards carry
    representative outcomes of the installed systems, labelled as
-   such — never presented as guaranteed client results. Real numbers
-   drop straight into the same slots.
+   such — never presented as guaranteed client results.
    ───────────────────────────────────────────────────────────── */
 
 body.eng-body.res-body { background: #e6dfd0; }
@@ -17,23 +22,23 @@ body.eng-body.res-body { background: #e6dfd0; }
 .res__inner { max-width: 66rem; margin: 0 auto; }
 
 /* — hero — */
-.res__hero { padding: 9.5rem 1.5rem 3.5rem; text-align: center; }
+.res__hero { padding: clamp(8rem, 12vw, 11rem) 1.5rem clamp(2.5rem, 5vw, 4rem); text-align: center; }
 .res__heroinner { max-width: 48rem; margin: 0 auto; }
 .res__h1 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.9rem, 7vw, 5.2rem);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
+  font-size: clamp(3.6rem, 9.5vw, 7.2rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
   color: var(--ink);
-  margin: 1.4rem 0 0;
+  margin: 1.2rem 0 0;
 }
 .res__h1 em { font-style: italic; color: var(--acc-t); }
 .res__lead {
-  max-width: 38rem;
-  margin: 1.3rem auto 0;
-  font-size: 1.05rem;
-  line-height: 1.7;
+  max-width: 35rem;
+  margin: 1.4rem auto 0;
+  font-size: 1.08rem;
+  line-height: 1.65;
   color: var(--muted);
 }
 
@@ -41,85 +46,108 @@ body.eng-body.res-body { background: #e6dfd0; }
 .res__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.2rem;
-  padding: 2.5rem 1.5rem 1rem;
-  max-width: 66rem;
+  gap: 1.4rem;
+  padding: clamp(1.8rem, 3vw, 2.8rem) 1.5rem 1rem;
+  max-width: 68rem;
   margin: 0 auto;
 }
 .res__card {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 1.9rem 1.7rem 1.8rem;
+  padding: clamp(1.8rem, 2.4vw, 2.3rem) clamp(1.6rem, 2vw, 2rem);
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  border: 1px solid rgba(31, 29, 22, 0.06);
+  border-radius: 24px;
   overflow: hidden;
+  box-shadow: 0 1px 2px rgba(31, 29, 22, 0.04), 0 24px 48px -32px rgba(31, 29, 22, 0.32);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
+/* soft per-system accent wash from the top-left — replaces the hard 3px bar */
 .res__card::before {
   content: '';
   position: absolute;
-  left: 0; top: 0; right: 0;
-  height: 3px;
-  background: var(--ca, var(--acc));
+  inset: 0 0 auto;
+  height: 55%;
+  background: radial-gradient(120% 80% at 0% 0%, color-mix(in srgb, var(--ca, var(--acc)) 9%, transparent), transparent 72%);
+  pointer-events: none;
 }
+@media (hover: hover) {
+  .res__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 2px 4px rgba(31, 29, 22, 0.05), 0 38px 66px -34px rgba(31, 29, 22, 0.42);
+  }
+}
+
 .res__tag {
+  position: relative; z-index: 1;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin: 0;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ca, var(--acc));
 }
-.res__tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--ca, var(--acc)); flex: none; }
+.res__tag i {
+  width: 6px; height: 6px; border-radius: 50%; flex: none;
+  background: var(--ca, var(--acc));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ca, var(--acc)) 15%, transparent);
+}
 
-.res__nums { display: flex; align-items: baseline; gap: 0.6rem; margin: 1.4rem 0 0; flex-wrap: wrap; }
+.res__nums { position: relative; z-index: 1; display: flex; align-items: baseline; gap: 0.5rem; margin: clamp(1.6rem, 2.5vw, 2.2rem) 0 0; flex-wrap: wrap; }
 .res__from {
   font-family: var(--font-display);
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: var(--soft);
   text-decoration: line-through;
-  text-decoration-color: color-mix(in srgb, var(--soft) 50%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--soft) 45%, transparent);
 }
 .res__arrow { color: var(--ca, var(--acc)); display: inline-flex; }
+.res__arrow svg { width: 18px; height: 18px; }
 .res__to {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 3.4rem;
-  line-height: 0.9;
-  letter-spacing: -0.02em;
+  font-size: clamp(3.4rem, 5vw, 4.4rem);
+  line-height: 0.85;
+  letter-spacing: -0.03em;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 .res__metric {
-  margin: 1rem 0 0;
-  font-size: 0.82rem;
+  position: relative; z-index: 1;
+  margin: clamp(1rem, 1.6vw, 1.3rem) 0 0;
+  font-size: 0.9rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--ink);
 }
 .res__ctx {
-  margin: 0.55rem 0 0;
-  font-size: 0.85rem;
-  line-height: 1.55;
+  position: relative; z-index: 1;
+  margin: 0.6rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
   color: var(--muted);
 }
 .res__time {
-  margin: 1.3rem 0 0;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
+  position: relative; z-index: 1;
+  margin: auto 0 0;
+  padding-top: 1.3rem;
+  border-top: 1px solid rgba(31, 29, 22, 0.08);
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 0.6rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--gold-text);
 }
+/* keep a floor of air above the footer when the context text is short */
+.res__ctx + .res__time { margin-top: 1.5rem; }
 
 .res__note {
   max-width: 44rem;
-  margin: 1.6rem auto 0;
+  margin: 1.8rem auto 0;
   padding: 0 1.5rem;
   text-align: center;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -130,24 +158,25 @@ body.eng-body.res-body { background: #e6dfd0; }
 }
 
 /* — featured deep-dive — */
-.res__feature { padding: 5rem 1.5rem 5.5rem; }
+.res__feature { padding: clamp(3.5rem, 6vw, 6rem) 1.5rem clamp(4rem, 7vw, 6.5rem); }
 .res__featcard {
-  max-width: 60rem;
+  max-width: 62rem;
   margin: 0 auto;
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
+  border: 1px solid rgba(31, 29, 22, 0.06);
+  border-radius: 28px;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(31, 29, 22, 0.05), 0 44px 90px -50px rgba(31, 29, 22, 0.42);
 }
 .res__feathead {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
-  padding: 1.6rem 1.9rem;
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--ca, var(--acc)) 7%, transparent);
+  padding: clamp(1.8rem, 2.6vw, 2.6rem) clamp(1.9rem, 2.6vw, 2.8rem);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--ca, var(--acc)) 11%, transparent), color-mix(in srgb, var(--ca, var(--acc)) 3%, transparent));
+  border-bottom: 1px solid rgba(31, 29, 22, 0.06);
 }
 .res__feateyebrow {
   margin: 0;
@@ -160,16 +189,19 @@ body.eng-body.res-body { background: #e6dfd0; }
 .res__feattitle {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
   line-height: 1.1;
+  letter-spacing: -0.02em;
   color: var(--ink);
-  margin: 0.3rem 0 0;
+  margin: 0.5rem 0 0;
+  max-width: 26rem;
 }
 .res__featnum {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.6rem, 6vw, 4rem);
-  line-height: 0.9;
+  font-size: clamp(2.8rem, 6vw, 4.4rem);
+  line-height: 0.85;
+  letter-spacing: -0.02em;
   color: var(--ca, var(--acc));
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -177,27 +209,46 @@ body.eng-body.res-body { background: #e6dfd0; }
 .res__featbody {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2rem;
-  padding: 2rem 1.9rem 2.3rem;
+  gap: clamp(1.8rem, 3vw, 3rem);
+  padding: clamp(2rem, 3vw, 2.8rem) clamp(1.9rem, 2.6vw, 2.8rem) clamp(2.4rem, 3.4vw, 3rem);
+  counter-reset: step;
 }
 .res__step h4 {
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--gold-text);
 }
-.res__step p { margin: 0.7rem 0 0; font-size: 0.92rem; line-height: 1.65; color: #4a463e; }
-
-@media (max-width: 860px) {
-  .res__grid { grid-template-columns: 1fr; }
-  .res__featbody { grid-template-columns: 1fr; gap: 1.6rem; }
+.res__step h4::before {
+  counter-increment: step;
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: color-mix(in srgb, var(--ca, var(--acc)) 13%, transparent);
+  color: var(--ca, var(--acc));
+  font-size: 0.6rem;
+  flex: none;
 }
-/* tighten desktop vertical rhythm on phones + step down the big stat so a
-   longer value can't overflow a card (horizontal padding unchanged) */
+.res__step p { margin: 0.8rem 0 0; font-size: 0.94rem; line-height: 1.65; color: #4a463e; }
+
+/* ═══════ responsive ═══════ */
+@media (max-width: 860px) {
+  .res__grid { grid-template-columns: 1fr; max-width: 34rem; }
+  .res__featbody { grid-template-columns: 1fr; gap: 1.8rem; }
+  .res__feathead { align-items: flex-start; }
+}
 @media (max-width: 560px) {
-  .res__hero { padding: 7rem 1.4rem 2.6rem; }
-  .res__feature { padding: 3.4rem 1.4rem 4rem; }
-  .res__to { font-size: 2.9rem; }
+  .res__hero { padding-top: clamp(7rem, 20vw, 8rem); }
+  .res__to { font-size: clamp(3rem, 14vw, 3.6rem); }
+  .res__featnum { font-size: clamp(2.4rem, 12vw, 3rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .res__card { transition: none; }
 }

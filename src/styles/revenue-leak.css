@@ -163,10 +163,11 @@
 .rl__panels { position: relative; margin-top: 1.6rem; }
 .rl__panel[hidden] { display: none; }
 .rl__panel {
-  border-radius: 22px;
+  position: relative;
+  border-radius: 24px;
   background: var(--panel);
-  border: 1px solid var(--hair);
-  box-shadow: 0 40px 80px -60px rgba(31, 29, 22, 0.5);
+  border: 1px solid rgba(31, 29, 22, 0.06);
+  box-shadow: 0 1px 2px rgba(31, 29, 22, 0.04), 0 34px 70px -46px rgba(31, 29, 22, 0.4);
   overflow: hidden;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -188,8 +189,9 @@
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 .rl__cta svg { transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
-.rl__cta:hover { filter: brightness(1.06); }
+.rl__cta:hover { filter: brightness(1.06); transform: translateY(-1px); }
 .rl__cta:hover svg { transform: translateX(4px); }
+.rl__cta:active { transform: scale(0.97); transition: transform 0.12s ease-out; }
 .rl__cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
 /* ── the demonstration flow (shared scaffold) ── */
@@ -207,7 +209,9 @@
 .rl__step { font-size: 0.52rem; color: var(--faint); }
 
 .rl__card {
-  border-radius: 14px; background: var(--card); border: 1px solid var(--hair);
+  border-radius: 14px; background: var(--card);
+  border: 1px solid rgba(31, 29, 22, 0.05);
+  box-shadow: 0 1px 2px rgba(31, 29, 22, 0.03);
   padding: 0.8rem 0.85rem;
 }
 .rl__card--plain { background: transparent; border: 0; padding: 0.2rem 0; }
@@ -374,17 +378,93 @@
   .rl__rail { grid-auto-columns: 86%; }
 }
 
-/* ── fit-to-screen ──
-   On desktop the full four-column map overflowed the viewport, so the whole
-   inner block runs ~30% smaller there. `zoom` (not transform: scale) is used so
-   the layout genuinely reflows and pointer hit-testing stays accurate; the
-   full-width ivory band and its padding stay on .rl, untouched. Tablet/mobile
-   keep full size — they already stack and scroll, and their touch targets must
-   stay ≥44px. */
+/* ── desktop: Apple-scale redesign ──
+   The old build force-shrank the whole map to 70% (`zoom: 0.7`) because it was
+   too cramped to fit. That density is what read as un-Apple. This layer removes
+   the zoom entirely and sizes the map to breathe at 100%: larger display type,
+   softer layered-shadow materials, more air between the rail and the panel, and
+   spring press-feedback on every interactive surface. Markup + JS untouched. */
 @media (min-width: 1001px) {
-  .rl__wrap { zoom: 0.7; }
-  .rl {
-    padding-top: clamp(2.4rem, 4.2vw, 3.8rem);
-    padding-bottom: clamp(2.6rem, 4.2vw, 3.9rem);
+  /* Sized to breathe at 100%, then scaled to 70% so the whole map fits on one
+     screen — the Apple-look proportions and materials are preserved, just fit
+     to the viewport. `zoom` (not transform) keeps layout reflow + hit-testing
+     accurate. */
+  .rl { padding: clamp(2.6rem, 4.2vw, 4rem) clamp(1.5rem, 4vw, 3rem) clamp(3rem, 4.2vw, 4.4rem); }
+  .rl__wrap { max-width: 78rem; zoom: 0.7; }
+
+  /* header — bigger, tighter, calmer */
+  .rl__head { gap: 2.5rem 3rem; }
+  .rl__title { font-size: clamp(3rem, 4.6vw, 4.4rem); line-height: 0.98; letter-spacing: -0.032em; }
+  .rl__lede { max-width: 20rem; margin-bottom: 0.6rem; font-size: 1.02rem; line-height: 1.6; }
+
+  /* journey — more air, larger nodes */
+  .rl__journey { margin-top: clamp(3rem, 4.5vw, 4.2rem); }
+  .rl__oppo { margin-bottom: 1.4rem; font-size: 0.64rem; }
+  .rl__rail { gap: clamp(1rem, 2vw, 2rem); }
+  .rl__line { top: 14px; }
+  .rl__badge { width: 30px; height: 30px; font-size: 0.66rem; }
+  .rl__disc { width: 64px; height: 64px; margin-top: 1rem; box-shadow: 0 12px 30px -18px rgba(31, 29, 22, 0.55); }
+  .rl__disc svg { width: 44%; height: 44%; }
+  .rl__slabel { margin-top: 1rem; font-size: 0.6rem; }
+  .rl__shead { margin-top: 0.5rem; font-size: clamp(1.35rem, 1.8vw, 1.7rem); }
+
+  /* leak card — soft floating material, press + select responsive */
+  .rl__stage { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+  .rl__stage:active { transform: scale(0.985); }
+  .rl__leak {
+    margin-top: 1.3rem; padding: 1.15rem 1rem; border-radius: 18px;
+    background: var(--panel);
+    border: 1px solid color-mix(in srgb, var(--acc) 12%, rgba(31, 29, 22, 0.05));
+    box-shadow: 0 1px 2px rgba(31, 29, 22, 0.04), 0 16px 34px -26px color-mix(in srgb, var(--acc) 55%, transparent);
   }
+  .rl__leakval { font-size: clamp(1.9rem, 2.4vw, 2.4rem); }
+  .rl__leaknote { margin-top: 0.5rem; font-size: 0.72rem; }
+  .rl__stage[aria-selected='true'] .rl__leak {
+    background: var(--acc-soft);
+    border-color: color-mix(in srgb, var(--acc) 40%, transparent);
+    box-shadow: 0 1px 2px rgba(31, 29, 22, 0.05), 0 24px 46px -24px color-mix(in srgb, var(--acc) 65%, transparent);
+    transform: translateY(-2px);
+  }
+
+  /* panel — larger radius, deeper soft shadow, accent as a soft top wash */
+  .rl__panels { margin-top: 2.4rem; }
+  .rl__panel {
+    border-radius: 30px;
+    box-shadow: 0 1px 3px rgba(31, 29, 22, 0.05), 0 50px 100px -60px rgba(31, 29, 22, 0.45);
+  }
+  .rl__panel::before {
+    content: ''; position: absolute; inset: 0 0 auto; height: 4px; z-index: 2;
+    background: linear-gradient(90deg, var(--acc), color-mix(in srgb, var(--acc) 25%, transparent));
+  }
+  .rl__pin { padding: clamp(2rem, 2.8vw, 3rem); border-top: 0; }
+  .rl__pkicker { margin-bottom: 0.9rem; font-size: 0.62rem; }
+  .rl__ph { font-size: clamp(2rem, 2.8vw, 2.7rem); letter-spacing: -0.025em; }
+  .rl__psub { margin-top: 0.7rem; font-size: 1.02rem; line-height: 1.6; }
+  .rl__cta {
+    min-height: 48px; padding: 0 1.5rem; font-size: 0.9rem;
+    box-shadow: 0 14px 30px -16px color-mix(in srgb, var(--acc) 80%, transparent);
+  }
+
+  /* flow — breathing room, larger cards, readable viz */
+  .rl__flow { gap: clamp(1rem, 1.8vw, 1.6rem); margin-top: clamp(2rem, 3vw, 2.8rem); }
+  .rl__col { gap: 0.8rem; }
+  .rl__col + .rl__col::before { top: 3rem; }
+  .rl__step { font-size: 0.58rem; }
+  .rl__card {
+    border-radius: 18px; padding: 1.1rem;
+    box-shadow: 0 1px 2px rgba(31, 29, 22, 0.04), 0 12px 28px -22px rgba(31, 29, 22, 0.3);
+  }
+  .rlv__qbody { font-size: 0.9rem; }
+  .rlv__cn { font-size: 0.86rem; }
+  .rlv__see li { font-size: 0.86rem; }
+  .rls__sig, .rlp__ev, .rlpr__trig { font-size: 0.82rem; }
+  .rls__acct b { font-size: 0.84rem; }
+
+  /* metric strip — generous */
+  .rl__strip { gap: clamp(1rem, 2vw, 1.8rem); margin-top: clamp(2rem, 3vw, 2.6rem); padding-top: clamp(1.8rem, 2.6vw, 2.2rem); }
+  .rl__tileic { width: 36px; height: 36px; border-radius: 10px; }
+  .rl__tileic svg { width: 17px; height: 17px; }
+  .rl__tileval { font-size: clamp(1.5rem, 2vw, 1.8rem); }
+  .rl__tilelab { margin-top: 0.4rem; font-size: 0.72rem; }
+  .rl__note { margin-top: 1.6rem; font-size: 0.62rem; }
 }
