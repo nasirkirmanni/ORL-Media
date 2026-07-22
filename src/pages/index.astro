@@ -313,14 +313,38 @@ import GlassNav from '../components/GlassNav.astro';
   <!-- ══════════ ENDLESS BACKGROUND (one continuous world) ══════════ -->
   <div class="bg" aria-hidden="true">
     <div class="bg__track" data-bg-track>
-      {/* This tile is the measured LCP element (168,552 B). It sat at default
-          priority, so the browser deprioritised it as a plain background image
-          and raced it against everything else in the document. The three tiles
-          are the same URL and dedupe to one request, so the hint belongs on the
-          first alone; marking all three would be noise. */}
-      <img class="bg__tile" src="/bg-tile.webp" alt="" width="3530" height="891" fetchpriority="high" />
-      <img class="bg__tile" src="/bg-tile.webp" alt="" width="3530" height="891" />
-      <img class="bg__tile" src="/bg-tile.webp" alt="" width="3530" height="891" />
+      {/* This tile is the measured LCP element. It sat at default priority, so
+          the browser deprioritised it as a plain background image and raced it
+          against everything else; the three tiles share one URL and dedupe to a
+          single request, so the hint belongs on the first alone.
+
+          AVIF first, WebP fallback: 168,552 B -> 71,612 B, a 57% cut on the
+          largest asset on the page. Encoded at q50, which measures 40.3 dB PSNR
+          against the WebP it replaces — the same order as the 40.8 dB that
+          already separates this image's own mirrored halves, so the added error
+          sits inside the noise the source already carries.
+
+          Deliberately NOT halved-and-mirrored. The right half of this image is
+          a flipped copy of the left (verified: 40.8 dB), so shipping one half
+          and mirroring in CSS would save a further ~8% — but it puts a seam
+          down the middle of a full-bleed background that can hairline at
+          fractional scales, and that is not verifiable without a real browser.
+          Not worth 8% on the site's centrepiece.
+
+          The <picture> wrappers need `display: contents` (see .bg__track in the
+          styles below) or they, not the <img>, become the flex items. */}
+      <picture>
+        <source srcset="/bg-tile.avif" type="image/avif" />
+        <img class="bg__tile" src="/bg-tile.webp" alt="" width="3530" height="891" fetchpriority="high" />
+      </picture>
+      <picture>
+        <source srcset="/bg-tile.avif" type="image/avif" />
+        <img class="bg__tile" src="/bg-tile.webp" alt="" width="3530" height="891" />
+      </picture>
+      <picture>
+        <source srcset="/bg-tile.avif" type="image/avif" />
+        <img class="bg__tile" src="/bg-tile.webp" alt="" width="3530" height="891" />
+      </picture>
     </div>
   </div>
 
@@ -4968,6 +4992,15 @@ import GlassNav from '../components/GlassNav.astro';
     display: flex;
     will-change: transform;
   }
+  /* Load-bearing. Each tile is wrapped in <picture> to offer AVIF, and this
+     track is a flex container — so without display:contents the <picture>
+     becomes the flex item and .bg__tile's `flex: none; height: 100%` lands on
+     an <img> inside an unsized parent, collapsing the endless background.
+     display:contents removes the wrapper's box and lets the <img> stay the
+     flex item, so the layout is byte-for-byte what it was before. It also
+     leaves tileW() = (3530/891) * innerHeight correct, which the seamless
+     wrap at gsap.utils.wrap(-tileW(), 0, bgX) depends on. */
+  .bg__track picture { display: contents; }
   .bg__tile {
     height: 100%;
     width: auto;
