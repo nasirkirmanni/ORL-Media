@@ -56,6 +56,18 @@ const ogImage = image ? new URL(image, base).href : undefined;
 <link rel="alternate" type="application/rss+xml" title="The ORL Journal" href={new URL('/rss.xml', base).href} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 
+{/* Brand mark. Google will only render an icon beside a result when the site
+    declares one AND the file is a square whose side is a multiple of 48 —
+    the .ico carries 16/32 for browser chrome, so the 192 PNG is declared
+    alongside it as the candidate Google actually picks up. */}
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#0d0d0d" />
+
 <!-- Open Graph -->
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={SITE_NAME} />

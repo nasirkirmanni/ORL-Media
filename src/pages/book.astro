@@ -12,6 +12,19 @@ const ld = graph([
   ]),
 ]);
 import GlassNav from '../components/GlassNav.astro';
+
+/* TODO(orl): this form has NO transport. There is no action, no method, no
+   fetch, and no API route anywhere in src/pages — submitting it has always
+   discarded the lead in the browser. Until a real destination exists, the
+   page must not tell anyone a meeting was booked.
+
+   Set ONE of these and the page wires itself up:
+     CONTACT_EMAIL   → renders a mailto fallback so a visitor has somewhere to go
+     SCHEDULER_URL   → replace this form with the real embed (Cal.com / Calendly)
+
+   Left null on purpose, the same way src/lib/schema.ts leaves logo and sameAs
+   null: an address that bounces is worse than no address at all. */
+const CONTACT_EMAIL: string | null = null;
 ---
 
 <html lang="en">
@@ -188,10 +201,10 @@ import GlassNav from '../components/GlassNav.astro';
             </button>
             <button class="bk__submit bk__submit--grow" type="submit" data-bk-submit>
               <span class="bk__spin" aria-hidden="true"></span>
-              <span data-bk-submit-label>Confirm booking</span>
+              <span data-bk-submit-label>Review your request</span>
             </button>
           </div>
-          <p class="bk__fine mono">A confirmation &amp; calendar invite land in your inbox.</p>
+          <p class="bk__fine mono">Online booking isn&rsquo;t live yet &mdash; this step won&rsquo;t send anything.</p>
         </div>
       </form>
 
@@ -200,14 +213,17 @@ import GlassNav from '../components/GlassNav.astro';
         <span class="bk__done-ic" aria-hidden="true">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>
         </span>
-        <h2 class="bk__done-t">Booking confirmed.</h2>
-        <p class="bk__done-s">You&rsquo;re on the calendar. A confirmation email with the meeting link is on its way &mdash; and we&rsquo;ll bring your live AI-visibility audit to the call.</p>
+        <h2 class="bk__done-t" tabindex="-1">Nothing was sent.</h2>
+        <p class="bk__done-s">Online booking on this site isn&rsquo;t connected yet, so no request left your browser and no meeting is held. Sorry &mdash; that&rsquo;s our fault, not yours. Your answers are below so you can copy them{CONTACT_EMAIL ? ' into an email' : ''} rather than type them again.</p>
         <div class="bk__done-sum">
-          <div><span>When</span><strong data-bk-sum-when></strong></div>
+          <div><span>Preferred time</span><strong data-bk-sum-when></strong></div>
           <div><span>Who</span><strong data-bk-sum-who></strong></div>
           <div><span>Company</span><strong data-bk-sum-co></strong></div>
           <div><span>Budget</span><strong data-bk-sum-budget></strong></div>
         </div>
+        {CONTACT_EMAIL && (
+          <a class="bk__done-back" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Call request — ORL Media')}`}>Email us instead &rarr;</a>
+        )}
         <a class="bk__done-back" href="/">&larr; Back to the site</a>
       </div>
     </section>
@@ -400,20 +416,23 @@ import GlassNav from '../components/GlassNav.astro';
       (slotGrid.querySelector('button') as HTMLButtonElement | null)?.focus();
       return;
     }
+    /* No busy state and no delay. There is nothing to wait for — the 900ms
+       timer that used to sit here existed only to imitate a network round
+       trip, which made a request that never happened feel like one that did.
+       Restore both the moment a real destination exists. */
     submitBtn.disabled = true;
-    submitBtn.classList.add('is-busy');
-    submitLabel.textContent = 'Confirming…';
-    setTimeout(() => {
-      const name = form.querySelector<HTMLInputElement>('#bk-name')!.value.trim();
-      const co = form.querySelector<HTMLInputElement>('#bk-company')!.value.trim();
-      document.querySelector('[data-bk-sum-when]')!.textContent = fmtLong(selDate!) + ' · ' + selTime;
-      document.querySelector('[data-bk-sum-who]')!.textContent = name;
-      document.querySelector('[data-bk-sum-co]')!.textContent = co;
-      document.querySelector('[data-bk-sum-budget]')!.textContent = budgetSel.value + ' / mo';
-      form.style.display = 'none';
-      done.classList.add('is-on');
-      done.scrollIntoView({ block: 'center', behavior: REDUCED ? 'auto' : 'smooth' });
-    }, 900);
+    const name = form.querySelector<HTMLInputElement>('#bk-name')!.value.trim();
+    const co = form.querySelector<HTMLInputElement>('#bk-company')!.value.trim();
+    document.querySelector('[data-bk-sum-when]')!.textContent = fmtLong(selDate!) + ' · ' + selTime;
+    document.querySelector('[data-bk-sum-who]')!.textContent = name;
+    document.querySelector('[data-bk-sum-co]')!.textContent = co;
+    document.querySelector('[data-bk-sum-budget]')!.textContent = budgetSel.value + ' / mo';
+    form.style.display = 'none';
+    done.classList.add('is-on');
+    /* Hiding the form destroys focus, which drops it to <body> and strands
+       keyboard and screen-reader users above the panel they need to read. */
+    done.querySelector<HTMLElement>('.bk__done-t')?.focus();
+    done.scrollIntoView({ block: 'center', behavior: REDUCED ? 'auto' : 'smooth' });
   });
 </script>
 </body>

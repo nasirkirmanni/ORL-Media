@@ -5,6 +5,30 @@
   "outputDirectory": "dist",
   "headers": [
     {
+      "comment": "Baseline security headers. Only HSTS was being sent. No CSP here — this site inlines styles and scripts throughout, so a policy strict enough to be worth having would need a nonce pass first; a permissive one is theatre.",
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()" }
+      ]
+    },
+    {
+      "comment": "Static media in /public carried max-age=0, must-revalidate — the Vercel default when nothing is declared. Every repeat visit paid a measured 0.30-0.39s revalidation round trip, including on the LCP image. /_astro/* already gets immutable from Astro's content hashing; these files are not hashed, so they get a day of freshness plus a week of stale-while-revalidate rather than immutable — replacing bg-tile.webp must not strand viewers on the old bytes for a year.",
+      "source": "/((?!_astro/).*)\\.(webp|avif|png|jpg|jpeg|gif|svg|ico|mp4|webm)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+      ]
+    },
+    {
+      "comment": "A month, NOT immutable. These filenames encode weight (switzer-900.woff2, pierson-thin.ttf), not a content hash, so the same URL can legitimately serve different bytes — and global.css:18-22 documents swapping the display face for a licensed one as planned work. immutable suppresses revalidation even on a manual reload, which would strand returning visitors on the old face for up to a year with no recovery short of renaming the file.",
+      "source": "/fonts/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=2592000" }
+      ]
+    },
+    {
       "source": "/llms.txt",
       "headers": [
         { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
