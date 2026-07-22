@@ -9,3 +9,15 @@ mov.mp4
 # blobs forever, so committing these would bloat every future clone
 # permanently — the shipped, compressed versions live in public/video/.
 .archive/
+
+.vercel
+.env*
+
+# RuFlo runtime state. These are mutating databases and logs rewritten on
+# every run — .swarm/ and ruvector.db alone are ~3.2MB of binary that would
+# churn in every diff. Same reasoning as .archive/ above: git keeps blobs
+# forever. The shareable RuFlo config (CLAUDE.md, .mcp.json, .claude/) is
+# deliberately NOT ignored.
+.claude-flow/
+.swarm/
+ruvector.db
