@@ -79,11 +79,10 @@ const prune = (node: any): any => {
 const FOUNDER_NAME = 'TODO — Founder Full Name';
 export const FOUNDER_READY = !FOUNDER_NAME.includes('TODO');
 
-/* TODO(orl): no ORL brand mark exists in the repo — public/logos/ holds
-   module icons and AI-vendor marks only. Ship a square mark (512×512 min,
-   transparent PNG or SVG) to public/logos/, then set LOGO_PATH to it and
-   correct the dimensions. Left null so we never claim a logo that 404s. */
-const LOGO_PATH: string | null = null;
+/* The ORL wordmark, shipped 2026-07-22. Same artwork as the favicon set at
+   the site root — one mark, one file, so the icon Google shows beside a
+   result and the logo it reads from this graph cannot drift apart. */
+const LOGO_PATH: string | null = '/logos/orl-mark-512.png';
 const LOGO_SIZE = { width: 512, height: 512 };
 const LOGO = LOGO_PATH
   ? {
@@ -186,6 +185,11 @@ export const website = () => ({
   '@id': WEBSITE_ID,
   url: SITE,
   name: SITE_NAME,
+  /* "ORL Media" is not a unique string — it collides with OREL Media UG
+     (Stuttgart) and ORL Creative (Orlando), and bare "ORL" is the medical
+     abbreviation. alternateName gives the engine the domain-qualified form
+     to reconcile against, which is the one variant nobody else owns. */
+  alternateName: 'ORL Media Agency',
   publisher: { '@id': ORG_ID },
   inLanguage: 'en-US',
 });
