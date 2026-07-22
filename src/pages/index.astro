@@ -2625,7 +2625,12 @@ import GlassNav from '../components/GlassNav.astro';
 
   // the Observer that releases the lock now exists, so it is safe to lock —
   // but on mobile the hero is off: disable the interceptor and never lock.
-  if (HERO_OFF) obs.disable();
+  //
+  // REDUCED joins HERO_OFF here. The lock sets overflow:hidden on <html>, which
+  // takes away the scrollbar, find-in-page and keyboard paging until the hero
+  // releases — a visitor who asked the OS for reduced motion was still having
+  // their scroll taken over, because this was gated on viewport width alone.
+  if (HERO_OFF || REDUCED) obs.disable();
   else setDocScroll(true);
 
   // if the browser restored a mid-page scroll position (reload / back-nav),
@@ -5415,7 +5420,13 @@ import GlassNav from '../components/GlassNav.astro';
     transform: translateY(calc(-100% - 1.5rem));
     transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-  .sitenav.is-visible { transform: translateY(0); }
+  .sitenav.is-visible,
+  /* keyboard safety: never let focus land on an invisible target. The nav is
+     parked off-screen by transform, which does NOT remove its links from the
+     tab order — so before this, tabbing from the hero moved focus into a nav
+     sitting above the viewport. Same guard visibility.css:57 already applies
+     to .sitenav--page; the homepage never got it. */
+  .sitenav:focus-within { transform: translateY(0); }
   .sitenav__brand {
     display: flex;
     align-items: center;

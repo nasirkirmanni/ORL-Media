@@ -526,10 +526,22 @@ html.hero-locked { padding-right: var(--sbw, 0px); }
   place-items: center;
   padding: 1.5rem;
   opacity: 0;
+  /* visibility, not just opacity. `opacity:0` leaves descendants in the tab
+     order, so the close button inside this modal stayed focusable while the
+     modal was shut — and index.astro marks the wrapper aria-hidden, so a
+     keyboard user tabbed onto a control that was both invisible and silent.
+     pointer-events:none never covered this: it stops the mouse, not the Tab
+     key. The 0.3s visibility delay on close lets the fade-out still play. */
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
-.p2modal.is-open { opacity: 1; pointer-events: auto; }
+.p2modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.3s ease, visibility 0s;
+}
 .p2modal__scrim {
   position: absolute;
   inset: 0;

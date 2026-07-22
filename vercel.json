@@ -16,7 +16,7 @@
     },
     {
       "comment": "Static media in /public carried max-age=0, must-revalidate — the Vercel default when nothing is declared. Every repeat visit paid a measured 0.30-0.39s revalidation round trip, including on the LCP image. /_astro/* already gets immutable from Astro's content hashing; these files are not hashed, so they get a day of freshness plus a week of stale-while-revalidate rather than immutable — replacing bg-tile.webp must not strand viewers on the old bytes for a year.",
-      "source": "/(.*)\\.(webp|avif|png|jpg|jpeg|gif|svg|ico|mp4|webm)",
+      "source": "/((?!_astro/).*)\\.(webp|avif|png|jpg|jpeg|gif|svg|ico|mp4|webm)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
       ]
