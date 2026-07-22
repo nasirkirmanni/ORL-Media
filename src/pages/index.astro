@@ -311,7 +311,12 @@ import GlassNav from '../components/GlassNav.astro';
   <!-- ══════════ ENDLESS BACKGROUND (one continuous world) ══════════ -->
   <div class="bg" aria-hidden="true">
     <div class="bg__track" data-bg-track>
-      <img class="bg__tile" src="/bg-tile.webp" alt="" width="3530" height="891" />
+      {/* This tile is the measured LCP element (168,552 B). It sat at default
+          priority, so the browser deprioritised it as a plain background image
+          and raced it against everything else in the document. The three tiles
+          are the same URL and dedupe to one request, so the hint belongs on the
+          first alone; marking all three would be noise. */}
+      <img class="bg__tile" src="/bg-tile.webp" alt="" width="3530" height="891" fetchpriority="high" />
       <img class="bg__tile" src="/bg-tile.webp" alt="" width="3530" height="891" />
       <img class="bg__tile" src="/bg-tile.webp" alt="" width="3530" height="891" />
     </div>
