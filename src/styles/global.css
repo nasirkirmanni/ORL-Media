@@ -52,6 +52,23 @@ html, body {
    Licence: ITF Free Font Licence — free for commercial use, redistribution
    with the site is permitted. */
 @font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/general-sans-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  /* Self-hosted for the same reason Switzer is, and now for a measured one:
+     the api.fontshare.com stylesheet this replaces was render-blocking in the
+     head of all ten page templates, and answered in 0.77-0.90s (TLS handshake
+     alone 0.58-0.68s) to deliver 607 bytes. Google Fonts serves the same kind
+     of request in 0.24-0.28s. Worse, those 607 bytes only pointed at
+     cdn.fontshare.com — a second origin, never preconnected — so the actual
+     font sat behind a fresh DNS+TCP+TLS after the 0.88s was already spent.
+     This file is that exact woff2, byte-identical, served from our own origin.
+     General Sans is ITF, free to self-host under the same licence as Switzer. */
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Switzer';
   src: url('/fonts/switzer-900.woff2') format('woff2');
   font-weight: 900;

@@ -187,15 +187,17 @@ import GlassNav from '../components/GlassNav.astro';
   </Seo>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
   <!-- Inter 900 is requested for the pinned wordmark. Without it the browser
        synthesises a fake black from 600, which smears at 240px+. -->
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <!-- Switzer 900 (the pinned wordmark) is self-hosted — see @font-face in
-       global.css. It is NOT requested here: api.fontshare.com currently answers
-       with "Access to the Fontshare API has been temporarily restricted", so
-       any face behind it silently never arrives. -->
-  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
+  {/* Both ITF faces — Switzer 900 (the pinned wordmark) and General Sans 600 —
+      are self-hosted; see @font-face in global.css. Neither is requested here.
+      api.fontshare.com has answered "Access to the Fontshare API has been
+      temporarily restricted" before, so any face behind it can silently never
+      arrive, and when it does answer it took a measured 0.77-0.90s to return
+      607 bytes of CSS that only pointed at a second, un-preconnected origin.
+      Astro comment, not HTML: this note is for whoever reads the source, and
+      there is no reason to ship it to every visitor. */}
 </head>
 <body>
 
