@@ -21,3 +21,40 @@ mov.mp4
 .claude-flow/
 .swarm/
 ruvector.db
+
+# ── Local working files ───────────────────────────────────────
+# Design masters, source media and research notes that live at the repo
+# root as a scratch area. None of it is consumed by the build — the site
+# reads only src/ and public/ — and several are duplicates of shipped
+# assets (root 3.png / rob.png are byte-identical to the originals that
+# now ship as public/*.webp). ~64MB total; git keeps blobs forever, so
+# the same reasoning as .archive/ above applies.
+#
+# Root-anchored (leading /) so public/ and src/ assets are unaffected.
+/*.png
+/*.mp4
+/*.pdf
+/*.ttf
+/readme.html
+
+# Research + planning notes (the audit reports and CITATIONS-TODO.md are
+# deliberately tracked; these are working drafts).
+/aeo.md
+/myaeo.md
+/gtm.md
+/orlmedia_blueprint.md
+/orlproof.md
+/orlsignals.md
+/section2prompt.md
+/buying-windows-implementation.md
+/ORL_AEO_MASTER_PLAYBOOK.md
+/ORL_AEO_v1.1_Evidence_Hygiene_Log.md
+
+# Font source kits and the pre-Astro static prototype.
+/OTF/
+/Variable/
+/WEB/
+
+# Installed agent skills — reproducible from skills-lock.json via
+# `npx skills add`, which is tracked.
+/.agents/
