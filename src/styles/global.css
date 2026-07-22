@@ -10,6 +10,16 @@
   --gray-deep: #3a3a38;
   --accent: #8a5320;
 
+  /* The faint tier, which never existed. --o3-muted and --o3-soft cover the
+     mid greys, so every author who needed something fainter typed a literal —
+     #a79d89 and #b9b09d, which measure 2.40:1 and 1.93:1 on the cream surfaces
+     and fail 1.4.3 outright at the 0.56-0.62rem sizes they are used at.
+     Tinted ink over alpha rather than a flat tan, so it tracks whatever ground
+     it lands on: the pattern the author already arrived at independently at
+     line ~860 after measuring the old tan at "~2:1, effectively invisible".
+     0.65 puts it near 4.9:1 on #f6f2ea and higher on the white cards. */
+  --faint: rgba(31, 29, 25, 0.65);
+
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-ui: 'Inter', system-ui, sans-serif;
   /* Giant-display face — the oversized single words (currently only
@@ -4663,7 +4673,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
   padding-top: 0.85rem;
   border-top: 1px solid #f0e9da;
   font-size: 0.58rem;
-  color: #a79d89;
+  color: var(--faint);
 }
 .inscard--feat { grid-column: 1 / -1; padding: 2.3rem 2.4rem 1.8rem; }
 .inscard--feat .inscard__title { font-size: clamp(1.8rem, 3vw, 2.5rem); max-width: 46rem; }
@@ -4728,7 +4738,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
   transition: transform 0.15s ease;
 }
 .blg__cta a:hover { transform: translateY(-2px); }
-.blg__foot { padding: 2.6rem 0 2.2rem; text-align: center; font-size: 0.6rem; color: #a79d89; }
+.blg__foot { padding: 2.6rem 0 2.2rem; text-align: center; font-size: 0.6rem; color: var(--faint); }
 
 /* — article page — */
 .post { max-width: 74rem; margin: 0 auto; padding: 3.5rem 1.5rem 0; }
@@ -4746,7 +4756,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
   margin: 0.9rem 0 0;
 }
 .post__desc { margin: 1.2rem 0 0; font-size: 1.06rem; line-height: 1.6; color: #6f675a; }
-.post__meta { margin: 1.5rem 0 0; padding-top: 1.2rem; border-top: 1px solid #e6ddcc; font-size: 0.6rem; color: #a79d89; }
+.post__meta { margin: 1.5rem 0 0; padding-top: 1.2rem; border-top: 1px solid #e6ddcc; font-size: 0.6rem; color: var(--faint); }
 
 .prose { max-width: 48rem; margin: 0 auto; font-size: 1.02rem; line-height: 1.78; color: #2c2924; }
 .prose h2 {
@@ -4884,7 +4894,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
 }
 .bk__steps strong { display: block; font-size: 0.9rem; font-weight: 600; color: #1f1d19; }
 .bk__steps p { margin: 0.25rem 0 0; font-size: 0.86rem; line-height: 1.5; color: #6f675a; }
-.bk__trust { margin: 2rem 0 0; font-size: 0.62rem; color: #a79d89; }
+.bk__trust { margin: 2rem 0 0; font-size: 0.62rem; color: var(--faint); }
 
 /* — right: the booking card — */
 .bk__card {
@@ -4909,7 +4919,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
 .bk-field:last-child { margin-bottom: 0; }
 .bk-field label { display: block; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 500; color: #1f1d19; }
 .bk-field label em { font-style: normal; color: #c14a35; }
-.bk-field label small { font-weight: 400; color: #a79d89; font-size: 0.72rem; }
+.bk-field label small { font-weight: 400; color: var(--faint); font-size: 0.72rem; }
 .bk-field input {
   width: 100%;
   box-sizing: border-box;
@@ -4923,7 +4933,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
   border-radius: 10px;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
-.bk-field input::placeholder { color: #b9b09d; }
+.bk-field input::placeholder { color: var(--faint); }
 .bk-field input:focus-visible {
   outline: none;
   border-color: var(--accent);
@@ -4949,7 +4959,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
   gap: 0.45rem;
   font-size: 0.72rem;
   font-weight: 500;
-  color: #b9b09d;
+  color: var(--faint);
 }
 .bk__prog-item b {
   width: 24px;
@@ -4992,9 +5002,9 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 /* placeholder-grey while the disabled first option is still selected */
-.bk__select:required:invalid { color: #b9b09d; }
+.bk__select:required:invalid { color: var(--faint); }
 .bk__select option { color: #1f1d19; }
-.bk__select option[disabled] { color: #b9b09d; }
+.bk__select option[disabled] { color: var(--faint); }
 .bk__select:focus-visible {
   outline: none;
   border-color: var(--accent);
@@ -5032,7 +5042,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
 .bk__calnav button:hover:not(:disabled) { background: #f6f1e6; }
 .bk__calnav button:disabled { opacity: 0.35; cursor: default; }
 .bk__caldays, .bk__calgrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.bk__caldays span { text-align: center; font-size: 0.56rem; color: #a79d89; padding: 0.3rem 0; }
+.bk__caldays span { text-align: center; font-size: 0.56rem; color: var(--faint); padding: 0.3rem 0; }
 .bk__calgrid button {
   aspect-ratio: 1;
   min-height: 38px;
@@ -5083,7 +5093,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
 .bk__slotlist button:hover { border-color: #cfc4ab; background: #fbf7ee; }
 .bk__slotlist button.is-sel { background: #1f1d19; border-color: #1f1d19; color: #f6f2ea; }
 .bk__slotlist button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.bk__tz { margin: 0.8rem 0 0; font-size: 0.58rem; color: #a79d89; }
+.bk__tz { margin: 0.8rem 0 0; font-size: 0.58rem; color: var(--faint); }
 
 /* step-2 actions */
 .bk__actions { display: flex; gap: 0.7rem; align-items: stretch; margin-top: 1.6rem; }
@@ -5154,7 +5164,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
 }
 .bk__submit.is-busy .bk__spin { display: inline-block; }
 @keyframes bkspin { to { transform: rotate(360deg); } }
-.bk__fine { margin: 0.9rem 0 0; text-align: center; font-size: 0.6rem; color: #a79d89; }
+.bk__fine { margin: 0.9rem 0 0; text-align: center; font-size: 0.6rem; color: var(--faint); }
 
 /* success panel */
 .bk__done { display: none; text-align: center; padding: 2.5rem 1.5rem 2rem; }
@@ -5182,7 +5192,7 @@ html.navmenu-lock { padding-right: var(--navmenu-sbw, 0px); }
 }
 .bk__done-sum div { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; font-size: 0.84rem; }
 .bk__done-sum div + div { border-top: 1px solid #f6f0e4; }
-.bk__done-sum span { color: #a79d89; }
+.bk__done-sum span { color: var(--faint); }
 .bk__done-sum strong { font-weight: 600; color: #1f1d19; text-align: right; }
 .bk__done-back { display: inline-flex; margin-top: 1.6rem; font-size: 0.86rem; font-weight: 600; color: var(--accent); text-decoration: none; }
 .bk__done-back:hover { text-decoration: underline; text-underline-offset: 3px; }
