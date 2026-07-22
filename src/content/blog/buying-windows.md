@@ -1,5 +1,7 @@
 ---
 title: "Buying windows: the missing layer in modern GTM"
+seoTitle: "Buying Windows: The Missing Layer in Modern GTM"
+seoDescription: "Cold email converts at 1.2%. Paid's pipeline share fell to 26%. CAC payback hit 18 months. The problem was never reach - it was timing. A field guide."
 description: "Cold email converts at 1.2%. Paid's share of pipeline fell to 26%. CAC payback stretched to 18 months. The problem was never reach — it was timing. A field guide to buying-window intelligence, and the infrastructure that detects it."
 date: 2026-07-19
 category: "Pipeline"

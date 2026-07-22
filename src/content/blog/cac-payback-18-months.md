@@ -1,5 +1,7 @@
 ---
 title: "CAC payback hit 18 months. The old pipeline math is dead."
+seoTitle: "CAC Payback Hit 18 Months: The New Pipeline Math"
+seoDescription: "Paid's share of B2B SaaS pipeline fell from 34% to 26% while organic climbed to 27%. What stretched payback periods mean for how founders fund pipeline now."
 description: "Paid's share of B2B SaaS pipeline fell from 34% to 26% while organic climbed to 27%. What stretched payback periods mean for how founders should fund pipeline in 2026."
 date: 2026-05-21
 category: "Pipeline"

@@ -1,5 +1,7 @@
 ---
 title: "Lean by design: the $100K-per-employee operating model"
+seoTitle: "Lean by Design: The $100K-Per-Employee Model"
+seoDescription: "Median revenue per employee at $1-3M ARR is now ~$100K and CMO tenure is under two years. How small teams re-architect growth work."
 description: "Median revenue per employee at $1–3M ARR is now ~$100K, a full-time marketer is the exception rather than the rule, and CMO tenure averages under two years. How small teams re-architect growth work."
 date: 2026-04-24
 category: "Operations"

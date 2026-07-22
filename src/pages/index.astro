@@ -1,6 +1,6 @@
 ---
 import Seo from '../components/Seo.astro';
-import { graph, organization, website } from '../lib/schema';
+import { graph, organization, website, faqPage } from '../lib/schema';
 
 import '../styles/global.css';
 import '../styles/revenue-leak.css';
@@ -51,7 +51,7 @@ const slides = [
     line: 'AI that works while you rest — outbound, buyer trust, and analytics in one engine.',
     actLabel: 'Act Two',
     actName: 'Built to Compound',
-    img: '/rob.png',
+    img: '/rob.webp',
     imgW: 1024,
     imgH: 1536,
   },
@@ -67,7 +67,7 @@ const slides = [
     line: 'Senior people who install the machine — and stay to run it.',
     actLabel: 'Act Three',
     actName: 'On Your Side',
-    img: '/3.png',
+    img: '/3.webp',
     imgW: 1254,
     imgH: 1254,
     frame: true, // full-scene photo, shown framed & centered (not a cutout)
@@ -124,7 +124,51 @@ const STAGES = [
   },
 ];
 
-const ld = graph([organization(), website()]);
+/* ── FAQ (objection handling) ──────────────────────────────────
+   Single source of truth: the <details> list below renders FROM
+   this array and faqPage() serializes the SAME array. Answer
+   engines require the marked-up Q&A to match what the visitor
+   can actually read — keeping one copy is how that stays true. */
+const FAQ = [
+  {
+    q: 'What exactly is the Growth Engine?',
+    a: 'The full system: Visibility, Signals, Proof, and Pricing running together on one Metrics layer — discovery, demand, deal conversion, and monetization, installed and operated for you. Each system is accountable to a single number: Share of Answer, qualified meetings booked, no-decision rate, and net revenue per account. Start with one module or install the whole machine.',
+  },
+  {
+    q: 'How does the AI Visibility Audit work?',
+    a: 'Fixed scope, 10 business days. We score how you appear across ChatGPT, Perplexity, Gemini, and Google AI Overviews for 100+ real buying questions, benchmark you against three competitors, and hand you a prioritized 90-day plan. All we need to start is your domain, your category, and your three closest competitors — we build the question set, you approve the list. It is where every engagement starts.',
+  },
+  {
+    q: 'Can we just buy one module?',
+    a: 'Yes — Visibility and Signals run standalone. Proof is design-partner only right now, with three seats; Pricing is in build with the waitlist open. The full Engine is for companies that want the whole machine on one set of numbers: every module, one senior team, one weekly cadence, with the Metrics layer bundled in rather than sold separately.',
+  },
+  {
+    q: 'How do you measure success?',
+    a: 'One metric per system — Share of Answer, qualified meetings booked, no-decision rate, and net revenue per account — all reporting into a board-grade Metrics layer bundled into every engagement and never sold separately. Share of Answer, for example, is the percentage of AI answers in your category that cite or recommend you, tracked monthly against three competitors.',
+  },
+  {
+    q: 'Do we keep the systems if we leave?',
+    a: 'Yes. Everything we install is yours and keeps running after the engagement ends: the question map and entity layer on your domain, the trigger model trained on your own closed-won deals, the Stall Map and evidence library, the dashboards and their full history. That is the difference between an installation and a retainer.',
+  },
+  {
+    q: 'How are you different from an agency?',
+    a: 'We install systems you own. Most agencies sell activity — more emails, more content, more campaigns — and the defining property is that when the activity stops, the results stop. Nothing accumulates. Our own AI products run inside every engagement, and what we build keeps working after we are gone.',
+  },
+  {
+    q: 'What does it cost?',
+    a: 'Scoped on the call. Every engagement is a flat retainer matched to the modules and volume you need — a flat fee, never a percentage of ad spend. Ask and you get real numbers immediately; we do not do the coy-pricing dance. Every engagement starts with the fixed-scope Audit, so you see the work before committing to anything ongoing.',
+  },
+  {
+    q: 'What if it doesn’t work?',
+    a: 'Engine engagements carry a 90-day pipeline guarantee: installed and generating qualified pipeline within 90 days, or we keep working free until they are. We can offer that because we do not start engagements we do not believe in — the Audit exists to find that out first, cheaply, and plenty of audits end at the readout.',
+  },
+  {
+    q: 'Do you do social media or paid ads?',
+    a: 'Paid runs inside the Engine when it is the right channel, and it is measured on the same Metrics layer as everything else. We do not sell channel management as a product — we sell the system that makes channels work. Buying more activity on top of a leaking funnel is how growth budgets disappear.',
+  },
+];
+
+const ld = graph([organization(), website(), faqPage(FAQ)]);
 import GlassNav from '../components/GlassNav.astro';
 ---
 
@@ -133,7 +177,7 @@ import GlassNav from '../components/GlassNav.astro';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <Seo
-    title="ORL Media — Inside the Growth Engine"
+    title="Growth Infrastructure for B2B SaaS & AI Startups | ORL Media"
     description="ORL Media installs AI-powered growth systems for B2B SaaS and AI startups — discovery, demand, deals, and monetization in one engine, on one set of numbers."
     ogTitle="We don’t run your marketing. We install the machine."
     ogDescription="Growth infrastructure for B2B SaaS and AI companies: AI search visibility, buying-signal intelligence, deal-stage proof, and monetization — four systems on one layer of truth."
@@ -146,7 +190,7 @@ import GlassNav from '../components/GlassNav.astro';
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
   <!-- Inter 900 is requested for the pinned wordmark. Without it the browser
        synthesises a fake black from 600, which smears at 240px+. -->
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <!-- Switzer 900 (the pinned wordmark) is self-hosted — see @font-face in
        global.css. It is NOT requested here: api.fontshare.com currently answers
        with "Access to the Fontshare API has been temporarily restricted", so
@@ -154,6 +198,8 @@ import GlassNav from '../components/GlassNav.astro';
   <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
 </head>
 <body>
+
+<a class="skip-link" href="#main">Skip to content</a>
 
 <!-- ═══════════════════════════════════════════════════════════════
      MOBILE-ONLY HOMEPAGE (≤767px)
@@ -2245,42 +2291,12 @@ import GlassNav from '../components/GlassNav.astro';
       <h2 class="faq__h2" data-faq-in>Questions founders<br />actually ask.</h2>
     </div>
     <div class="faq__list" data-faq-in>
-      <details class="faq__item">
-        <summary>What exactly is the Growth Engine?</summary>
-        <p>The full system: Visibility, Signals, Proof, and Pricing running together on one Metrics layer &mdash; discovery, demand, deal conversion, and monetization, installed and operated for you. Start with a single module or install the whole machine.</p>
-      </details>
-      <details class="faq__item">
-        <summary>How does the AI Visibility Audit work?</summary>
-        <p>Fixed scope, 10 business days. We score how you appear across ChatGPT, Perplexity, Gemini, and Google AI Overviews for 100+ real buying questions, benchmark you against three competitors, and hand you a prioritized 90-day plan. It&rsquo;s where every engagement starts.</p>
-      </details>
-      <details class="faq__item">
-        <summary>Can we just buy one module?</summary>
-        <p>Yes &mdash; Visibility and Signals run standalone. Proof is design-partner only right now; Pricing is in build. The full Engine is for companies that want the whole machine on one set of numbers.</p>
-      </details>
-      <details class="faq__item">
-        <summary>How do you measure success?</summary>
-        <p>One metric per system &mdash; Share of Answer, qualified meetings booked, no-decision rate, and net revenue per account &mdash; all reporting into a board-grade Metrics layer that&rsquo;s bundled into every engagement and never sold separately.</p>
-      </details>
-      <details class="faq__item">
-        <summary>Do we keep the systems if we leave?</summary>
-        <p>Yes. Everything we install &mdash; the dashboards, the trigger models, the content and citation layer, the trust center &mdash; is yours and keeps running after the engagement ends. That&rsquo;s the difference between an installation and a retainer.</p>
-      </details>
-      <details class="faq__item">
-        <summary>How are you different from an agency?</summary>
-        <p>We install systems you own. Agencies rent you effort &mdash; when they leave, everything stops. Our own AI products run inside every engagement, and what we build keeps working after we&rsquo;re gone.</p>
-      </details>
-      <details class="faq__item">
-        <summary>What does it cost?</summary>
-        <p>Scoped on the call. Every engagement is a flat retainer matched to the modules and volume you need &mdash; never a percentage of ad spend. When you ask, we give you real numbers immediately.</p>
-      </details>
-      <details class="faq__item">
-        <summary>What if it doesn&rsquo;t work?</summary>
-        <p>Engine engagements carry a 90-day pipeline guarantee. If the systems aren&rsquo;t producing qualified pipeline, we keep working free until they are.</p>
-      </details>
-      <details class="faq__item">
-        <summary>Do you do social media or paid ads?</summary>
-        <p>Paid runs inside the Engine when it&rsquo;s the right channel. We don&rsquo;t sell channel management as a product &mdash; we sell the system that makes channels work.</p>
-      </details>
+      {FAQ.map((f) => (
+        <details class="faq__item">
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
     </div>
   </div>
 </section>
@@ -4989,7 +5005,7 @@ import GlassNav from '../components/GlassNav.astro';
     display: block;
     backface-visibility: hidden;
   }
-  /* Machine slide (rob.png): GSAP parses the person's CSS translateX(-50%) as a
+  /* Machine slide (rob.webp): GSAP parses the person's CSS translateX(-50%) as a
      base x and adds its own xPercent:-50 on top, so the figure lands at an
      effective translateX(-100%) — 50% too far left. The container transform is
      GSAP-owned, so we can't correct it there; instead shift the IMG (which GSAP

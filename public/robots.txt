@@ -4,4 +4,9 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://orlmedia.com/sitemap-index.xml
+Sitemap: https://www.orlmedia.agency/sitemap-index.xml
+
+# Machine-readable context for AI systems and agents.
+# Non-standard directives; ignored by crawlers that don't read them.
+# https://www.orlmedia.agency/llms.txt
+# https://www.orlmedia.agency/pricing.md

@@ -1,5 +1,6 @@
 ---
 title: "Churn announces itself 90 days early"
+seoDescription: "Almost nobody churns on renewal day. Usage slips, tickets pile up, engagement fades weeks before the email arrives. The anatomy of a preventable churn."
 description: "Almost nobody churns on renewal day. Usage slips, tickets pile up, engagement fades — weeks before the email arrives. The anatomy of a preventable churn, and the system that catches it."
 date: 2026-06-05
 category: "Retention"

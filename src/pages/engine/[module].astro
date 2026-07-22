@@ -2,7 +2,7 @@
 import '../../styles/global.css';
 import '../../styles/engine.css';
 import Seo from '../../components/Seo.astro';
-import { graph, organization, website, service, breadcrumbs } from '../../lib/schema';
+import { graph, organization, website, service, faqPage, breadcrumbs } from '../../lib/schema';
 import { MODULES, ORDER } from '../../lib/modules';
 
 /* ─────────────────────────────────────────────────────────────
@@ -44,6 +44,7 @@ const ld = graph([
   organization(),
   website(),
   service({ name: m.name, description: m.sub, path: modPath }),
+  faqPage(m.faq),
   breadcrumbs([
     { name: 'Home', path: '/' },
     { name: 'The Growth Engine', path: '/engine/' },
@@ -58,8 +59,8 @@ import GlassNav from '../../components/GlassNav.astro';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <Seo
-    title={`${m.name} — ${m.pos} | ORL Growth Engine`}
-    description={`System ${m.num} of the ORL Growth Engine. ${m.sub}`}
+    title={m.seoTitle}
+    description={m.seoDescription}
     ogTitle={`ORL ${m.name} — ${m.pos}`}
     image={`/og/${slug}.jpg`}
   >
@@ -72,6 +73,8 @@ import GlassNav from '../../components/GlassNav.astro';
   <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600&display=swap" rel="stylesheet" />
 </head>
 <body class="blg-body eng-body">
+
+<a class="skip-link" href="#main">Skip to content</a>
 
 <nav class="sitenav sitenav--page is-visible" aria-label="Site">
   <a class="sitenav__brand" href="/">
@@ -122,6 +125,10 @@ import GlassNav from '../../components/GlassNav.astro';
       <div class="mod__probleft" data-e-in>
         <p class="mod__eyebrow mono">Why this system exists</p>
         <h2 class="mod__h2">{m.problem.headline}</h2>
+        {/* Standalone answer passage — sits directly under the top H2 so
+            an answer engine extracting this section gets a complete,
+            self-contained definition of the system. */}
+        <p class="mod__answer" data-e-in>{m.answer}</p>
         <p class="mod__bigstat"><strong data-e-in>{m.problem.stat}</strong></p>
         <p class="mod__bigstatline mono">{m.problem.statLine}</p>
       </div>
@@ -213,6 +220,24 @@ import GlassNav from '../../components/GlassNav.astro';
       </ol>
     </div>
   </nav>
+
+  <!-- ── faq ──
+       Rendered from m.faq, the same array faqPage() serializes into
+       JSON-LD, so the marked-up Q&A always matches what is on screen. -->
+  <section class="mod__faq" aria-label="Frequently asked questions">
+    <div class="mod__inner">
+      <p class="mod__eyebrow mono" data-e-in>Before you ask</p>
+      <h2 class="mod__h2" data-e-in>{m.name} questions.</h2>
+      <div class="mod__faqlist" data-e-in>
+        {m.faq.map((f) => (
+          <details class="mod__faqitem">
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
 
   <!-- ── cta ── -->
   <section class="mod__cta" aria-label="Next step">

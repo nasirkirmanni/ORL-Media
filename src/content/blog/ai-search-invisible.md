@@ -1,5 +1,6 @@
 ---
 title: "If AI doesn't cite you, you don't exist"
+seoDescription: "94% of B2B buyers now use generative AI while purchasing, and chatbots drive vendor shortlists. How the shortlist actually gets formed, and how to get on it."
 description: "94% of B2B buyers now use generative AI during their purchase process — and chatbots have become the single biggest influence on vendor shortlists. Here's how the shortlist actually gets formed, and how to get on it."
 date: 2026-07-14
 category: "AI Search"

@@ -1,5 +1,7 @@
 ---
 title: "The AI churn wave is real. Your NRR already knows."
+seoTitle: "The AI Churn Wave Is Real — Your NRR Knows"
+seoDescription: "Median NRR for $1-10M ARR SaaS has slipped to ~98%, and low-priced AI products post NRR as low as 32%. What the churn wave looks like from inside the metrics."
 description: "Median NRR for $1–10M ARR SaaS has slipped to ~98% — and low-priced AI products are posting NRR as low as 32%. What the churn wave looks like from inside the metrics, and how to get ahead of it."
 date: 2026-07-02
 category: "Retention"

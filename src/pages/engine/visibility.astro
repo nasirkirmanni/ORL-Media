@@ -5,7 +5,7 @@ import '../../styles/visibility.css';
 import '../../styles/aeo.css';
 import Seo from '../../components/Seo.astro';
 import GlassNav from '../../components/GlassNav.astro';
-import { graph, organization, website, service, breadcrumbs } from '../../lib/schema';
+import { graph, organization, website, service, faqPage, breadcrumbs } from '../../lib/schema';
 import { MODULES, ORDER } from '../../lib/modules';
 
 /* ─────────────────────────────────────────────────────────────
@@ -36,6 +36,7 @@ const ld = graph([
   organization(),
   website(),
   service({ name: m.name, description: m.sub, path: modPath }),
+  faqPage(m.faq),
   breadcrumbs([
     { name: 'Home', path: '/' },
     { name: 'The Growth Engine', path: '/engine/' },
@@ -240,8 +241,8 @@ const MODALS: Record<string, Modal> = {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <Seo
-    title={`${m.name} — ${m.pos} | ORL Growth Engine`}
-    description={`System ${m.num} of the ORL Growth Engine. ${m.sub}`}
+    title={m.seoTitle}
+    description={m.seoDescription}
     ogTitle={`ORL ${m.name} — ${m.pos}`}
     image={`/og/${slug}.jpg`}
   >
@@ -274,6 +275,8 @@ const MODALS: Record<string, Modal> = {
 </head>
 <body class="blg-body eng-body">
 
+<a class="skip-link" href="#main">Skip to content</a>
+
 <nav class="sitenav sitenav--page is-visible" aria-label="Site">
   <a class="sitenav__brand" href="/">
     <span class="sitenav__mark" aria-hidden="true"></span>
@@ -299,7 +302,11 @@ const MODALS: Record<string, Modal> = {
       <a href="/engine">The Growth Engine</a>
       <span aria-hidden="true">/</span> System {m.num}
     </p>
-    <h1 class="vmhero__title">{m.name}<em>.</em></h1>
+    {/* Was an <h1>, but the visually-hidden document H1 lower in this file
+        is also in the DOM — two H1s on one page. Demoted to <p>: the CSS is
+        class-based (.vmhero__title), so this is visually identical, and the
+        single sr-only H1 now serves both breakpoints. */}
+    <p class="vmhero__title">{m.name}<em>.</em></p>
     <p class="vmhero__pos">{m.pos}</p>
     <p class="vmhero__sub">{m.sub}</p>
   </header>
@@ -439,6 +446,9 @@ const MODALS: Record<string, Modal> = {
         and AI-powered search engines for recommendations, comparisons and
         solutions.
       </p>
+      {/* Standalone answer passage — self-contained so an answer engine
+          extracting this section alone still gets a complete definition. */}
+      <p class="aeo__answer" data-aeo-card>{m.answer}</p>
       <div class="aeo__ctacenter" data-aeo-card>
         <a class="aeo__btn" href="/audit">
           Discover your AI visibility
@@ -801,6 +811,24 @@ const MODALS: Record<string, Modal> = {
         Illustrative demonstration data, not a client result. Replaced with real,
         attributable figures once available.
       </p>
+    </div>
+  </section>
+
+  <!-- ── 9b · faq ──
+       Rendered from m.faq, the same array faqPage() serializes into
+       JSON-LD. Marked-up Q&A must match on-screen copy, so there is
+       exactly one source for both. -->
+  <section class="aeo__sec aeo__faq" aria-labelledby="aeo-faq-h">
+    <div class="aeo__in--narrow">
+      <h2 class="aeo__h2" id="aeo-faq-h" data-aeo-card>Common questions</h2>
+      <div class="aeo__faqlist" data-aeo-card>
+        {m.faq.map((f) => (
+          <details class="aeo__faqitem">
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
     </div>
   </section>
 

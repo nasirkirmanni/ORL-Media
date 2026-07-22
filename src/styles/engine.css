@@ -762,3 +762,60 @@ body.eng-body::after {
     align-items: center;
   }
 }
+
+/* ── answer passage ───────────────────────────────────────────
+   The 40–60 word standalone answer under each module's top H2.
+   Visually a lede; structurally the passage answer engines lift. */
+.mod__answer {
+  margin: 1.1rem 0 0;
+  max-width: 34rem;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: #3b372f;
+}
+
+/* ── module FAQ ───────────────────────────────────────────────
+   Mirrors the homepage .faq__* treatment so the two read as one
+   system; scoped to .mod__ so engine.css stays self-contained. */
+.mod__faq { padding: 4.5rem 1.5rem 1rem; }
+.mod__faqlist { max-width: 46rem; margin: 2rem 0 0; }
+.mod__faqitem { border-top: 1px solid #e6ddcc; }
+.mod__faqitem:last-child { border-bottom: 1px solid #e6ddcc; }
+.mod__faqitem summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.4rem 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.22rem;
+  color: #1f1d19;
+}
+.mod__faqitem summary::-webkit-details-marker { display: none; }
+.mod__faqitem summary::after {
+  content: '+';
+  flex: none;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--acc-d);
+  transition: transform 0.2s ease;
+}
+.mod__faqitem[open] summary::after { content: '\2212'; }
+.mod__faqitem p {
+  margin: 0 0 1.5rem;
+  max-width: 42rem;
+  font-size: 0.97rem;
+  line-height: 1.7;
+  color: #575046;
+}
+@media (max-width: 720px) {
+  .mod__faq { padding: 3.5rem 1.25rem 0.5rem; }
+  .mod__faqitem summary { font-size: 1.08rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mod__faqitem summary::after { transition: none; }
+}

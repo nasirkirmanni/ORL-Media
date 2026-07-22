@@ -35,6 +35,7 @@ const ld = graph([
     description: post.data.description,
     path: postPath,
     published: post.data.date,
+    updated: post.data.updated,
     section: post.data.category,
     wordCount,
   }),
@@ -48,10 +49,22 @@ const ld = graph([
 const all = (await getCollection('blog')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
-const related = [
-  ...all.filter((p) => p.id !== post.id && p.data.category === post.data.category),
-  ...all.filter((p) => p.id !== post.id && p.data.category !== post.data.category),
-].slice(0, 2);
+/* Same-category first — that is what actually helps a reader. The rest is a
+   ROTATING window rather than "newest first".
+
+   Why: `all` is sorted newest-first, so the cross-category slots always went
+   to the same two or three recent posts. The result was a lopsided internal
+   link graph — the newest articles collected 9 inbound links while the two
+   oldest sat on 1 each, starving the pages that hold most of the site's
+   statistics. Offsetting the window by this post's own index spreads
+   internal authority evenly and stays fully deterministic across builds. */
+const sameCat = all.filter((p) => p.id !== post.id && p.data.category === post.data.category);
+const others = all.filter((p) => p.id !== post.id && p.data.category !== post.data.category);
+const selfIdx = all.findIndex((p) => p.id === post.id);
+const rotated = others.length
+  ? others.map((_, i) => others[(i + selfIdx) % others.length])
+  : [];
+const related = [...sameCat, ...rotated].slice(0, 3);
 
 const CAT_COLOR: Record<string, string> = {
   'AI Search': '#2e5cff',
@@ -91,11 +104,12 @@ import GlassNav from '../../components/GlassNav.astro';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <Seo
-    title={`${post.data.title} | The ORL Journal`}
-    description={post.data.description}
+    title={`${post.data.seoTitle ?? post.data.title} | ORL Media`}
+    description={post.data.seoDescription ?? post.data.description}
     ogTitle={post.data.title}
     type="article"
     publishedTime={post.data.date.toISOString()}
+    modifiedTime={(post.data.updated ?? post.data.date).toISOString()}
     image={ogImage}
   >
     <script type="application/ld+json" is:inline set:html={ld} />
@@ -114,6 +128,8 @@ import GlassNav from '../../components/GlassNav.astro';
 </head>
 <body class="blg-body">
 
+<a class="skip-link" href="#main">Skip to content</a>
+
 <div class="rprog" aria-hidden="true"><div class="rprog__bar" data-rprog></div></div>
 <nav class="srail" data-srail aria-label="Article sections"></nav>
 <GlassNav />
@@ -130,7 +146,7 @@ import GlassNav from '../../components/GlassNav.astro';
   <a class="sitenav__pill" href="/book">Book a call</a>
 </nav>
 
-<main class="post">
+<main class="post" id="main">
   <article>
     <header class="post__head">
       <a class="post__back mono" href="/blog">&larr; All articles</a>

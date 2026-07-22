@@ -213,7 +213,7 @@ body.eng-body.res-body { background: #e6dfd0; }
   padding: clamp(2rem, 3vw, 2.8rem) clamp(1.9rem, 2.6vw, 2.8rem) clamp(2.4rem, 3.4vw, 3rem);
   counter-reset: step;
 }
-.res__step h4 {
+.res__step h3 {
   margin: 0;
   display: flex;
   align-items: center;
@@ -224,7 +224,7 @@ body.eng-body.res-body { background: #e6dfd0; }
   text-transform: uppercase;
   color: var(--gold-text);
 }
-.res__step h4::before {
+.res__step h3::before {
   counter-increment: step;
   content: counter(step);
   display: grid;

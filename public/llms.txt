@@ -1,0 +1,46 @@
+# ORL Media
+
+> Growth infrastructure for B2B SaaS and AI companies. ORL Media installs four systems — AI search visibility, buying-signal intelligence, deal-stage proof, and monetization — on one shared analytics layer, then hands them over. Clients own what gets installed and keep running it after the engagement ends.
+
+ORL Media works with seed to Series B B2B SaaS and AI companies, typically $1M–$20M ARR. Each system is accountable to exactly one number, and all four report into a single Metrics layer that is bundled into every engagement and never sold separately.
+
+The four systems:
+
+- **Visibility** (live) — answer engine optimization. Maps the 100+ real buying questions in a category, scores how four AI engines answer each today, then engineers the content, entity and citation layers needed to get cited. Metric: Share of Answer.
+- **Signals** (limited, capped at 5 concurrent clients) — buying-window detection. Reads signal convergence (funding, hiring, stack changes, competitor churn) to flag accounts entering a buying window. Metric: qualified meetings booked.
+- **Proof** (design partner, 3 seats) — deal-stage evidence. Maps where deals stall, builds third-party evidence against those stall points, and fires it into live deals at the stall moment. Metric: no-decision rate.
+- **Pricing** (in build, waitlist open) — monetization and expansion. Instruments consumption, tests packaging against real conversion, and triggers expansion plays. Metric: net revenue per account.
+
+Every engagement starts with the AI Visibility Audit: fixed scope, 10 business days, no retainer required.
+
+## Core pages
+
+- [Home](https://www.orlmedia.agency/): What ORL Media installs and the problems each system solves.
+- [The Growth Engine](https://www.orlmedia.agency/engine/): All four systems, the Metrics layer, and how they run together.
+- [AI Visibility Audit](https://www.orlmedia.agency/audit/): The fixed-scope 10-day entry point to every engagement.
+- [Results](https://www.orlmedia.agency/results/): Outcomes and evidence.
+- [About](https://www.orlmedia.agency/about/): Who ORL Media is and how it operates.
+- [Book a call](https://www.orlmedia.agency/book/): Scoping conversation and pricing.
+- [Pricing summary](https://www.orlmedia.agency/pricing.md): Machine-readable pricing overview.
+
+## Systems
+
+- [Visibility](https://www.orlmedia.agency/engine/visibility/): Answer engine optimization; Share of Answer.
+- [Signals](https://www.orlmedia.agency/engine/signals/): Buying-window detection; qualified meetings.
+- [Proof](https://www.orlmedia.agency/engine/proof/): Deal-stage evidence; no-decision rate.
+- [Pricing](https://www.orlmedia.agency/engine/pricing/): Monetization and expansion; net revenue per account.
+
+## Writing
+
+- [The ORL Journal](https://www.orlmedia.agency/blog/): Index of all articles.
+- [Buying windows: the missing layer in modern GTM](https://www.orlmedia.agency/blog/buying-windows/): Field guide to buying-window intelligence.
+- [If AI doesn't cite you, you don't exist](https://www.orlmedia.agency/blog/ai-search-invisible/): How AI shortlists get formed.
+- [Share of Answer: the visibility metric that replaced rankings](https://www.orlmedia.agency/blog/share-of-answer/): Instrumenting AI visibility.
+- [CAC payback hit 18 months](https://www.orlmedia.agency/blog/cac-payback-18-months/): Pipeline economics in 2026.
+- [The AI churn wave is real](https://www.orlmedia.agency/blog/ai-churn-wave/): NRR compression in AI products.
+
+## Notes
+
+- Contact and scoping happen at https://www.orlmedia.agency/book/
+- Sitemap: https://www.orlmedia.agency/sitemap-index.xml
+- All crawlers, including AI crawlers, are permitted. See https://www.orlmedia.agency/robots.txt

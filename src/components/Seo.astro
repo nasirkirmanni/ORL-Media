@@ -50,6 +50,10 @@ const ogImage = image ? new URL(image, base).href : undefined;
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+{/* Feed autodiscovery — how readers, aggregators and several AI crawlers
+    find the journal without being told it exists. Site-wide, not just on
+    /blog/, because that is the convention clients look for. */}
+<link rel="alternate" type="application/rss+xml" title="The ORL Journal" href={new URL('/rss.xml', base).href} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 
 <!-- Open Graph -->

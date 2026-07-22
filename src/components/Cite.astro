@@ -1,0 +1,75 @@
+---
+/* ─────────────────────────────────────────────────────────────
+   Cite.astro — renders the source link for a published statistic.
+
+   Usage:  <Cite id="cold-email-reply-1-2" />
+
+   Behaviour is deliberately asymmetric:
+     • url set   → renders a real, visible, outbound <a>. Citing
+                   sources is the top-ranked GEO factor, and the
+                   link has to be crawlable to count, so it is a
+                   plain <a href> — not a JS tooltip.
+     • url null  → renders NOTHING in production. An uncited claim
+                   stays plain text rather than shipping a dead or
+                   placeholder link, which would be a worse signal
+                   than no link at all.
+                   In `astro dev` it renders a visible red TODO
+                   marker so gaps are obvious while writing.
+
+   rel="nofollow" is intentionally NOT set: these are genuine
+   editorial citations and should pass trust to the source.
+   ───────────────────────────────────────────────────────────── */
+import { cite, CITATIONS } from '../lib/citations';
+
+interface Props {
+  id: string;
+  /** Render inline in prose rather than as a superscript marker. */
+  inline?: boolean;
+}
+const { id, inline = false } = Astro.props;
+
+const c = cite(id);
+const known = Boolean(CITATIONS[id]);
+const isDev = import.meta.env.DEV;
+---
+
+{c ? (
+  <a
+    class={inline ? 'cite cite--inline' : 'cite'}
+    href={c.href}
+    target="_blank"
+    rel="noopener external"
+    title={c.claim}
+  >{inline ? c.label : '†'}</a>
+) : isDev ? (
+  <span class="cite cite--todo" title={known ? `TODO: add url for "${id}"` : `UNKNOWN citation id: ${id}`}>
+    [{known ? 'TODO' : 'BAD ID'}:{id}]
+  </span>
+) : null}
+
+<style>
+  .cite {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.72em;
+    vertical-align: super;
+    line-height: 0;
+    color: var(--accent, #8a5320);
+    text-decoration: none;
+    margin-inline-start: 0.15em;
+  }
+  .cite:hover { text-decoration: underline; }
+  .cite--inline {
+    vertical-align: baseline;
+    font-size: 0.82em;
+    margin-inline-start: 0.35em;
+  }
+  .cite--todo {
+    vertical-align: baseline;
+    font-size: 0.7em;
+    color: #b3261e;
+    background: #fdeceb;
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    cursor: help;
+  }
+</style>

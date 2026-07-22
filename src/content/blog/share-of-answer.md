@@ -1,5 +1,7 @@
 ---
 title: "Share of Answer: the visibility metric that replaced rankings"
+seoTitle: "Share of Answer: The Metric Replacing Rankings"
+seoDescription: "Average position measures the wrong thing now. How to instrument, benchmark and grow the share of AI answers that name your brand."
 description: "Average position measures the wrong thing now. How to instrument, benchmark, and grow the percentage of AI answers that name your brand — the number that decides whether you make the shortlist."
 date: 2026-06-18
 category: "AI Search"

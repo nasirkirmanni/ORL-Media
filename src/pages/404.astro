@@ -1,0 +1,108 @@
+---
+import '../styles/global.css';
+import '../styles/engine.css';
+import Seo from '../components/Seo.astro';
+import GlassNav from '../components/GlassNav.astro';
+
+/* ─────────────────────────────────────────────────────────────
+   404 — recovery, not a dead end.
+
+   Previously Vercel's default 404 page: correct status code, but no
+   navigation, no branding, and no route back into the site. A crawler
+   landing here from a stale link got a valid 404 and nothing else; a
+   human got a blank wall.
+
+   noindex is set explicitly. Astro emits this to /404.html and Vercel
+   serves it with a genuine 404 status, so this is a hard 404 and not a
+   soft-404 (a 200 that merely looks like an error page), which is the
+   failure mode Google actually penalises.
+   ───────────────────────────────────────────────────────────── */
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <Seo
+    title="Page not found — ORL Media"
+    description="That page doesn’t exist. Here’s the way back into the Growth Engine."
+    noindex={true}
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body class="blg-body eng-body">
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="sitenav sitenav--page is-visible" aria-label="Site">
+  <a class="sitenav__brand" href="/">
+    <span class="sitenav__mark" aria-hidden="true"></span>
+    ORL
+  </a>
+  <div class="sitenav__links">
+    <a href="/engine" class="sitenav__link">Engine</a>
+    <a href="/audit" class="sitenav__link">Audit</a>
+    <a href="/results" class="sitenav__link">Results</a>
+    <a href="/about" class="sitenav__link">About</a>
+    <a href="/blog" class="sitenav__link">Blog</a>
+  </div>
+  <a class="sitenav__pill" href="/book">Book a call</a>
+</nav>
+<GlassNav />
+
+<main class="mod" id="main">
+  <section class="mod__cta nf" aria-label="Page not found">
+    <div class="mod__inner">
+      <p class="mod__eyebrow mono">Error 404</p>
+      <h1 class="mod__ctah">This page isn’t in the answer either.</h1>
+      <p class="mod__ctas">
+        The URL you followed doesn’t exist — it may have moved, or the link
+        may be stale. Everything below still works.
+      </p>
+
+      <ul class="nf__links">
+        <li><a href="/engine">The Growth Engine</a><span>All four systems and the metrics layer</span></li>
+        <li><a href="/audit">AI Visibility Audit</a><span>Fixed scope, 10 business days</span></li>
+        <li><a href="/blog">The ORL Journal</a><span>Field notes on AI search and pipeline</span></li>
+        <li><a href="/results">Results</a><span>One hard number per system</span></li>
+        <li><a href="/about">About</a><span>Why we install rather than rent</span></li>
+      </ul>
+
+      <a class="mod__ctabtn" href="/">Back to the homepage
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </section>
+</main>
+
+<style>
+  .nf { padding-top: 8rem; text-align: left; }
+  .nf__links {
+    list-style: none;
+    margin: 2.5rem 0;
+    padding: 0;
+    max-width: 40rem;
+    border-top: 1px solid #e6ddcc;
+  }
+  .nf__links li { border-bottom: 1px solid #e6ddcc; }
+  .nf__links a {
+    display: block;
+    padding: 1.1rem 0 0.2rem;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: #1f1d19;
+    text-decoration: none;
+  }
+  .nf__links a:hover { color: var(--accent, #8a5320); }
+  .nf__links span {
+    display: block;
+    padding-bottom: 1.1rem;
+    font-size: 0.92rem;
+    color: #575046;
+  }
+</style>
+
+</body>
+</html>

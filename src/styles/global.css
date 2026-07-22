@@ -5360,3 +5360,26 @@ html.stack-reveal .why::before { content: none; }
   .eng__phase p,
   .mod__stepdesc { font-size: 0.95rem; line-height: 1.6; }
 }
+
+/* ── skip link ────────────────────────────────────────────────
+   First focusable element on every page. Off-screen until focused,
+   NOT display:none — a hidden-from-focus skip link is worse than
+   none, because keyboard users are told it exists and it isn't.
+   The site is heavy on fixed navs and long animated sections, so
+   the tab distance to real content was substantial. */
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -3.5rem;
+  z-index: 9999;
+  padding: 0.65rem 1rem;
+  background: #1f1d19;
+  color: #fff;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.82rem;
+  border-radius: 0 0 6px 6px;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip-link:focus { top: 0; outline: 2px solid #c49a5e; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .skip-link { transition: none; } }

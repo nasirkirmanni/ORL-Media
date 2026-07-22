@@ -622,3 +622,57 @@ html.vhpin-on .aeo__enter > .aeo__shift { will-change: transform; }
   html.vhpin-on .aeo__enterslot { margin-top: 0; }
   html.vhpin-on .aeo__enter { overflow: visible; will-change: auto; }
 }
+
+/* ── answer passage ───────────────────────────────────────────
+   Standalone 40–60 word answer under the top H2, written to be
+   extractable on its own by an answer engine. */
+.aeo__answer {
+  margin: 1.4rem auto 0;
+  max-width: 40rem;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--aeo-ink-2, #4a463e);
+}
+
+/* ── FAQ ──────────────────────────────────────────────────────
+   Same treatment as the homepage FAQ so the pages read as one
+   system. Source array is m.faq, shared with the JSON-LD. */
+.aeo__faqlist { max-width: 44rem; margin: 2.25rem auto 0; text-align: left; }
+.aeo__faqitem { border-top: 1px solid #e6ddcc; }
+.aeo__faqitem:last-child { border-bottom: 1px solid #e6ddcc; }
+.aeo__faqitem summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.35rem 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.2rem;
+  color: #1f1d19;
+}
+.aeo__faqitem summary::-webkit-details-marker { display: none; }
+.aeo__faqitem summary::after {
+  content: '+';
+  flex: none;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--acc-d, #8a5320);
+  transition: transform 0.2s ease;
+}
+.aeo__faqitem[open] summary::after { content: '\2212'; }
+.aeo__faqitem p {
+  margin: 0 0 1.4rem;
+  font-size: 0.97rem;
+  line-height: 1.7;
+  color: #575046;
+}
+@media (max-width: 720px) {
+  .aeo__faqitem summary { font-size: 1.06rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aeo__faqitem summary::after { transition: none; }
+}
