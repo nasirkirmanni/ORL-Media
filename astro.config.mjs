@@ -13,8 +13,12 @@ const postDates = Object.fromEntries(
     .filter((f) => f.endsWith('.md'))
     .map((f) => {
       const src = readFileSync(`./src/content/blog/${f}`, 'utf8');
-      const updated = src.match(/^updated:\s*(\d{4}-\d{2}-\d{2})/m);
-      const date = src.match(/^date:\s*(\d{4}-\d{2}-\d{2})/m);
+      /* The optional quote class is load-bearing: YAML permits `date: 2026-06-18`
+         and `date: "2026-06-18"` interchangeably, and without it the first
+         quoted date anyone writes silently drops that URL's lastmod — no error,
+         no warning, just a sitemap entry that quietly stops declaring freshness. */
+      const updated = src.match(/^updated:\s*['"]?(\d{4}-\d{2}-\d{2})/m);
+      const date = src.match(/^date:\s*['"]?(\d{4}-\d{2}-\d{2})/m);
       return [`/blog/${f.replace(/\.md$/, '')}/`, (updated ?? date)?.[1] ?? null];
     })
     .filter(([, d]) => d),

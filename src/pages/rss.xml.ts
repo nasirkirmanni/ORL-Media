@@ -25,6 +25,10 @@ export const GET: APIRoute = async () => {
     (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
   );
 
+  /* pubDate below is the ORIGINAL publication date, never `updated`. Feeding
+     an edit date into pubDate resurfaces an old post as new in every reader
+     the next time it is touched. Dormant today only because no post carries
+     `updated` yet — which is exactly when it is cheapest to fix. */
   const items = posts
     .map((p) => {
       const url = `${SITE}/blog/${p.id}/`;
@@ -34,7 +38,7 @@ export const GET: APIRoute = async () => {
       <guid isPermaLink="true">${url}</guid>
       <description>${esc(p.data.description)}</description>
       <category>${esc(p.data.category)}</category>
-      <pubDate>${(p.data.updated ?? p.data.date).toUTCString()}</pubDate>
+      <pubDate>${p.data.date.toUTCString()}</pubDate>
     </item>`;
     })
     .join('\n');
